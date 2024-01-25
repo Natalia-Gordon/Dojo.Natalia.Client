@@ -1,0 +1,70 @@
+>npm uninstall -g @angular/cli
+output:
+removed 230 packages in 1s
+
+>npm cache clean --force
+output:
+npm WARN using --force Recommended protections disabled.
+
+>npm install -g @angular/cli@16
+npm WARN deprecated @npmcli/move-file@2.0.1: This functionality has been moved to @npmcli/fs
+
+added 269 packages in 55s
+
+39 packages are looking for funding
+  run `npm fund` for details
+
+>ng version
+output:
+     _                      _                 ____ _     ___
+    / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+   / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
+  / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+ /_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+                |___/
+    
+
+Angular CLI: 16.2.12
+Node: 20.11.0 (Unsupported)
+Package Manager: npm 10.3.0
+OS: win32 x64
+
+Angular:
+...
+
+Package                      Version
+------------------------------------------------------
+@angular-devkit/architect    0.1602.12 (cli-only)
+@angular-devkit/core         16.2.12 (cli-only)
+@angular-devkit/schematics   16.2.12 (cli-only)
+@schematics/angular          16.2.12 (cli-only)
+
+Warning: The current version of Node (20.11.0) is not supported by Angular.
+
+to fix this Warning: Unistale node fro windows program files and download 18.19.0 version and install
+https://nodejs.org/download/release/v18.19.0/
+
+>ng version
+output:
+     _                      _                 ____ _     ___
+    / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+   / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
+  / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+ /_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+                |___/
+    
+
+Angular CLI: 16.2.12
+Node: 18.19.0
+Package Manager: npm 10.3.0
+OS: win32 x64
+
+Angular:
+...
+
+Package                      Version
+------------------------------------------------------
+@angular-devkit/architect    0.1602.12 (cli-only)
+@angular-devkit/core         16.2.12 (cli-only)
+@angular-devkit/schematics   16.2.12 (cli-only)
+@schematics/angular          16.2.12 (cli-only)
