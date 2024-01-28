@@ -1,0 +1,17 @@
+Install github
+Oper VS Code as Administrator
+Open powershel Terminal
+
+>winget install --id Git.Git -e --source winget
+output:
+Found Git [Git.Git] Version 2.42.0.2
+This application is licensed to you by its owner.
+Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Downloading https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/Git-2.42.0.2-64-bit.exe
+  ██████████████████████████████  58.4 MB / 58.4 MB
+Successfully verified installer hash
+Starting package install...
+Successfully installed
+
+>git config --global user.name "Your Name"
+>git config --global user.email "Your Email"

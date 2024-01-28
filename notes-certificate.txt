@@ -1,0 +1,28 @@
+get url https://github.com/FiloSottile/mkcert
+first, install mk currently
+>choco install mkcert
+
+>mkdir ssl
+output:
+
+
+    Directory: D:\Projects\Repos\Bujinkan.Dojo.Natalia\Client\natalia-dojo-website
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         1/28/2024  12:05 PM                ssl
+
+>cd ssl
+
+>mkcert -install
+output:
+The local CA is now installed in the system trust store! ⚡️
+
+>mkcert localhost
+Created a new certificate valid for the following names 📜
+ - "localhost"
+
+The certificate is at "./localhost.pem" and the key at "./localhost-key.pem" ✅
+
+It will expire on 28 April 2026 🗓
