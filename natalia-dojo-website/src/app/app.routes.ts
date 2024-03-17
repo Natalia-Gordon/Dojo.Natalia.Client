@@ -7,6 +7,7 @@ import { WorkoutsComponent } from './workouts/workouts.component';
 import { TeamComponent } from './team/team.component';
 import { BlogComponent } from './blog/blog.component';
 import { TestimonialComponent } from './testimonial/testimonial.component';
+import { ArticlesComponent } from './blog/articles/articles.component';
 
 export const routes: Routes = [
     {path: "", component: HomeComponent},
@@ -15,5 +16,6 @@ export const routes: Routes = [
     {path: "workouts", component: WorkoutsComponent},
     {path: "team", component: TeamComponent},
     {path: "blog", component: BlogComponent},
-    {path: "testimonial", component: TestimonialComponent}
+    {path: "testimonial", component: TestimonialComponent},
+    {path: "articles", component: ArticlesComponent}
 ];
