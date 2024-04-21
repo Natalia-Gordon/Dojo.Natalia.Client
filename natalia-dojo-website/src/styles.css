@@ -78,9 +78,9 @@ h6,
 .navbar-dark .navbar-nav .nav-link {
     font-family: 'Oswald', sans-serif;
     margin-right: 30px;
-    padding: 40px 0;
+    padding: 30px 0;
     color: var(--light);
-    font-size: 17px;
+    font-size: 18px;
     text-transform: uppercase;
     outline: none;
 }
