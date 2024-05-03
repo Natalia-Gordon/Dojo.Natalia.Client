@@ -11,7 +11,7 @@ import { ArticlesComponent } from './blog/articles/articles.component';
 import { Zen1Component } from './blog/articles/zen/zen-1/zen-1.component';
 
 export const routes: Routes = [
-    {path: "", component: HomeComponent},
+    {path: "", redirectTo: "home", pathMatch: "full"},
     {path: "home", component: HomeComponent},
     {path: "about", component: AboutComponent},
     {path: "contact", component: ContactComponent},
