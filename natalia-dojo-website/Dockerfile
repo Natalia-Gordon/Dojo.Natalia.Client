@@ -5,6 +5,7 @@ FROM node:20.11.0-alpine as builder
 
 # Set the working directory
 WORKDIR /usr/src/app
+EXPOSE 8080
 
 COPY package.json package-lock.json ./
 
