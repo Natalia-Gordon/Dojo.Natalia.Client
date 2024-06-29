@@ -20,4 +20,4 @@ docker push me-west1-docker.pkg.dev/ninjutsu/dojo-website/natalia:latest
 gcloud artifacts docker images list me-west1-docker.pkg.dev/ninjutsu/dojo-website/natalia --include-tags
 
 # Deploy on Cloud Run
-gcloud run deploy --image=me-west1-docker.pkg.dev/ninjutsu/dojo-website:latest --port=3000 --region=us-central1 --allow-unauthenticated --platform=managed --command=gotenberg gotenberg
+gcloud run deploy --image=me-west1-docker.pkg.dev/ninjutsu/dojo-website/natalia:latest --port=3000 --region=us-central1 --allow-unauthenticated --platform=managed --command=gotenberg gotenberg
