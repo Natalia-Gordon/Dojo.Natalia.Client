@@ -1,6 +1,4 @@
 steps:
-- options:
-  logging: CLOUD_LOGGING_ONLY
 # Build the container image
 - name: "grc.io/cloud-builders/docker"
   dir: "natalia-dojo-website"
@@ -27,5 +25,8 @@ steps:
     - '--max-instances'
     - '1'
     - '--allow-unauthenticated'
+# This fix this error Failed to trigger build: generic::invalid_argument: if 'build.service_account' is specified, the build must either (a) specify 'build.logs_bucket', (b) use the REGIONAL_USER_OWNED_BUCKET build.options.default_logs_bucket_behavior option, or (c) use either CLOUD_LOGGING_ONLY / NONE logging options
+options:
+  logging: CLOUD_LOGGING_ONLY
 images:
 - 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia'
