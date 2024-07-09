@@ -1,0 +1,29 @@
+steps:
+# Build the container image
+- name: "grc.io/cloud-builders/docker"
+  dir: "natalia-dojo-website"
+  args: ['build', '-t', 'me-west1-docker.pkg.dev/ninjutsu/$PROJECT_ID/natalia:$COMMIT_SHA', '.']
+#Push the container image to Cloud Registry
+- name: "grc.io/cloud-builders/docker"
+  args: ['push', 'me-west1-docker.pkg.dev/ninjutsu/$PROJECT_ID/natalia:$COMMIT_SHA']
+# Deploy container image to Cloud Run
+- name: "grc.io/google.com/cloudsdktool/cloud-sdk"
+  entrypot: gcloud
+  args:
+    - 'beta'
+    - 'run'
+    - 'deploy'
+    - 'natalia'
+    - '--image'
+    - 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia:$COMMIT_SHA'
+    - '--region'
+    - 'me-west1'
+    - '--platform'
+    - 'managed'
+    - '--min-instances'
+    - '0'
+    - '--max-instances'
+    - '1'
+    - '--allow-unauthenticated'
+images:
+- 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia'
