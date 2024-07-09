@@ -1,4 +1,6 @@
 steps:
+- options:
+  logging: CLOUD_LOGGING_ONLY
 # Build the container image
 - name: "grc.io/cloud-builders/docker"
   dir: "natalia-dojo-website"
