@@ -20,7 +20,7 @@ COPY . ./
 # Generate the build of the application
 RUN npm run build --configuration=production
 
-CMD ["ng", "serve", "--host", "0.0.0.0", "--disableHostCheck", "true"]
+CMD ["ng", "serve", "--host", "0.0.0.0"]
 
 EXPOSE $PORT
 EXPOSE 8080
