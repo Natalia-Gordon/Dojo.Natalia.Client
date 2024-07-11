@@ -23,3 +23,4 @@ RUN npm run build --configuration=production
 CMD ["ng", "serve", "--host", "0.0.0.0", "--disableHostCheck", "true"]
 
 EXPOSE $PORT
+EXPOSE 8080
