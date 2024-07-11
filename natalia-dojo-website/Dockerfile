@@ -18,8 +18,8 @@ RUN npm install
 COPY . ./
 
 # Generate the build of the application
-RUN npm run build --prod
+RUN npm run build --configuration=production
 
-CMD ["ng", "serve", "--host", "0.0.0.0"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--disableHostCheck", "true"]
 
 EXPOSE $PORT

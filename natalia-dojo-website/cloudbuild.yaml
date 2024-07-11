@@ -16,6 +16,8 @@ steps:
     - 'natalia'
     - '--image'
     - '$IMAGE'
+    - '--port'
+    - '3000'
     - '--region'
     - '$REGION'
     - '--platform'
