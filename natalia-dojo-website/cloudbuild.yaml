@@ -15,7 +15,7 @@ steps:
     - 'deploy'
     - 'natalia'
     - '--image'
-    - '$IMAGE'
+    - 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia:$COMMIT_SHA'
     - '--port'
     - '3000'
     - '--region'
