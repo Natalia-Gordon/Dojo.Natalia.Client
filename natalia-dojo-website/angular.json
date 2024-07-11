@@ -13,7 +13,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/natalia-dojo-website",
+            "outputPath": {
+              "base": "dist/natalia-dojo-website"
+            },
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
