@@ -34,8 +34,8 @@ export class SharedContactComponent implements OnInit {
   onSubmit(FormData : any) {
     var myMessage = "Hello, my name is " + FormData.Fullname + 
     " I am contacting you about " + FormData.Subject + 
-    " details message " + FormData.Message + "." +
-    "My email is " + FormData.Email;
+    " details message " + FormData.Message + " \n" +
+    "My contact email " + FormData.Email;
     this.contactApi.SendMessageToWatsapp(this.phone, myMessage);
   }
 }
