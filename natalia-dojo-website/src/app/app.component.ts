@@ -14,7 +14,7 @@ import * as jQuery from "jquery";
     imports: [RouterOutlet, HeaderComponent, FooterComponent, HomeComponent]
 })
 export class AppComponent {
-  title = 'natalia-dojo-website';
+  title = 'Natalia Ninjutsu Dojo';
   constructor() {
     setTheme('bs5'); // or 'bs4'
   }

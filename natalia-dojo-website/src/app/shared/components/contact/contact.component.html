@@ -1,0 +1,23 @@
+<div class="bg-dark p-5">
+    <form [formGroup]="FormData" (ngSubmit)="onSubmit(FormData.value)">
+        <div class="row g-3">
+            <div class="col-6">
+                <input type="text" class="form-control bg-light border-0 px-4" name="Fullname" placeholder="שם פרטי ושם משפחה" style="height: 55px;" formControlName="Fullname">
+            </div>
+            <div class="col-6">
+                <input type="email" class="form-control bg-light border-0 px-4" name="Email" placeholder="כתובת מייל" style="height: 55px;" formControlName="Email">
+            </div>
+            <div class="col-12">
+                <input type="text" class="form-control bg-light border-0 px-4" name="Subject" placeholder="נושא" style="height: 55px;" formControlName="Subject">
+            </div>
+            <div class="col-12">
+                <textarea class="form-control bg-light border-0 px-4 py-3" rows="4" name="Message" placeholder="הודעה" formControlName="Message"></textarea>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary w-100 py-3 px-5" >שלח הודעה</button>
+                <!--<a href="https://api.whatsapp.com/send?phone=+972547007906&text=רוצה להצטרף לאימון נינג&#39;וטסו" class="btn btn-primary w-100 py-3 px-5">שלח הודעה</a>
+            -->
+            </div>
+        </div>
+    </form>
+</div>
