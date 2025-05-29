@@ -20,11 +20,13 @@ import { ZenTermsHattoComponent } from "./hatto/hatto.component";
 import { ZenTermsHojoComponent } from "./hojo/hojo.component";
 import { ZenTermsHaikuComponent } from "./haiku/haiku.component";
 import { ZenTermsZazenComponent } from "./zazen/zazen.component";
+import { ZenTermsZendoComponent } from "./zendo/zendo.component";
+import { ZenTermsZenkiComponent } from "./zenki/zenki.component";
 
 @Component({
   selector: 'app-terms',
   standalone: true,
-  imports: [ZenSidebarComponent, CommentsComponent, SharedHeroComponent, ZenTermsAnAtamanComponent, ZenTermsIgyoComponent, ZenTermsEisaiComponent, ZenTermsEngakujiComponent, ZenTermsAsangaComponent, ZenTermsBuddhaComponent, ZenTermsBodhidahrmaComponent, ZenTermsBodhisatavaComponent, ZenTermsButsudenComponent, ZenTermsGazenIchimiComponent, ZenTermsGyochaShikiComponent, ZenTermsGenkanComponent, ZenTermsDojoComponent, ZenTermsHabokuComponent, ZenTermsHattoComponent, ZenTermsHojoComponent, ZenTermsHaikuComponent, ZenTermsZazenComponent],
+  imports: [ZenSidebarComponent, CommentsComponent, SharedHeroComponent, ZenTermsAnAtamanComponent, ZenTermsIgyoComponent, ZenTermsEisaiComponent, ZenTermsEngakujiComponent, ZenTermsAsangaComponent, ZenTermsBuddhaComponent, ZenTermsBodhidahrmaComponent, ZenTermsBodhisatavaComponent, ZenTermsButsudenComponent, ZenTermsGazenIchimiComponent, ZenTermsGyochaShikiComponent, ZenTermsGenkanComponent, ZenTermsDojoComponent, ZenTermsHabokuComponent, ZenTermsHattoComponent, ZenTermsHojoComponent, ZenTermsHaikuComponent, ZenTermsZazenComponent, ZenTermsZendoComponent, ZenTermsZenkiComponent],
   templateUrl: './terms.component.html',
   styleUrl: './terms.component.css'
 })

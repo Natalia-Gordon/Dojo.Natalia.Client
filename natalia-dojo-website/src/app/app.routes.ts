@@ -22,6 +22,7 @@ import { ZenTermsBuddhaComponent } from './sensei/articles/zen/terms/buddha/budd
 import { ZenTermsBodhidahrmaComponent } from './sensei/articles/zen/terms/bodhidahrma/bodhidahrma.component';
 import { ZenTermsBodhisatavaComponent } from './sensei/articles/zen/terms/bodhisatava/bodhisatava.component';
 import { ZenTermsDojoComponent } from './sensei/articles/zen/terms/dojo/dojo.component';
+import { ZenTermsZazenComponent } from './sensei/articles/zen/terms/zazen/zazen.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
@@ -44,6 +45,8 @@ export const routes: Routes = [
     {path: "sensei/articles/zen/terms/bodhidahrma", component: ZenTermsBodhidahrmaComponent},
     {path: "sensei/articles/zen/terms/bodhisatava", component: ZenTermsBodhisatavaComponent},
     {path: "sensei/articles/zen/terms/dojo", component: ZenTermsDojoComponent},
+    {path: "sensei/articles/zen/terms/zazen", component: ZenTermsZazenComponent},
+    {path: "sensei/articles/zen/terms/zenki", component: ZenTermsZazenComponent},
     {path: "sensei/articles/zen/introduction", component: SenseiArticlesZenIntroductionComponent},
     {path: "sensei/team", component: SenseiTeamComponent},
     {path: "sensei/team/tania", component: SenseiTeamTaniaComponent}
