@@ -8,5 +8,12 @@ import { Component } from '@angular/core';
   styleUrl: './footer.component.css'
 })
 export class FooterComponent {
+  onSave() {
+    console.log(' saved!');
+  }
 
+  onSubmit() {
+    console.log('Form submitted!');
+    // Add your form processing logic here
+  }
 }

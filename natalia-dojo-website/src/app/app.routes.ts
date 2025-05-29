@@ -16,6 +16,12 @@ import { SenseiTeamTaniaComponent } from './sensei/team/tania/tania.component';
 import { SenseiTeamComponent } from './sensei/team/team.component';
 import { SenseiArticlesNinjutsuComponent } from './sensei/articles/ninjutsu/ninjutsu.component';
 import { SenseiArticlesZenIntroductionComponent } from './sensei/articles/zen/introduction/introduction.component';
+import { ZenTermsComponent } from './sensei/articles/zen/terms/terms.component';
+import { ZenTermsAnAtamanComponent } from './sensei/articles/zen/terms/an-ataman/an-ataman.component';
+import { ZenTermsBuddhaComponent } from './sensei/articles/zen/terms/buddha/buddha.component';
+import { ZenTermsBodhidahrmaComponent } from './sensei/articles/zen/terms/bodhidahrma/bodhidahrma.component';
+import { ZenTermsBodhisatavaComponent } from './sensei/articles/zen/terms/bodhisatava/bodhisatava.component';
+import { ZenTermsDojoComponent } from './sensei/articles/zen/terms/dojo/dojo.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
@@ -32,6 +38,12 @@ export const routes: Routes = [
     {path: "sensei/articles", component: SenseiArticlesComponent},
     {path: "sensei/articles/ninjutsu", component: SenseiArticlesNinjutsuComponent},
     {path: "sensei/articles/zen", component: SenseiArticlesZenComponent},
+    {path: "sensei/articles/zen/terms", component: ZenTermsComponent},
+    {path: "sensei/articles/zen/terms/an-ataman", component: ZenTermsAnAtamanComponent},
+    {path: "sensei/articles/zen/terms/buddha", component: ZenTermsBuddhaComponent},
+    {path: "sensei/articles/zen/terms/bodhidahrma", component: ZenTermsBodhidahrmaComponent},
+    {path: "sensei/articles/zen/terms/bodhisatava", component: ZenTermsBodhisatavaComponent},
+    {path: "sensei/articles/zen/terms/dojo", component: ZenTermsDojoComponent},
     {path: "sensei/articles/zen/introduction", component: SenseiArticlesZenIntroductionComponent},
     {path: "sensei/team", component: SenseiTeamComponent},
     {path: "sensei/team/tania", component: SenseiTeamTaniaComponent}
