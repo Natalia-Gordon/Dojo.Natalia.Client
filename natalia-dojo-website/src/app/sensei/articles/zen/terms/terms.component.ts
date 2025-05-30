@@ -22,11 +22,27 @@ import { ZenTermsHaikuComponent } from "./haiku/haiku.component";
 import { ZenTermsZazenComponent } from "./zazen/zazen.component";
 import { ZenTermsZendoComponent } from "./zendo/zendo.component";
 import { ZenTermsZenkiComponent } from "./zenki/zenki.component";
+import { ZenTermsObakuComponent } from "./obaku/obaku.component";
+import { ZenTermsYokyokuComponent } from "./yokyoku/yokyoku.component";
+import { ZenTermsMokushozenComponent } from "./mokushozen/mokushozen.component";
+import { ZenTermsMushiDokugoComponent } from "./mushi-dokugo/mushi-dokugo.component";
+import { ZenTermsMenguComponent } from "./mengu/mengu.component";
+import { ZenTermsSotoSenComponent } from "./soto-sen/soto-sen.component";
+import { ZenTermsSunyataComponent } from "./sunyata/sunyata.component";
+import { ZenTermsSatoriComponent } from "./satori/satori.component";
+import { ZenTermsKannaZenComponent } from "./kanna-zen/kanna-zen.component";
+import { ZenTermsKojoNoShikanComponent } from "./kojo-no-shikan/kojo-no-shikan.component";
+import { ZenTermsKinhinComponent } from "./kinhin/kinhin.component";
+import { ZenTermsRengaComponent } from "./renga/renga.component";
+import { ZenTermsRandoriComponent } from "./randori/randori.component";
+import { ZenTermsShuryoComponent } from "./shuryo/shuryo.component";
+import { ZenTermsShikentazaComponent } from "./shikentaza/shikentaza.component";
+import { ZenTermsJijiyuzamaiComponent } from "./jijiyuzamai/jijiyuzamai.component";
 
 @Component({
   selector: 'app-terms',
   standalone: true,
-  imports: [ZenSidebarComponent, CommentsComponent, SharedHeroComponent, ZenTermsAnAtamanComponent, ZenTermsIgyoComponent, ZenTermsEisaiComponent, ZenTermsEngakujiComponent, ZenTermsAsangaComponent, ZenTermsBuddhaComponent, ZenTermsBodhidahrmaComponent, ZenTermsBodhisatavaComponent, ZenTermsButsudenComponent, ZenTermsGazenIchimiComponent, ZenTermsGyochaShikiComponent, ZenTermsGenkanComponent, ZenTermsDojoComponent, ZenTermsHabokuComponent, ZenTermsHattoComponent, ZenTermsHojoComponent, ZenTermsHaikuComponent, ZenTermsZazenComponent, ZenTermsZendoComponent, ZenTermsZenkiComponent],
+  imports: [ZenSidebarComponent, CommentsComponent, SharedHeroComponent, ZenTermsAnAtamanComponent, ZenTermsIgyoComponent, ZenTermsEisaiComponent, ZenTermsEngakujiComponent, ZenTermsAsangaComponent, ZenTermsBuddhaComponent, ZenTermsBodhidahrmaComponent, ZenTermsBodhisatavaComponent, ZenTermsButsudenComponent, ZenTermsGazenIchimiComponent, ZenTermsGyochaShikiComponent, ZenTermsGenkanComponent, ZenTermsDojoComponent, ZenTermsHabokuComponent, ZenTermsHattoComponent, ZenTermsHojoComponent, ZenTermsHaikuComponent, ZenTermsZazenComponent, ZenTermsZendoComponent, ZenTermsZenkiComponent, ZenTermsObakuComponent, ZenTermsYokyokuComponent, ZenTermsMokushozenComponent, ZenTermsMushiDokugoComponent, ZenTermsMenguComponent, ZenTermsSotoSenComponent, ZenTermsSunyataComponent, ZenTermsSatoriComponent, ZenTermsKannaZenComponent, ZenTermsKojoNoShikanComponent, ZenTermsKinhinComponent, ZenTermsRengaComponent, ZenTermsRandoriComponent, ZenTermsShuryoComponent, ZenTermsShikentazaComponent, ZenTermsJijiyuzamaiComponent],
   templateUrl: './terms.component.html',
   styleUrl: './terms.component.css'
 })

@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-mokushozen',
+  selector: 'app-zen-terms-mokushozen',
   standalone: true,
   imports: [],
   templateUrl: './mokushozen.component.html',
   styleUrl: './mokushozen.component.css'
 })
-export class MokushozenComponent {
+export class ZenTermsMokushozenComponent {
 
 }

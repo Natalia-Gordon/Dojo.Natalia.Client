@@ -23,6 +23,12 @@ import { ZenTermsBodhidahrmaComponent } from './sensei/articles/zen/terms/bodhid
 import { ZenTermsBodhisatavaComponent } from './sensei/articles/zen/terms/bodhisatava/bodhisatava.component';
 import { ZenTermsDojoComponent } from './sensei/articles/zen/terms/dojo/dojo.component';
 import { ZenTermsZazenComponent } from './sensei/articles/zen/terms/zazen/zazen.component';
+import { ZenTermsMenguComponent } from './sensei/articles/zen/terms/mengu/mengu.component';
+import { ZenTermsZenkiComponent } from './sensei/articles/zen/terms/zenki/zenki.component';
+import { ZenTermsSotoSenComponent } from './sensei/articles/zen/terms/soto-sen/soto-sen.component';
+import { ZenTermsSatoriComponent } from './sensei/articles/zen/terms/satori/satori.component';
+import { ZenTermsKinhinComponent } from './sensei/articles/zen/terms/kinhin/kinhin.component';
+import { ZenTermsRandoriComponent } from './sensei/articles/zen/terms/randori/randori.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
@@ -46,7 +52,14 @@ export const routes: Routes = [
     {path: "sensei/articles/zen/terms/bodhisatava", component: ZenTermsBodhisatavaComponent},
     {path: "sensei/articles/zen/terms/dojo", component: ZenTermsDojoComponent},
     {path: "sensei/articles/zen/terms/zazen", component: ZenTermsZazenComponent},
-    {path: "sensei/articles/zen/terms/zenki", component: ZenTermsZazenComponent},
+    {path: "sensei/articles/zen/terms/zenki", component: ZenTermsZenkiComponent},
+    {path: "sensei/articles/zen/terms/mengu", component: ZenTermsMenguComponent},
+    {path: "sensei/articles/zen/terms/soto-zen", component: ZenTermsSotoSenComponent},
+    {path: "sensei/articles/zen/terms/sunyata", component: ZenTermsSotoSenComponent},
+    {path: "sensei/articles/zen/terms/satori", component: ZenTermsSatoriComponent},
+    {path: "sensei/articles/zen/terms/kinhin", component: ZenTermsKinhinComponent},
+    {path: "sensei/articles/zen/terms/randori", component: ZenTermsRandoriComponent},
+    {path: "sensei/articles/zen/terms/jijiyuzamai", component: ZenTermsRandoriComponent},
     {path: "sensei/articles/zen/introduction", component: SenseiArticlesZenIntroductionComponent},
     {path: "sensei/team", component: SenseiTeamComponent},
     {path: "sensei/team/tania", component: SenseiTeamTaniaComponent}

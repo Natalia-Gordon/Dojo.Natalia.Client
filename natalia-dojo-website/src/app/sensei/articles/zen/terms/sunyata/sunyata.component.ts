@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-sunyata',
+  selector: 'app-zen-terms-sunyata',
   standalone: true,
   imports: [],
   templateUrl: './sunyata.component.html',
   styleUrl: './sunyata.component.css'
 })
-export class SunyataComponent {
+export class ZenTermsSunyataComponent {
 
 }

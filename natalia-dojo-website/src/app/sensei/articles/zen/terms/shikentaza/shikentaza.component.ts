@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-shikentaza',
+  selector: 'app-zen-terms-shikentaza',
   standalone: true,
   imports: [],
   templateUrl: './shikentaza.component.html',
   styleUrl: './shikentaza.component.css'
 })
-export class ShikentazaComponent {
+export class ZenTermsShikentazaComponent {
 
 }

@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-yokyoku',
+  selector: 'app-zen-terms-yokyoku',
   standalone: true,
   imports: [],
   templateUrl: './yokyoku.component.html',
   styleUrl: './yokyoku.component.css'
 })
-export class YokyokuComponent {
+export class ZenTermsYokyokuComponent {
 
 }
