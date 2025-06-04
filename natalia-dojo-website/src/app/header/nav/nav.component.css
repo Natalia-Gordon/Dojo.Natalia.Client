@@ -14,19 +14,19 @@
     color: var(--primary);
 }
 
-@media (max-width: 991.98px) {
+/* ============ small devices ============ */
+@media (max-width: 991px) {
     .navbar-dark .navbar-nav .nav-link  {
         margin-right: 0;
         padding: 10px 0;
     }
+    .dropdown-menu .dropdown-menu{
+        margin-left:0.7rem; margin-right:0.7rem; margin-bottom: .5rem;
+    }
 }
+/* ============ small devices .end// ============ */
 
 .dropdown-menu {
-    text-align: right;
-}
-
-.dropdown-submenu {
-    position: relative;    
     text-align: right;
 }
 
