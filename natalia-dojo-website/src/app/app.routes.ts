@@ -30,6 +30,7 @@ import { ZenTermsSatoriComponent } from './sensei/articles/zen/terms/satori/sato
 import { ZenTermsKinhinComponent } from './sensei/articles/zen/terms/kinhin/kinhin.component';
 import { ZenTermsRandoriComponent } from './sensei/articles/zen/terms/randori/randori.component';
 import { SenseiArticlesZenFukanZazengiComponent } from './sensei/articles/zen/fukan-zazengi/fukan-zazengi.component';
+import { SenseiArticlesZenGenjoKoanComponent } from './sensei/articles/zen/genjo-koan/genjo-koan.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
@@ -63,6 +64,7 @@ export const routes: Routes = [
     {path: "sensei/articles/zen/terms/jijiyuzamai", component: ZenTermsRandoriComponent},
     {path: "sensei/articles/zen/introduction", component: SenseiArticlesZenIntroductionComponent},
     {path: "sensei/articles/zen/fukan-zazengi", component: SenseiArticlesZenFukanZazengiComponent},
+    {path: "sensei/articles/zen/genjo-koan", component: SenseiArticlesZenGenjoKoanComponent},
     {path: "sensei/team", component: SenseiTeamComponent},
     {path: "sensei/team/tania", component: SenseiTeamTaniaComponent}
 ];

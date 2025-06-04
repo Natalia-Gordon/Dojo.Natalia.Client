@@ -197,3 +197,12 @@ h6,
         background: var(--primary);
     }
 }
+
+.article-text{
+    /*font-family: 'Moses', 'NarkisBlock';*/
+    font-size: 19px;
+    font-weight: 440;
+    line-height: 28px;
+    margin: 0 0 15px 0;
+    letter-spacing: normal;
+}
