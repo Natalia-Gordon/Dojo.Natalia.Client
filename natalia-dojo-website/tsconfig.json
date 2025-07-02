@@ -15,10 +15,14 @@
     "declaration": false,
     "experimentalDecorators": true,
     "moduleResolution": "node",
+    "baseUrl": "./src",
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
+    "paths": {
+      "app/*": ["app/*"]
+    },
     "lib": [
       "ES2022",
       "dom"
