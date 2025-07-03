@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ZenSidebarComponent } from "../sidebar/sidebar.component";
 import { SharedHeroComponent } from "../../../../shared/components/hero/hero.component";
-import { AddcommentComponent } from "../../../../blog/articles/addcomment/addcomment.component";
+import { AddcommentComponent } from "../../../../core/templates/addcomment/addcomment.component";
 import { CommonModule } from '@angular/common';
 import { ZenTermsAnAtamanComponent } from "./an-ataman/an-ataman.component";
 import { ZenTermsIgyoComponent } from "./igyo/igyo.component";

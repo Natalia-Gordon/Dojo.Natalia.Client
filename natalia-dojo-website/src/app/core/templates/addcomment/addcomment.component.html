@@ -1,0 +1,60 @@
+<!-- Comment Form Start -->
+<div class="bg-dark rounded p-5">
+    <h3 class="text-light text-uppercase mb-4">התגובה שלי</h3>
+    <form (ngSubmit)="submitComment()" #commentForm="ngForm">
+        <div class="row g-3">
+            <div class="col-12 col-sm-6">
+                <input type="text" class="form-control bg-white border-0" placeholder="שם מלא" style="height: 55px;" name="author" [(ngModel)]="newComment.author" required minlength="2" maxlength="50" pattern="^[a-zA-Zא-ת\s\.\'-]+$" #author="ngModel">
+                <div *ngIf="author.invalid && (author.dirty || author.touched)" class="text-danger mt-1">
+                    <div *ngIf="author.errors?.['required']">
+                        שם הכותב נדרש.
+                    </div>
+                    <div *ngIf="author.errors?.['minlength']">
+                        שם הכותב חייב להיות לפחות 2 תווים.
+                    </div>
+                    <div *ngIf="author.errors?.['maxlength']">
+                        שם הכותב לא יכול להיות יותר מ-50 תווים.
+                    </div>
+                    <div *ngIf="author.errors?.['pattern']">
+                        שם הכותב מכיל תווים לא חוקיים.
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <input type="email" class="form-control bg-white border-0" placeholder="דואר אלקטרוני" style="height: 55px;" name="email" [(ngModel)]="newComment.email" required email #email="ngModel">
+                <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-danger mt-1">
+                    <div *ngIf="email.errors?.['required']">
+                        כתובת הדוא"ל נדרשת.
+                    </div>
+                    <div *ngIf="email.errors?.['email']">
+                        אנא הזן כתובת דוא"ל חוקית.
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <input type="text" class="form-control bg-white border-0" placeholder="נושא" style="height: 55px;" name="subject" [(ngModel)]="newComment.subject">
+            </div>
+            <div class="col-12">
+                <textarea class="form-control bg-white border-0" rows="5" placeholder="תוכן התגובה" name="text" [(ngModel)]="newComment.text" required minlength="5" maxlength="1000" #text="ngModel"></textarea>
+                <div *ngIf="text.invalid && (text.dirty || text.touched)" class="text-danger mt-1">
+                    <div *ngIf="text.errors?.['required']">
+                        תוכן התגובה נדרש.
+                    </div>
+                    <div *ngIf="text.errors?.['minlength']">
+                        תוכן התגובה חייב להיות לפחות 5 תווים.
+                    </div>
+                    <div *ngIf="text.errors?.['maxlength']">
+                        תוכן התגובה לא יכול להיות יותר מ-1000 תווים.
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary w-100 py-3" type="submit" [disabled]="commentForm.invalid">שלח תגובה</button>
+            </div>
+        </div>
+    </form>
+    <div *ngIf="showSuccessMessage" class="alert alert-success mt-3" role="alert">
+        תגובתך נשלחה בהצלחה!
+    </div>
+</div>
+<!-- Comment Form End -->

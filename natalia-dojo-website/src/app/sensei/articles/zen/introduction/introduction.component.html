@@ -55,7 +55,7 @@
             <!-- Comment List End -->
 
             <!-- Comment Form Start -->
-            <app-addcomment></app-addcomment>
+            <app-addcomment (newCommentAdded)="addNewComment($event)"></app-addcomment>
             <!-- Comment Form End -->
         </div>
 
