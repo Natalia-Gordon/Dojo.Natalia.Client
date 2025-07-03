@@ -8,7 +8,6 @@ import { TeamComponent } from './team/team.component';
 import { BlogComponent } from './blog/blog.component';
 import { TestimonialComponent } from './testimonial/testimonial.component';
 import { ArticlesComponent } from './blog/articles/articles.component';
-import { Zen1Component } from './blog/articles/zen/zen-1/zen-1.component';
 import { SenseiAboutComponent } from './sensei/about/about.component';
 import { SenseiArticlesComponent } from './sensei/articles/articles.component';
 import { SenseiArticlesZenComponent } from './sensei/articles/zen/zen.component';
@@ -29,9 +28,9 @@ import { ZenTermsSotoSenComponent } from './sensei/articles/zen/terms/soto-sen/s
 import { ZenTermsSatoriComponent } from './sensei/articles/zen/terms/satori/satori.component';
 import { ZenTermsKinhinComponent } from './sensei/articles/zen/terms/kinhin/kinhin.component';
 import { ZenTermsRandoriComponent } from './sensei/articles/zen/terms/randori/randori.component';
-import { SenseiArticlesZenFukanZazengiComponent } from './sensei/articles/zen/fukan-zazengi/fukan-zazengi.component';
-import { SenseiArticlesZenGenjoKoanComponent } from './sensei/articles/zen/genjo-koan/genjo-koan.component';
-import { SenseiArticlesZenZenkiComponent } from './sensei/articles/zen/zenki/zenki.component';
+import { FukanZazengiComponent } from './sensei/articles/zen/fukan-zazengi/fukan-zazengi.component';
+import { GenjoKoanComponent } from './sensei/articles/zen/genjo-koan/genjo-koan.component';
+import { ZenkiComponent } from './sensei/articles/zen/zenki/zenki.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
@@ -43,7 +42,6 @@ export const routes: Routes = [
     {path: "blog", component: BlogComponent},
     {path: "testimonial", component: TestimonialComponent},
     {path: "articles", component: ArticlesComponent},
-    {path: "articles/zen/1", component: Zen1Component},
     {path: "sensei/about", component: SenseiAboutComponent},
     {path: "sensei/articles", component: SenseiArticlesComponent},
     {path: "sensei/articles/ninjutsu", component: SenseiArticlesNinjutsuComponent},
@@ -64,9 +62,9 @@ export const routes: Routes = [
     {path: "sensei/articles/zen/terms/randori", component: ZenTermsRandoriComponent},
     {path: "sensei/articles/zen/terms/jijiyuzamai", component: ZenTermsRandoriComponent},
     {path: "sensei/articles/zen/introduction", component: SenseiArticlesZenIntroductionComponent},
-    {path: "sensei/articles/zen/fukan-zazengi", component: SenseiArticlesZenFukanZazengiComponent},
-    {path: "sensei/articles/zen/genjo-koan", component: SenseiArticlesZenGenjoKoanComponent},
-    {path: "sensei/articles/zen/zenki", component: SenseiArticlesZenZenkiComponent},
+    {path: "sensei/articles/zen/fukan-zazengi", component: FukanZazengiComponent},
+    {path: "sensei/articles/zen/genjo-koan", component: GenjoKoanComponent},
+    {path: "sensei/articles/zen/zenki", component: ZenkiComponent},
     {path: "sensei/team", component: SenseiTeamComponent},
     {path: "sensei/team/tania", component: SenseiTeamTaniaComponent}
 ];
