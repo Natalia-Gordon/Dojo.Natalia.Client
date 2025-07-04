@@ -159,7 +159,7 @@ h6,
     display: flex;
     justify-content: center;
     position: absolute;
-    bottom: 0px; /* Added spacing from the bottom */
+    bottom: 10px; /* Added spacing from the bottom */
     left: 0;
     right: 0;
     width: 100%;
