@@ -2,28 +2,10 @@
 <div class="mb-5">
     <h3 class="text-uppercase mb-4">{{ comments.length }} תגובות</h3>
     <!-- Main Comments -->
-    <div *ngFor="let comment of comments" class="d-flex mb-4" style="gap: 15px;">
-        <img *ngIf="!comment.avatarError" [src]="comment.avatar" (error)="comment.avatarError = true" class="img-fluid rounded" style="width: 45px; height: 45px;">
-        <i *ngIf="comment.avatarError" class="fa fa-user fs-5 text-muted" style="font-size: 45px;"></i>
-        <div>
-            <h6><a href="#"><strong>{{ comment.author }}</strong></a> &nbsp;|&nbsp; <small><i><strong>{{ comment.date }}</strong></i></small></h6>
-            <p *ngIf="comment.subject" class="text-secondary mb-2"><strong>נושא:</strong> {{ comment.subject }}</p>
-            <p style="font-size: 19px; font-weight: 440; line-height: 28px; letter-spacing: normal;">{{ comment.text }}</p>
-            <button class="btn btn-sm btn-secondary">Reply</button>
-            <!-- Replies -->
-            <div *ngFor="let reply of comment.replies" class="d-flex ms-5 mt-3" style="gap: 15px;">
-                <img *ngIf="!reply.avatarError" [src]="reply.avatar" (error)="reply.avatarError = true" class="img-fluid rounded" style="width: 45px; height: 45px;">
-                <i *ngIf="reply.avatarError" class="fa fa-user fs-5 text-muted" style="font-size: 45px;"></i>
-                <div>
-                    <h6><a href="#"><strong>{{ reply.author }}</strong></a> &nbsp;|&nbsp; <small><i><strong>{{ reply.date }}</strong></i></small></h6>
-                    <p *ngIf="reply.subject" class="text-secondary mb-2"><strong>נושא:</strong> {{ reply.subject }}</p>
-                    <p style="font-size: 19px; font-weight: 440; line-height: 28px; letter-spacing: normal;">{{ reply.text }}</p>
-                    <button class="btn btn-sm btn-secondary">Reply</button>
-                </div>
-            </div>
-            <!-- End Replies -->
-        </div>
-    </div>
+    <app-comment-item *ngFor="let comment of comments" [comment]="comment" (replyAdded)="onCommentAdded($event)"></app-comment-item>
     <!-- End Main Comments -->
 </div>
-<!-- Comment List End --> 
+<!-- Comment List End -->
+
+<!-- Add Comment Form for new comments -->
+<app-addcomment (newCommentAdded)="onCommentAdded($event)"></app-addcomment> 
