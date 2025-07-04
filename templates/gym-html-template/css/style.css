@@ -174,12 +174,6 @@ h6,
     opacity: 1;
 }
 
-.testimonial-carousel .owl-nav {
-    margin-top: 30px;
-    display: flex;
-    justify-content: start;
-}
-
 .testimonial-carousel .owl-nav .owl-prev,
 .testimonial-carousel .owl-nav .owl-next{
     position: relative;

@@ -153,9 +153,23 @@ h6,
 }
 
 .testimonial-carousel .owl-nav {
-    margin-top: 30px;
+    opacity: 1 !important;
+    visibility: visible !important;
+    margin-top: 0;
     display: flex;
-    justify-content: start;
+    justify-content: center;
+    position: absolute;
+    bottom: 0px; /* Added spacing from the bottom */
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+/* Ensure owl-nav is always visible, overriding default Owl Carousel theme styles */
+.owl-theme .owl-nav {
+    opacity: 1;
+    visibility: visible;
+    transition: none;
 }
 
 .testimonial-carousel .owl-nav .owl-prev,
@@ -174,9 +188,17 @@ h6,
     transition: .5s;
 }
 
+/* Ensure individual buttons are always visible, overriding default Owl Carousel theme styles */
+.owl-theme .owl-nav [class*=owl-] {
+    opacity: 1;
+    visibility: visible;
+    transition: none;
+}
+
 .testimonial-carousel .owl-nav .owl-prev:hover,
 .testimonial-carousel .owl-nav .owl-next:hover {
-    color: var(--dark);
+    color: var(--dark) !important;
+    background: var(--primary);
 }
 
 .testimonial-carousel .owl-item img {
@@ -199,10 +221,11 @@ h6,
 }
 
 .article-text{
-    /*font-family: 'Moses', 'NarkisBlock';*/
     font-size: 19px;
     font-weight: 440;
     line-height: 28px;
     margin: 0 0 15px 0;
     letter-spacing: normal;
 }
+
+/*font-family: 'Moses', 'NarkisBlock';*/

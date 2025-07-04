@@ -10,8 +10,10 @@ border:1px solid #ECECEC;
     font-family: inherit;
     font-size: 17px;
     line-height: 1.5;
-    margin: 0 0 17px 0;
+    margin: 0 auto 17px auto;
     font-weight: 300;
+    text-align: center;
+    overflow-wrap: break-word;
 }
 .testimonial-name {
     margin: -17px auto 0;
@@ -24,17 +26,39 @@ border:1px solid #ECECEC;
     color: #fff;
     box-shadow: 0 9px 18px rgba(0,0,0,0.12), 0 5px 7px rgba(0,0,0,0.05);
 }
-#testimonials-list .item {
+.col-lg-6.bg-dark {
+    /* border: 2px solid red; Temporary border for debugging Removed */
+}
+#testimonials-list .testimonial-item {
     text-align: center;
-    padding: 50px;
-        margin-bottom:80px;
-    opacity: .2;
+    padding: 15px;
+    box-sizing: border-box;
+    margin-bottom:0px; /* Changed from 80px */
+    margin: 0;
+    opacity: 1 !important; /* Set opacity to 1 to remove gray shadow */
+    width: 100%;
+    /* border: 2px solid blue; Temporary border for debugging Removed */
     -webkit-transform: scale3d(0.8, 0.8, 1);
     transform: scale3d(0.8, 0.8, 1);
     transition: all 0.3s ease-in-out;
 }
-#testimonials-list .owl-item.active.center .item {
-    opacity: 1;
+#testimonials-list .testimonial-item p {
+    color: #FFFFFF !important; /* Force text color to white */
+    text-shadow: none !important; /* Ensure no text shadow */
+    background-color: transparent !important; /* Revert background to transparent */
+    outline: none !important; /* Remove any outline effects */
+    filter: none !important; /* Ensure no filter effects */
+    mix-blend-mode: normal !important; /* Ensure normal blending mode */
+    text-align: justify; /* Even distribution of text */
+}
+#testimonials-list .testimonial-item p i {
+    margin-left: 15px; /* Added spacing after the icon */
+}
+#testimonials-list .owl-item {
+    margin: 0;
+}
+#testimonials-list .owl-item.active.center .testimonial-item {
+    opacity: 1 !important;
     -webkit-transform: scale3d(1.0, 1.0, 1);
     transform: scale3d(1.0, 1.0, 1);
 }
@@ -70,4 +94,41 @@ display: inline-block;
             transform-origin: 50% 50% 0;
     transition: all 250ms ease-out 0s;
     width: 20px;
+}
+#testimonials-list.owl-carousel {
+    /* overflow: hidden; Removed as it might be clipping navigation buttons */
+    position: relative;
+}
+
+/* Force visibility for Owl Carousel navigation and buttons */
+#testimonials-list.owl-carousel .owl-nav {
+    opacity: 1 !important;
+    visibility: visible !important;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    bottom: 20px; /* Added spacing from the bottom */
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+#testimonials-list.owl-carousel .owl-nav .owl-prev,
+#testimonials-list.owl-carousel .owl-nav .owl-next {
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: var(--primary) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--primary) !important;
+}
+
+#testimonials-list.owl-carousel .owl-nav .owl-prev:hover,
+#testimonials-list.owl-carousel .owl-nav .owl-next:hover {
+    background: var(--primary) !important;
+    color: var(--dark) !important;
+}
+
+.testimonial-item .ps-4 {
+    margin-right: 20px; /* Added spacing between image and name */
 }
