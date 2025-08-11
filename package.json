@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@kolkov/ngx-gallery": "^2.0.1",
     "jquery": "^3.7.1",
     "popper.js": "^1.16.1"
   }

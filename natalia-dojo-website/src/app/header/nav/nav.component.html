@@ -1,57 +1,24 @@
 <nav class="navbar navbar-expand-lg bg-dark navbar-dark p-3 p-lg-0 px-lg-0">
     <a href="#" class="navbar-brand d-block d-lg-none">
-        <img src="/assets/img/logo.svg" alt="Dojo Natalia" height="100" loading="lazy">
+        <img src="/assets/img/logo.svg" alt="Dojo Natalia" loading="lazy">
     </a>
     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-        <ul class="navbar-nav mr-auto py-0">
-            <li class="nav-item">
-              <a class="nav-link" routerLink="/home" routerLinkActive="active">דף הבית</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" routerLink="/about" routerLinkActive="active" >מי אני</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" routerLink="/workouts" routerLinkActive="active" >יומן אימונים</a>
-            </li>
-            <!--
-            <li class="nav-item">
-              <a class="nav-link" routerLink="/team" routerLinkActive="active">המורה שלי</a>
-            </li>
-          -->
-            <li class="nav-item">
-              <a class="nav-link" routerLink="/testimonial" routerLinkActive="active">ממליצים</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                מאמרים
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                <li><a href="sensei/articles/zen" class="dropdown-item">לחימה ומדיטציה</a></li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                על המורה שלי
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">                
-                <li><a class="dropdown-item" href="sensei/about">פרטי התקשרות</a></li>
-                <li><a class="dropdown-item" href="sensei/team">תלמידים</a></li>
-                <!--<li><hr class="dropdown-divider"></li>
-                <li class="dropdown-submenu">
-                  <a class="dropdown-item">מאמרים</a>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" tabindex="1" href="sensei/articles/zen">זן בודיזם</a></li>
-                    <li><a class="dropdown-item" tabindex="2" href="sensei/articles/ninjutsu">נינג&#39;וטסו</a></li>
-                  </ul>
-                </li>-->
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" routerLink="/contact" routerLinkActive="active">צרו קשר</a>
-            </li>
-        </ul>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav py-0">
+            <a routerLink="/home" routerLinkActive="active" class="nav-item nav-link">בית</a>
+            <a routerLink="/about" routerLinkActive="active" class="nav-item nav-link">אודות</a>
+            <a routerLink="/workouts" routerLinkActive="active" class="nav-item nav-link">יומן אימונים</a>
+            <a routerLink="/gallery" routerLinkActive="active" class="nav-item nav-link">גלריה</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">בלוג</a>
+                <div class="dropdown-menu">
+                    <a routerLink="/sensei/articles/zen" routerLinkActive="active" class="dropdown-item" (click)="closeMobileMenu()">פילוסופיה של זן</a>
+                </div>
+            </div>
+            <a routerLink="/testimonial" routerLinkActive="active" class="nav-item nav-link">ממליצים</a>
+            <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link">צור קשר</a>
+        </div>
     </div>
 </nav>

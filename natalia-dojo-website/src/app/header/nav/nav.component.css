@@ -18,12 +18,131 @@
 @media (max-width: 991px) {
     .navbar-dark .navbar-nav .nav-link  {
         margin-right: 0;
-        padding: 10px 0;
+        padding: 5px 0;
+        font-size: 16px;
     }
     .dropdown-menu .dropdown-menu{
         margin-left:0.7rem; margin-right:0.7rem; margin-bottom: .5rem;
     }
+    
+    /* Mobile navbar adjustments */
+    .navbar {
+        padding: 0.5rem 1rem !important;
+        min-height: auto;
+        height: auto;
+        margin: 0;
+        line-height: 1;
+    }
+    
+    .navbar-brand {
+        padding: 0;
+        margin: 0;
+        height: auto;
+        display: flex;
+        align-items: center;
+        line-height: 1;
+    }
+    
+    .navbar-brand img {
+        height: 60px !important;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .navbar-toggler {
+        padding: 0.25rem 0.5rem;
+        margin: 0;
+        border: none;
+        height: auto;
+        line-height: 1;
+    }
+    
+    .navbar-toggler:focus {
+        box-shadow: none;
+    }
+    
+    .navbar-collapse {
+        margin-top: 0.5rem;
+        padding: 0;
+        line-height: 1;
+    }
+    
+    .navbar-nav {
+        padding: 0;
+        margin: 0;
+        line-height: 1;
+    }
+    
+    .nav-item {
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+    }
+    
+    /* Override any global navbar styles */
+    .navbar-dark .navbar-nav .nav-link {
+        padding: 5px 0 !important;
+        margin: 0 !important;
+        line-height: 1.2;
+    }
+    
+    /* Ensure dropdown menus don't add extra space */
+    .dropdown-menu {
+        margin: 0;
+        padding: 0.5rem 0;
+    }
+    
+    .dropdown-item {
+        padding: 0.25rem 1rem;
+        line-height: 1.2;
+    }
 }
+
+/* Extra small devices */
+@media (max-width: 576px) {
+    .navbar {
+        padding: 0.25rem 0.5rem !important;
+        min-height: auto;
+        height: auto;
+        margin: 0;
+        line-height: 1;
+    }
+    
+    .navbar-brand img {
+        height: 50px !important;
+    }
+    
+    .navbar-dark .navbar-nav .nav-link {
+        padding: 3px 0 !important;
+        font-size: 14px;
+        margin: 0 !important;
+        line-height: 1.2;
+    }
+    
+    .navbar-toggler {
+        padding: 0.2rem 0.4rem;
+        height: auto;
+        line-height: 1;
+    }
+    
+    /* Ensure minimal spacing */
+    .navbar-collapse {
+        margin-top: 0.25rem;
+        line-height: 1;
+    }
+    
+    .navbar-nav {
+        line-height: 1;
+    }
+    
+    .nav-item {
+        line-height: 1;
+    }
+}
+
 /* ============ small devices .end// ============ */
 
 .dropdown-menu {

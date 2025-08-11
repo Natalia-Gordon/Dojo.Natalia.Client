@@ -4,7 +4,6 @@ import { setTheme } from 'ngx-bootstrap/utils';
 import { HeaderComponent } from "./header/header.component";
 import { FooterComponent } from "./footer/footer.component";
 import { HomeComponent } from './home/home.component';
-import * as jQuery from "jquery";
 
 @Component({
     selector: 'app-root',

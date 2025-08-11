@@ -31,10 +31,12 @@ import { ZenTermsRandoriComponent } from './sensei/articles/zen/terms/randori/ra
 import { FukanZazengiComponent } from './sensei/articles/zen/fukan-zazengi/fukan-zazengi.component';
 import { GenjoKoanComponent } from './sensei/articles/zen/genjo-koan/genjo-koan.component';
 import { ZenkiComponent } from './sensei/articles/zen/zenki/zenki.component';
+import { PhotoGalleryComponent } from './photo-gallery/photo-gallery.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
     {path: "home", component: HomeComponent},
+    {path: "gallery", component: PhotoGalleryComponent},
     {path: "about", component: AboutComponent},
     {path: "contact", component: ContactComponent},
     {path: "workouts", component: WorkoutsComponent},
