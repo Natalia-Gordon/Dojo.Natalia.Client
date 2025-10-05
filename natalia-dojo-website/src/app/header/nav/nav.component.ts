@@ -11,6 +11,11 @@ import { RouterModule } from '@angular/router';
 export class NavComponent {
   
   closeMobileMenu(): void {
+    // Only close menu on mobile/tablet devices (non-desktop)
+    if (window.innerWidth >= 992) {
+      return; // Don't close on desktop
+    }
+    
     // Close the mobile menu by removing the 'show' class
     const navbarCollapse = document.getElementById('navbarCollapse');
     if (navbarCollapse && navbarCollapse.classList.contains('show')) {

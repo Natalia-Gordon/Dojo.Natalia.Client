@@ -7,18 +7,18 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav py-0">
-            <a routerLink="/home" routerLinkActive="active" class="nav-item nav-link">בית</a>
-            <a routerLink="/about" routerLinkActive="active" class="nav-item nav-link">אודות</a>
-            <a routerLink="/workouts" routerLinkActive="active" class="nav-item nav-link">יומן אימונים</a>
-            <a routerLink="/gallery" routerLinkActive="active" class="nav-item nav-link">גלריה</a>
+            <a routerLink="/home" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">בית</a>
+            <a routerLink="/about" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">אודות</a>
+            <a routerLink="/workouts" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">יומן אימונים</a>
+            <a routerLink="/gallery" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">גלריה</a>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">בלוג</a>
                 <div class="dropdown-menu">
                     <a routerLink="/sensei/articles/zen" routerLinkActive="active" class="dropdown-item" (click)="closeMobileMenu()">פילוסופיה של זן</a>
                 </div>
             </div>
-            <a routerLink="/testimonial" routerLinkActive="active" class="nav-item nav-link">ממליצים</a>
-            <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link">צור קשר</a>
+            <a routerLink="/testimonial" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">ממליצים</a>
+            <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">צור קשר</a>
         </div>
     </div>
 </nav>
