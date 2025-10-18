@@ -18,7 +18,7 @@
             <a routerLink="/workouts" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">יומן אימונים</a>
             <a routerLink="/gallery" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">גלריה</a>
             <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">בלוג</a>
+                <a href="#" class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">בלוג</a>
                 <div class="dropdown-menu">
                     <a routerLink="/sensei/articles/zen" routerLinkActive="active" class="dropdown-item" (click)="closeMobileMenu()">פילוסופיה של זן</a>
                 </div>
