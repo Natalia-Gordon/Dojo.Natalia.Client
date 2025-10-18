@@ -90,7 +90,7 @@
         margin-top: 0;
         padding: 0;
         line-height: 1;
-        background-color: var(--dark);
+        background-color: #343a40;
         border-radius: 0;
         padding: 0.5rem 0;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -122,7 +122,7 @@
     }
     
     .navbar-dark .navbar-nav .nav-link:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: #212529;
         color: var(--primary) !important;
     }
     
@@ -130,7 +130,7 @@
     .dropdown-menu {
         margin: 0;
         padding: 0.5rem 0;
-        background-color: var(--dark);
+        background-color: #343a40;
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 0.5rem;
         margin-top: 0.25rem;
@@ -152,7 +152,7 @@
         float: none !important;
         width: 100% !important;
         margin-top: 0 !important;
-        background-color: var(--dark) !important;
+        background-color: #343a40 !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
     }
@@ -165,7 +165,7 @@
     }
     
     .dropdown-item:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: #212529;
         color: var(--primary);
     }
 }
