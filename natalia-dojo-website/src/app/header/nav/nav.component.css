@@ -66,8 +66,8 @@
     }
     
     .navbar-collapse {
-        margin-top: 0;
-        padding: 0.5rem 0;
+        margin: 0;
+        padding: 0;
         background-color: #343a40;
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-top: none;
@@ -75,10 +75,13 @@
     
     .navbar-nav, .nav-item {
         width: 100%;
+        margin: 0;
+        padding: 0;
     }
     
     .navbar-dark .navbar-nav .nav-link {
         padding: 12px 20px !important;
+        margin: 0 !important;
         width: 100%;
         text-align: right;
         transition: all 0.3s ease;
