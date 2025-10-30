@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, AfterViewInit, Inject, PLATFORM_ID, OnInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Title, Meta } from '@angular/platform-browser';
 
 declare var $: any; // Declare $ to avoid TypeScript errors with jQuery
 
@@ -10,9 +11,21 @@ declare var $: any; // Declare $ to avoid TypeScript errors with jQuery
   templateUrl: './testimonial.component.html',
   styleUrl: './testimonial.component.css'
 })
-export class TestimonialComponent implements AfterViewInit {
+export class TestimonialComponent implements AfterViewInit, OnInit {
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private title: Title,
+    private meta: Meta
+  ) {}
+
+  ngOnInit(): void {
+    this.title.setTitle('המלצות דוג׳ו נטליה');
+    this.meta.updateTag({
+      name: 'description',
+      content: 'חוות דעת וביקורות תלמידים על חוויית אימון אצל נטליה גורדון דוג׳ו בתל אביב.'
+    });
+  }
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
