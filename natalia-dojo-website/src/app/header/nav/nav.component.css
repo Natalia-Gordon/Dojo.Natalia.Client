@@ -53,7 +53,7 @@
     .navbar-toggler:focus { box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25); }
     .navbar-toggler-icon { width: 1.5em; height: 1.5em; }
     
-    .navbar-collapse { margin: 0 calc(-50vw + 50%) 0 calc(-50vw + 50%) !important; padding: 0 !important; background-color: #343a40; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; transform: translateY(-1px); width: 100vw; }
+    .navbar-collapse { margin: 0 calc(-50vw + 50%) 0 calc(-50vw + 50%) !important; padding: 0 !important; background-color: #343a40; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; transform: translateY(-2px); width: 100vw; }
     
     .navbar-nav, .nav-item { width: 100%; margin: 0 !important; padding: 0 !important; }
     .navbar-dark .navbar-nav .nav-link { padding: 12px 20px !important; margin: 0 !important; width: 100%; text-align: right; transition: all 0.3s ease; }
