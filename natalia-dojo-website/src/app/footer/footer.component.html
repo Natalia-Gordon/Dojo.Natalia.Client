@@ -84,4 +84,4 @@
 <!-- Footer End -->
 
 <!-- Back to Top -->
-<a href="#" class="btn btn-dark py-3 fs-4 back-to-top"><i class="bi bi-arrow-up"></i></a>
+<a href="#" class="btn btn-dark py-3 fs-4 back-to-top" (click)="scrollToTop($event)" [style.display]="isBackToTopVisible ? 'inline-flex' : 'none'"><i class="bi bi-arrow-up"></i></a>

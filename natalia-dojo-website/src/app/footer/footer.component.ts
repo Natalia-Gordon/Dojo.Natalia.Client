@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-footer',
@@ -8,12 +8,24 @@ import { Component } from '@angular/core';
   styleUrl: './footer.component.css'
 })
 export class FooterComponent {
+  isBackToTopVisible = false;
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.isBackToTopVisible = (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0) > 200;
+  }
+
   onSave() {
     console.log(' saved!');
   }
 
   onSubmit() {
     console.log('Form submitted!');
-    // Add your form processing logic here
+  }
+
+  scrollToTop(event: Event): void {
+    event.preventDefault();
+    // Instant jump to top to avoid any initial delay
+    window.scrollTo(0, 0);
   }
 }

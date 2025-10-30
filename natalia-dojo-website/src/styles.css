@@ -7,6 +7,9 @@
     --dark: #222429;
 }
 
+/* Ensure no CSS-based smooth scroll interferes with JS scrollToTop */
+html { scroll-behavior: auto !important; }
+
 [class^="flaticon-"]:before,
 [class*=" flaticon-"]:before,
 [class^="flaticon-"]:after,
@@ -73,6 +76,7 @@ h6,
     bottom: 0;
     border-radius: 0;
     z-index: 99;
+    transition: none !important;
 }
 .carousel-caption {
     top: 0;
