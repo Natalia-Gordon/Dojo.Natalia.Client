@@ -1,9 +1,48 @@
 
 <!-- Search Form Start -->
-<div class="mb-5">
-    <div class="input-group" dir="ltr">        
+<div class="mb-5 position-relative" style="z-index:20;">
+    <div class="input-group" dir="ltr">
         <button class="btn btn-primary px-4"><i class="bi bi-search"></i></button>
-        <input type="text" class="form-control p-3" placeholder="מילת מפתח" style="text-align: right;">
+        <input type="text" class="form-control p-3" placeholder="מילת מפתח" style="text-align: right; border-bottom-left-radius:0;border-bottom-right-radius:0;" 
+              [(ngModel)]="searchTerm" 
+              (ngModelChange)="onSearchTermChange($event)">
+    </div>
+    <!-- Results: Only show if searchTerm is not empty -->
+    <div *ngIf="searchTerm" 
+         style="position:absolute; right:0; left:0; top:100%; background: rgba(250,250,250,0.96); border:1px solid #eee; border-top:none; border-bottom-left-radius:1rem; border-bottom-right-radius:1rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+        <div *ngIf="filteredArticles.length > 0">
+            <div class="search-group-label" style="padding:0.75rem 1rem 0.25rem 1rem; font-weight: 700; color:#5a5a9a; border-bottom:1px solid #e0e0ef;">
+                📰 מאמרים
+            </div>
+            <div class="list-group bg-transparent mb-0" style="border-radius:0; box-shadow:none;">
+                <button class="list-group-item list-group-item-action" 
+                        style="text-align:right; border:none; background:transparent; padding:0.7rem 1.5rem; font-weight:500; font-size:1rem; color:#212136; border-radius:0; transition: background 0.2s;"
+                        *ngFor="let item of filteredArticles" 
+                        (click)="navigateTo(item.path)"
+                        [ngStyle]="{'background': 'transparent'}"
+                        onmouseover="this.style.background='#EDEFFA'" onmouseout="this.style.background='transparent'">
+                  {{item.label}}
+                </button>
+            </div>
+        </div>
+        <div *ngIf="filteredTerms.length > 0">
+           <div class="search-group-label" style="padding:0.75rem 1rem 0.25rem 1rem; font-weight: 700; color:#4e8573; border-bottom:1px solid #dcebe5;">
+                📖 מונחים
+           </div>
+           <div class="list-group bg-transparent mb-0" style="border-radius:0; box-shadow:none;">
+               <button class="list-group-item list-group-item-action" 
+                       style="text-align:right; border:none; background:transparent; padding:0.7rem 1.5rem; font-weight:500; font-size:1rem; color:#234636; border-radius:0; transition: background 0.2s;"
+                       *ngFor="let item of filteredTerms" 
+                       (click)="navigateTo(item.path)"
+                       [ngStyle]="{'background': 'transparent'}"
+                       onmouseover="this.style.background='#E4F5EA'" onmouseout="this.style.background='transparent'">
+                 {{item.label}}
+               </button>
+           </div>
+        </div>
+        <div *ngIf="filteredArticles.length === 0 && filteredTerms.length === 0" class="text-secondary text-center py-3" style="font-size:0.95rem;">
+          לא נמצאו תוצאות.
+        </div>
     </div>
 </div>
 <!-- Search Form End -->
