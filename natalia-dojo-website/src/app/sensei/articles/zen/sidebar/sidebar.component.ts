@@ -24,7 +24,17 @@ export class ZenSidebarComponent {
     { label: "הנחיות לישיבה בזה-זן", path: 'sensei/articles/zen/fukan-zazengi' },
     { label: "הקואן בחיי היום יום (גֶנְג'וֹקוֹאָן)", path: 'sensei/articles/zen/genjo-koan' },
     { label: "פילוסופיה של תפקוד מלא (זנקי)", path: 'sensei/articles/zen/zenki' },
-    { label: "זן וג'ודו", path: 'sensei/articles/zen/zenandjodo' }
+    { label: "דברי המורה דני וקסמן", path: 'sensei/articles/zen/teacher-message' },
+    { label: "זן וג'ודו", path: 'sensei/articles/zen/zenandjodo' },
+    { label: "הזן היום", path: 'sensei/articles/zen/zen-today' },
+    { label: "זן בחיי יומיום: גישת הסוֹטוֹ זֵן - תמצית שיטתי", path: 'sensei/articles/zen/zen-daily-life' },
+    { label: "להתאמן כשחיים, לחיותתאמנים", path: 'sensei/articles/zen/practice-when-living' },
+    { label: "הופעת הקואן בחיי היום יום", path: 'sensei/articles/zen/koan-daily-life' },
+    { label: "חשיבות הנפש האוניברסלית", path: 'sensei/articles/zen/universal-mind' },
+    { label: "לֵט-גוֹ בזֵן ובג'וּדוֹ", path: 'sensei/articles/zen/let-go-zen-judo' },
+    { label: "יחסי מורה תלמיד בעידן המודרני", path: 'sensei/articles/zen/teacher-student-relationship' },
+    { label: "זֵן ומוגבלויות", path: 'sensei/articles/zen/zen-disabilities' },
+    { label: "על חשיבות חיי האדם", path: 'sensei/articles/zen/human-life-importance' }
   ];
 
   // Example terms

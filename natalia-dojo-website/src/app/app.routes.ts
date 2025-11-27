@@ -33,6 +33,16 @@ import { GenjoKoanComponent } from './sensei/articles/zen/genjo-koan/genjo-koan.
 import { ZenkiComponent } from './sensei/articles/zen/zenki/zenki.component';
 import { PhotoGalleryComponent } from './photo-gallery/photo-gallery.component';
 import { SenseiArticlesZenAndJodoComponent } from './sensei/articles/zen/zenandjodo/zenandjodo.component';
+import { TeacherMessageComponent } from './sensei/articles/zen/teacher-message/teacher-message.component';
+import { ZenTodayComponent } from './sensei/articles/zen/zen-today/zen-today.component';
+import { ZenDailyLifeComponent } from './sensei/articles/zen/zen-daily-life/zen-daily-life.component';
+import { PracticeWhenLivingComponent } from './sensei/articles/zen/practice-when-living/practice-when-living.component';
+import { KoanDailyLifeComponent } from './sensei/articles/zen/koan-daily-life/koan-daily-life.component';
+import { UniversalMindComponent } from './sensei/articles/zen/universal-mind/universal-mind.component';
+import { LetGoZenJudoComponent } from './sensei/articles/zen/let-go-zen-judo/let-go-zen-judo.component';
+import { TeacherStudentRelationshipComponent } from './sensei/articles/zen/teacher-student-relationship/teacher-student-relationship.component';
+import { ZenDisabilitiesComponent } from './sensei/articles/zen/zen-disabilities/zen-disabilities.component';
+import { HumanLifeImportanceComponent } from './sensei/articles/zen/human-life-importance/human-life-importance.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
@@ -70,5 +80,15 @@ export const routes: Routes = [
     {path: "sensei/articles/zen/zenki", component: ZenkiComponent},
     {path: "sensei/team", component: SenseiTeamComponent},
     {path: "sensei/team/tania", component: SenseiTeamTaniaComponent},
-    {path: "sensei/articles/zen/zenandjodo", component: SenseiArticlesZenAndJodoComponent}
+    {path: "sensei/articles/zen/zenandjodo", component: SenseiArticlesZenAndJodoComponent},
+    {path: "sensei/articles/zen/teacher-message", component: TeacherMessageComponent},
+    {path: "sensei/articles/zen/zen-today", component: ZenTodayComponent},
+    {path: "sensei/articles/zen/zen-daily-life", component: ZenDailyLifeComponent},
+    {path: "sensei/articles/zen/practice-when-living", component: PracticeWhenLivingComponent},
+    {path: "sensei/articles/zen/koan-daily-life", component: KoanDailyLifeComponent},
+    {path: "sensei/articles/zen/universal-mind", component: UniversalMindComponent},
+    {path: "sensei/articles/zen/let-go-zen-judo", component: LetGoZenJudoComponent},
+    {path: "sensei/articles/zen/teacher-student-relationship", component: TeacherStudentRelationshipComponent},
+    {path: "sensei/articles/zen/zen-disabilities", component: ZenDisabilitiesComponent},
+    {path: "sensei/articles/zen/human-life-importance", component: HumanLifeImportanceComponent}
 ];

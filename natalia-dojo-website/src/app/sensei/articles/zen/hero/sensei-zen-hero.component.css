@@ -1,0 +1,81 @@
+.sensei-hero {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  background-image: linear-gradient(rgba(9, 9, 35, 0.6), rgba(9, 9, 35, 0.65)), url('/assets/img/blog-zen-1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.sensei-hero__overlay {
+  width: 100%;
+  padding: 4rem 1.5rem;
+}
+
+.sensei-hero__content {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: right;
+  color: #ffffff;
+}
+
+.sensei-hero__title {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+
+.sensei-hero__subtitle {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+.sensei-hero__breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(11, 11, 40, 0.6);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+.sensei-hero__breadcrumbs a {
+  color: #f5d97a;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sensei-hero__breadcrumbs a:hover {
+  color: #fff1bd;
+}
+
+.sensei-hero__breadcrumbs .divider {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media (max-width: 768px) {
+  .sensei-hero {
+    min-height: 300px;
+  }
+
+  .sensei-hero__overlay {
+    padding: 3rem 1.25rem;
+  }
+
+  .sensei-hero__breadcrumbs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    row-gap: 0.25rem;
+    justify-content: center;
+  }
+}
