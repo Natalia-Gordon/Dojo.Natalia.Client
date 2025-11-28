@@ -1,20 +1,49 @@
 .teacher-article {
-  background: linear-gradient(135deg, rgba(18, 25, 47, 0.92), rgba(27, 35, 61, 0.92));
-  border-radius: 2rem;
-  padding: 3rem;
-  color: #f4f6ff;
-  box-shadow: 0 20px 45px rgba(8, 12, 28, 0.35);
+  background: transparent;
+  padding: 0;
+  color: #333;
+  max-width: 100%;
 }
 
 .teacher-article__header {
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.teacher-article__header-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.teacher-article__avatar-wrapper {
+  flex-shrink: 0;
+}
+
+.teacher-article__avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #FB5B21;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+  padding: 0.5rem;
+}
+
+.teacher-article__header-text {
+  flex: 1;
+  min-width: 200px;
 }
 
 .teacher-article__headline {
   font-size: clamp(2rem, 3.2vw, 2.75rem);
   font-weight: 800;
   margin-bottom: 1rem;
-  color: #ffffff;
+  color: #222429;
+  line-height: 1.3;
 }
 
 .teacher-article__meta {
@@ -22,52 +51,95 @@
   gap: 1rem;
   align-items: center;
   font-size: 0.95rem;
-  color: rgba(235, 239, 255, 0.75);
+  color: #666;
+  margin-bottom: 0;
 }
 
 .teacher-article__meta .separator {
-  color: rgba(235, 239, 255, 0.45);
+  color: #999;
+}
+
+.teacher-article__section {
+  margin-bottom: 2.5rem;
 }
 
 .teacher-article__section + .teacher-article__section {
-  margin-top: 2.5rem;
+  margin-top: 3rem;
 }
 
 .teacher-article__section p {
-  font-size: 1.05rem;
-  line-height: 1.9;
-  margin-bottom: 1.25rem;
+  font-size: 1.125rem;
+  line-height: 1.85;
+  margin-bottom: 1.5rem;
+  color: #444;
+  text-align: justify;
 }
 
 .teacher-article__subheadline {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #f9d87a;
-  margin-bottom: 1rem;
+  color: #222429;
+  margin-bottom: 1.25rem;
+  margin-top: 2.5rem;
+  line-height: 1.4;
+  border-bottom: 2px solid #FB5B21;
+  padding-bottom: 0.5rem;
+  display: inline-block;
 }
 
 .source-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   margin-right: 0.75rem;
   font-size: 0.9rem;
-  color: #6dd6b6;
+  font-weight: 600;
+  color: #FB5B21;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: all 0.3s ease;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  background: transparent;
+  border: 1px solid #FB5B21;
+  outline: none;
 }
 
-.source-link:hover {
-  color: #aef2e1;
+.source-link:hover,
+.source-link:focus {
+  color: #ffffff;
+  background: #FB5B21;
+  border-color: #FB5B21;
+  transform: translateX(-3px);
+  outline: 2px solid rgba(251, 91, 33, 0.3);
+  outline-offset: 2px;
+}
+
+.source-link:focus-visible {
+  outline: 2px solid rgba(251, 91, 33, 0.5);
+  outline-offset: 2px;
 }
 
 .teacher-article__quote {
-  margin: 2.5rem 0;
-  padding: 1.75rem 2rem;
-  background: rgba(244, 216, 122, 0.12);
-  border-right: 6px solid #f9d87a;
+  margin: 3rem 0;
+  padding: 2rem 2.5rem;
+  background: #f8f9fa;
+  border-right: 4px solid #FB5B21;
   font-size: 1.25rem;
   line-height: 1.8;
-  color: #fff7d6;
-  border-radius: 1.5rem;
+  color: #333;
+  border-radius: 0.5rem;
+  position: relative;
+  font-style: italic;
+}
+
+.teacher-article__quote::before {
+  content: '"';
+  position: absolute;
+  top: 0.5rem;
+  right: 1.5rem;
+  font-size: 4rem;
+  color: rgba(251, 91, 33, 0.2);
+  font-family: serif;
+  line-height: 1;
 }
 
 .teacher-article__list {
@@ -78,24 +150,33 @@
 
 .teacher-article__list li {
   position: relative;
-  padding-right: 1.75rem;
-  margin-bottom: 0.85rem;
-  font-size: 1.05rem;
+  padding-right: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #444;
 }
 
 .teacher-article__list li::before {
   content: '\2713';
   position: absolute;
   right: 0;
-  color: #6dd6b6;
-  font-size: 1.1rem;
+  color: #FB5B21;
+  font-size: 1.25rem;
   line-height: 1;
   top: 0.1rem;
+  font-weight: bold;
 }
 
 .teacher-article__writings-intro {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 2.5rem;
+  border-top: 2px solid #e9ecef;
+  padding-top: 3rem;
+  margin-top: 3rem;
+}
+
+.teacher-article__writings-intro p {
+  color: #666;
+  font-size: 1.05rem;
 }
 
 .teacher-article__writings {
@@ -106,16 +187,60 @@
 }
 
 .teacher-article__writing-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 1.5rem;
+  background: #ffffff;
+  border-radius: 0.75rem;
   padding: 1.5rem 1.75rem;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.teacher-article__card-image {
+  width: 100%;
+  height: 140px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.teacher-article__card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(10%);
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.teacher-article__writing-card:hover .teacher-article__card-image img {
+  transform: scale(1.05);
+  filter: grayscale(0%);
+}
+
+.teacher-article__writing-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: #FB5B21;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .teacher-article__writing-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(8, 12, 28, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #FB5B21;
+}
+
+.teacher-article__writing-card:hover::before {
+  opacity: 1;
 }
 
 .teacher-article__writing-header {
@@ -128,26 +253,32 @@
 }
 
 .teacher-article__writing-card h4 {
-  font-size: 1.2rem;
-  color: #fef7d4;
-  margin: 0;
+  font-size: 1.25rem;
+  color: #222429;
+  margin: 0 0 0.75rem 0;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .teacher-article__writing-card p {
   margin: 0;
-  font-size: 0.98rem;
-  line-height: 1.8;
-  color: rgba(245, 247, 255, 0.9);
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #555;
 }
 
 .teacher-article__footer {
-  margin-top: 3rem;
+  margin-top: 4rem;
+  padding-top: 2.5rem;
+  border-top: 2px solid #e9ecef;
+  text-align: center;
 }
 
 .teacher-article__footer h4 {
   font-weight: 700;
-  margin-bottom: 1.25rem;
-  color: #fff;
+  margin-bottom: 1.5rem;
+  color: #222429;
+  font-size: 1.5rem;
 }
 
 .teacher-article__cta {
@@ -163,39 +294,106 @@
 }
 
 .teacher-article__cta .btn-outline-light {
-  color: #f4f6ff;
-  border-color: rgba(244, 246, 255, 0.4);
+  color: #222429;
+  border-color: #222429;
+  background: transparent;
 }
 
 .teacher-article__cta .btn-outline-light:hover {
-  border-color: #f4f6ff;
-  background: rgba(244, 246, 255, 0.12);
+  color: #ffffff;
+  background: #222429;
+  border-color: #222429;
 }
 
 .teacher-article__cta .btn-outline-primary {
-  color: #f9d87a;
-  border-color: rgba(249, 216, 122, 0.4);
+  color: #FB5B21;
+  border-color: #FB5B21;
+  background: transparent;
 }
 
 .teacher-article__cta .btn-outline-primary:hover {
-  color: #18203a;
-  background: #f9d87a;
-  border-color: #f9d87a;
+  color: #ffffff;
+  background: #FB5B21;
+  border-color: #FB5B21;
 }
 
 @media (max-width: 992px) {
-  .teacher-article {
-    padding: 2.25rem;
+  .teacher-article__header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .teacher-article__avatar {
+    width: 100px;
+    height: 100px;
   }
 }
 
 @media (max-width: 576px) {
-  .teacher-article {
-    padding: 1.75rem;
-  }
 
   .teacher-article__cta {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .teacher-article__writing-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .source-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .teacher-article__quote {
+    padding: 1.5rem 1.75rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* Smooth scroll animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.teacher-article__writing-card[data-aos="fade-up"] {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Accessibility improvements */
+.teacher-article__section:focus-within {
+  outline: 2px solid rgba(249, 216, 122, 0.5);
+  outline-offset: 8px;
+  border-radius: 0.5rem;
+}
+
+.teacher-article__cta .btn:focus-visible {
+  outline: 3px solid rgba(249, 216, 122, 0.8);
+  outline-offset: 3px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .back-to-top {
+    transition: opacity 0.1s ease;
   }
 }
