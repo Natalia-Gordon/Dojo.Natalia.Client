@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
 import { ZenSidebarComponent } from '../sidebar/sidebar.component';
 
@@ -12,9 +13,21 @@ import { ZenSidebarComponent } from '../sidebar/sidebar.component';
   styleUrl: './teacher-message.component.css'
 })
 export class TeacherMessageComponent implements OnInit, OnDestroy {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private titleService: Title,
+    private metaService: Meta
+  ) {}
 
   ngOnInit() {
+    // Set page title and meta description for SEO
+    this.titleService.setTitle('דברי המורה דני וקסמן | זן וחכמת חיים | דוג\'ו נטליה');
+    
+    this.metaService.updateTag({
+      name: 'description',
+      content: 'דברי השראה מהמורה דני וקסמן על תרגול זן בחיי היום-יום, יחסי מורה-תלמיד, והחיבור בין זן לג\'ודו. מאמרים נבחרים וכתבים על חכמת הזן והתרגול היומיומי.'
+    });
+
     // Smooth scroll behavior
     if (typeof document !== 'undefined') {
       document.documentElement.style.scrollBehavior = 'smooth';
