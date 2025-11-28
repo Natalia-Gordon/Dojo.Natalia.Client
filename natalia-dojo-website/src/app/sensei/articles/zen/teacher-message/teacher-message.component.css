@@ -2,7 +2,7 @@
 .teacher-article__header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid #e9ecef}
 .teacher-article__header-content{display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap}
 .teacher-article__avatar-wrapper{flex-shrink:0}
-.teacher-article__avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid #FB5B21;box-shadow:0 4px 12px rgba(0,0,0,.15);background:#fff;padding:.5rem}
+.teacher-article__avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,.15)}
 .teacher-article__header-text{flex:1;min-width:200px}
 .teacher-article__headline{font-size:clamp(2rem,3.2vw,2.75rem);font-weight:800;margin-bottom:1rem;color:#222429;line-height:1.3}
 .teacher-article__meta{display:flex;gap:1rem;align-items:center;font-size:.95rem;color:#666;margin:0}
