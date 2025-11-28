@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
 import { ZenSidebarComponent } from '../sidebar/sidebar.component';
 
@@ -11,6 +12,8 @@ import { ZenSidebarComponent } from '../sidebar/sidebar.component';
   styleUrl: './teacher-message.component.css'
 })
 export class TeacherMessageComponent implements OnInit, OnDestroy {
+  constructor(private router: Router) {}
+
   ngOnInit() {
     // Smooth scroll behavior
     if (typeof document !== 'undefined') {
@@ -22,5 +25,9 @@ export class TeacherMessageComponent implements OnInit, OnDestroy {
     if (typeof document !== 'undefined') {
       document.documentElement.style.scrollBehavior = 'auto';
     }
+  }
+
+  navigateToArticle(path: string) {
+    this.router.navigateByUrl(path);
   }
 }
