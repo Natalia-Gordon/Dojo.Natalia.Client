@@ -4,15 +4,20 @@ import { ZenSidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { CommentsListComponent, Comment } from '../../../../core/templates/comments-list/comments-list.component';
 import { AddcommentComponent } from '../../../../core/templates/addcomment/addcomment.component';
+import { AudioPlayerComponent } from '../../../../core/templates/audio-player/audio-player.component';
 
 @Component({
   selector: 'app-zen-today',
   standalone: true,
-  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent],
+  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent, AudioPlayerComponent],
   templateUrl: './zen-today.component.html',
   styleUrl: './zen-today.component.css'
 })
 export class ZenTodayComponent {
+  // Audio file path - place your audio file at: src/assets/audio/zen-today-dani-waxman.mp3
+  // Supported formats: MP3 (recommended), OGG, WAV
+  audioSrc = 'assets/audio/zen-today-dani-waxman.mp3';
+
   comments: Comment[] = [
     {
       id: 1,

@@ -1,0 +1,207 @@
+.audio-player {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.audio-player__header {
+  margin-bottom: 1rem;
+}
+
+.audio-player__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.audio-player__title i {
+  font-size: 1.5rem;
+  color: #0066cc;
+}
+
+.audio-player__author {
+  font-weight: 400;
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.audio-player__controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.audio-player__play-btn {
+  background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+  flex-shrink: 0;
+}
+
+.audio-player__play-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0052a3 0%, #003d7a 100%);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+}
+
+.audio-player__play-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.audio-player__play-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.audio-player__play-btn:focus-visible {
+  outline: 3px solid #0066cc;
+  outline-offset: 2px;
+}
+
+.audio-player__progress-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.audio-player__time {
+  font-size: 0.875rem;
+  color: #495057;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 40px;
+  text-align: center;
+}
+
+.audio-player__progress {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: #dee2e6;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  min-width: 100px;
+  direction: rtl;
+}
+
+.audio-player__progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0066cc;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.audio-player__progress::-webkit-slider-thumb:hover {
+  background: #0052a3;
+  transform: scale(1.2);
+}
+
+.audio-player__progress::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0066cc;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.audio-player__progress::-moz-range-thumb:hover {
+  background: #0052a3;
+  transform: scale(1.2);
+}
+
+.audio-player__progress::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to left, #0066cc 0%, #0066cc var(--progress, 0%), #dee2e6 var(--progress, 0%), #dee2e6 100%);
+}
+
+.audio-player__progress::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to left, #0066cc 0%, #0066cc var(--progress, 0%), #dee2e6 var(--progress, 0%), #dee2e6 100%);
+}
+
+.audio-player__progress:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.audio-player__loading {
+  display: flex;
+  align-items: center;
+  color: #6c757d;
+}
+
+.audio-player__error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dc3545;
+  padding: 0.75rem;
+  background: #f8d7da;
+  border-radius: 8px;
+  border: 1px solid #f5c6cb;
+}
+
+.audio-player__error i {
+  font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .audio-player {
+    padding: 1rem;
+  }
+
+  .audio-player__title {
+    font-size: 1.1rem;
+  }
+
+  .audio-player__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .audio-player__play-btn {
+    align-self: center;
+  }
+
+  .audio-player__progress-container {
+    width: 100%;
+  }
+
+  .audio-player__time {
+    font-size: 0.8rem;
+    min-width: 35px;
+  }
+}
+

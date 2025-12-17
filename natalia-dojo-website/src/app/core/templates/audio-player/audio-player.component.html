@@ -1,0 +1,54 @@
+<div class="audio-player" *ngIf="audioSrc">
+  <div class="audio-player__header">
+    <h3 class="audio-player__title">
+      <i class="bi bi-headphones" aria-hidden="true"></i>
+      {{ title }}
+      <span *ngIf="author" class="audio-player__author"> - {{ author }}</span>
+    </h3>
+  </div>
+
+  <audio #audioElement [src]="audioSrc" preload="metadata"></audio>
+
+  <div class="audio-player__controls" *ngIf="!hasError">
+    <button 
+      class="audio-player__play-btn"
+      (click)="togglePlayPause()"
+      [disabled]="isLoading"
+      [attr.aria-label]="isPlaying ? 'עצור' : 'נגן'"
+      [attr.aria-pressed]="isPlaying">
+      <i class="bi" 
+         [class.bi-pause-fill]="isPlaying" 
+         [class.bi-play-fill]="!isPlaying"
+         aria-hidden="true"></i>
+    </button>
+
+    <div class="audio-player__progress-container">
+      <span class="audio-player__time">{{ formatTime(currentTime) }}</span>
+      <input 
+        type="range" 
+        class="audio-player__progress"
+        dir="rtl"
+        [value]="progressPercentage"
+        (input)="onSeek($event)"
+        [style.--progress]="progressPercentage + '%'"
+        min="0"
+        max="100"
+        step="0.1"
+        [disabled]="isLoading || !duration"
+        aria-label="התקדמות השמעה">
+      <span class="audio-player__time">{{ formatTime(duration) }}</span>
+    </div>
+
+    <div class="audio-player__loading" *ngIf="isLoading">
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">טוען...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="audio-player__error" *ngIf="hasError">
+    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+    <span>{{ errorMessage || 'שגיאה בטעינת האודיו' }}</span>
+  </div>
+</div>
+
