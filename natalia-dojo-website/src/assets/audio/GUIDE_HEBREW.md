@@ -32,11 +32,10 @@
 
 אם אתם רוצים פתרון זמני עד להקלטה האמיתית, הנה שירותי TTS בעברית:
 
-#### 1. **Narakeet** (מומלץ)
-- אתר: https://www.narakeet.com/languages/hebrew-text-to-speech/
-- מציע קולות עבריים טבעיים
+#### 1. **luvvoice** (מומלץ) - בזה השתמשתי
+- אתר: https://luvvoice.com/
+- מציע קולות עבריים טבעיים חינמי
 - יוצא ישירות ל-MP3
-- **עלות:** ~$10 לחודש (יש גרסת ניסיון)
 
 #### 2. **TTSForge**
 - אתר: https://ttsforge.com/language/he-IL
