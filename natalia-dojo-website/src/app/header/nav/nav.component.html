@@ -25,6 +25,8 @@
             </div>
             <a routerLink="/testimonial" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">ממליצים</a>
             <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">צור קשר</a>
+            <a *ngIf="!isAuthenticated" href="#" (click)="openLoginModal(); closeMobileMenu(); $event.preventDefault()" class="nav-item nav-link" style="cursor: pointer;">התחברות</a>
+            <a *ngIf="isAuthenticated" (click)="logout(); closeMobileMenu()" class="nav-item nav-link" style="cursor: pointer;">התנתקות</a>
         </div>
     </div>
 </nav>

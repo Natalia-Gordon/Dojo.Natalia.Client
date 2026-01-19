@@ -4,13 +4,14 @@ import { setTheme } from 'ngx-bootstrap/utils';
 import { HeaderComponent } from "./header/header.component";
 import { FooterComponent } from "./footer/footer.component";
 import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
 
 @Component({
     selector: 'app-root',
     standalone: true,
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    imports: [RouterOutlet, HeaderComponent, FooterComponent, HomeComponent]
+    imports: [RouterOutlet, HeaderComponent, FooterComponent, HomeComponent, LoginComponent]
 })
 export class AppComponent {
   title = 'Natalia Ninjutsu Dojo';
