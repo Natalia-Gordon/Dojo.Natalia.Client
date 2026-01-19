@@ -26,7 +26,17 @@
             <a routerLink="/testimonial" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">ממליצים</a>
             <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">צור קשר</a>
             <div class="nav-item nav-link-auth" *ngIf="!isAuthenticated">
-                <a href="#" (click)="openLoginModal(); closeMobileMenu(); $event.preventDefault()" class="nav-link" style="cursor: pointer;">התחברות</a>
+                <button 
+                    type="button" 
+                    class="btn-login"
+                    (click)="openLoginModal(); closeMobileMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <span class="login-text">התחברות</span>
+                </button>
             </div>
             <div class="nav-item nav-link-auth" *ngIf="isAuthenticated">
                 <app-user-menu></app-user-menu>
