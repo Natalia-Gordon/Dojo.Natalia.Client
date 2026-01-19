@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
+import { UserMenuComponent } from '../../user-menu/user-menu.component';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -10,7 +11,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule]
+  imports: [RouterModule, CommonModule, UserMenuComponent]
 })
 export class NavComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
@@ -22,9 +23,7 @@ export class NavComponent implements OnInit, OnDestroy {
   ) {}
 
   openLoginModal(): void {
-    console.log('Opening login modal');
     this.loginModalService.open();
-    console.log('Modal service isOpen:', this.loginModalService.isOpen);
   }
 
   ngOnInit(): void {
@@ -41,9 +40,6 @@ export class NavComponent implements OnInit, OnDestroy {
     this.authSubscription?.unsubscribe();
   }
 
-  logout(): void {
-    this.authService.logout();
-  }
   
   closeMobileMenu(): void {
     // Only close menu on mobile/tablet devices (non-desktop)

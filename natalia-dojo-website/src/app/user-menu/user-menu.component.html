@@ -1,0 +1,58 @@
+<div class="user-menu-container" *ngIf="userInfo">
+  <!-- User Avatar Button -->
+  <button 
+    type="button" 
+    class="user-avatar-btn"
+    (click)="toggleMenu()"
+    [class.active]="isMenuOpen">
+    <div class="user-avatar">
+      <span class="avatar-initial">{{ getInitials() }}</span>
+    </div>
+  </button>
+
+  <!-- Dropdown Menu -->
+  <div class="user-menu-dropdown" *ngIf="isMenuOpen">
+    <!-- User Header Section -->
+    <div class="user-menu-header">
+      <div class="user-avatar-large">
+        <span class="avatar-initial-large">{{ getInitials() }}</span>
+      </div>
+      <div class="user-info">
+        <div class="user-name">{{ userInfo.displayName || userInfo.username }}</div>
+        <div class="user-email">{{ userInfo.email }}</div>
+        <div class="user-badges">
+          <span class="badge" [ngClass]="getLevelColor(userInfo.level)">
+            {{ userInfo.level || 'User' }}
+          </span>
+          <span class="badge badge-role" *ngIf="userInfo.role">
+            {{ userInfo.role }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Separator -->
+    <div class="menu-separator"></div>
+
+    <!-- Menu Items -->
+    <div class="menu-items">
+      <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
+        <span class="menu-icon">👤</span>
+        <span>הגדרות פרופיל</span>
+      </a>
+      <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
+        <span class="menu-icon">🛒</span>
+        <span>הרכישות שלי</span>
+      </a>
+    </div>
+
+    <!-- Separator -->
+    <div class="menu-separator"></div>
+
+    <!-- Logout Button -->
+    <button type="button" class="menu-item menu-item-logout" (click)="onLogout()">
+      <span class="menu-icon">🚪</span>
+      <span>התנתקות</span>
+    </button>
+  </div>
+</div>

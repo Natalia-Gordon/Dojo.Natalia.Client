@@ -24,6 +24,19 @@ export interface TokenResponse {
   refreshTokenExpiresAt: string;
 }
 
+export interface LogoutRequest {
+  refreshToken: string | null;
+}
+
+export interface UserInfo {
+  userId: number;
+  username: string | null;
+  email: string | null;
+  displayName: string | null;
+  role: string | null;
+  level: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,11 +51,18 @@ export class AuthService {
   private refreshTokenSubject = new BehaviorSubject<string | null>(this.getStoredRefreshToken());
   public refreshToken$ = this.refreshTokenSubject.asObservable();
 
+  private userInfoSubject = new BehaviorSubject<UserInfo | null>(this.getStoredUserInfo());
+  public userInfo$ = this.userInfoSubject.asObservable();
+
   constructor() {
-    // Check for stored token on initialization
+    // Check for stored token and user info on initialization
     const token = this.getStoredToken();
     if (token) {
       this.tokenSubject.next(token);
+    }
+    const userInfo = this.getStoredUserInfo();
+    if (userInfo) {
+      this.userInfoSubject.next(userInfo);
     }
   }
 
@@ -73,6 +93,16 @@ export class AuthService {
         if (response.refreshToken) {
           this.setRefreshToken(response.refreshToken);
         }
+        // Store user info
+        const userInfo: UserInfo = {
+          userId: response.userId,
+          username: response.username,
+          email: response.email,
+          displayName: response.displayName,
+          role: response.role,
+          level: response.level
+        };
+        this.setUserInfo(userInfo);
       }),
       catchError(error => {
         console.error('Login error:', error);
@@ -84,9 +114,45 @@ export class AuthService {
   /**
    * Logout user and clear token
    */
-  logout(): void {
-    this.clearToken();
-    this.router.navigate(['/home']);
+  logout(): Observable<void> {
+    const refreshToken = this.getRefreshToken();
+    const logoutRequest: LogoutRequest = {
+      refreshToken: refreshToken
+    };
+
+    // Call logout API
+    return this.http.post<void>(`${this.apiUrl}/users/logout`, logoutRequest, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(() => {
+        // Clear tokens and user info regardless of API response
+        this.clearToken();
+        this.clearUserInfo();
+        this.router.navigate(['/home']);
+      }),
+      catchError(error => {
+        // Even if API call fails, clear local data
+        console.error('Logout error:', error);
+        this.clearToken();
+        this.clearUserInfo();
+        this.router.navigate(['/home']);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Get current user info
+   */
+  getUserInfo(): UserInfo | null {
+    return this.userInfoSubject.value;
+  }
+
+  /**
+   * Get refresh token
+   */
+  getRefreshToken(): string | null {
+    return this.refreshTokenSubject.value;
   }
 
   /**
@@ -140,6 +206,43 @@ export class AuthService {
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('refresh_token', token);
       this.refreshTokenSubject.next(token);
+    }
+  }
+
+  /**
+   * Get stored user info from localStorage
+   */
+  private getStoredUserInfo(): UserInfo | null {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const stored = localStorage.getItem('user_info');
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch {
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Store user info in localStorage and update subject
+   */
+  private setUserInfo(userInfo: UserInfo): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('user_info', JSON.stringify(userInfo));
+      this.userInfoSubject.next(userInfo);
+    }
+  }
+
+  /**
+   * Clear user info from localStorage and update subject
+   */
+  private clearUserInfo(): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('user_info');
+      this.userInfoSubject.next(null);
     }
   }
 
