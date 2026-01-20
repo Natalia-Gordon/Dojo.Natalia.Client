@@ -17,7 +17,7 @@ RUN npm install
 #Copy other files and folder to working directory
 COPY . .
 
-# Generate the build of the application
-RUN npm run build
+# Generate the build of the application (production configuration)
+RUN npm run build -- --configuration production
 
 CMD ["ng", "serve", "--host", "0.0.0.0"]

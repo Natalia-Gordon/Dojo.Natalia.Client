@@ -23,7 +23,7 @@ steps:
     - '--platform'
     - 'managed'
     - '--min-instances'
-    - '0'
+    - '1'
     - '--max-instances'
     - '1'
     - '--allow-unauthenticated'
