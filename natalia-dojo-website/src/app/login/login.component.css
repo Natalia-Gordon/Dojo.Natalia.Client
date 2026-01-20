@@ -11,6 +11,16 @@
   background: transparent;
   border-bottom: 1px solid rgba(51, 65, 85, 0.8);
   padding: 1.5rem;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login-close-btn {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  order: -1;
 }
 
 .login-modal-body {
