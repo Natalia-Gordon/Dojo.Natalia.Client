@@ -16,10 +16,10 @@ import { RecentArticlesComponent } from "./recent-articles/recent-articles.compo
 export class HomeComponent implements OnInit {
     constructor(private title: Title, private meta: Meta) {}
     ngOnInit(): void {
-        this.title.setTitle('דף הבית | דוג׳ו נטליה');
+        this.title.setTitle('דוג׳ו נטליה - נינג׳וטסו ואומנויות לחימה באופקים');
         this.meta.updateTag({
             name: 'description',
-            content: 'דף הבית של דוג׳ו נטליה - נינג׳וטסו, אומנויות לחימה, מדריכה מוסמכת בתל אביב, שיטות עבודה יפניות, פילוסופיה וקהילה.'
+            content: 'דוג׳ו נטליה - בית ספר לנינג׳וטסו ואומנויות לחימה באופקים. אימוני הגנה עצמית, שיטות עבודה יפניות מסורתיות, פילוסופיה וקהילה מקצועית. הירשם לאימון ניסיון.'
         });
     }
 }
