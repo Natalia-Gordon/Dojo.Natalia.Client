@@ -1,0 +1,106 @@
+<!-- Login Modal -->
+<div class="modal fade" [class.show]="showModal" [class.d-block]="showModal" tabindex="-1" role="dialog" (click)="onBackdropClick($event)" [style.display]="showModal ? 'block' : 'none'">
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+        <div class="modal-content login-modal-content">
+            <div class="modal-header login-modal-header">
+                <button type="button" class="btn-close btn-close-white login-close-btn" (click)="closeModal()" aria-label="Close"></button>
+                <h5 class="modal-title login-title">התחברות לדוג'ו</h5>
+            </div>
+            <div class="modal-body login-modal-body">
+                <p class="login-subtitle">היכנסו לחשבון שלכם כדי לגשת לאימונים ומשאבי הנינג'וטסו</p>
+
+                <!-- Tabs -->
+                <div class="login-tabs">
+                    <button 
+                        type="button"
+                        class="tab-button" 
+                        [class.active]="activeTab === 'login'"
+                        (click)="setActiveTab('login')">
+                        התחברות
+                    </button>
+                    <button 
+                        type="button"
+                        class="tab-button" 
+                        [class.active]="activeTab === 'register'"
+                        (click)="setActiveTab('register')">
+                        הרשמה
+                    </button>
+                </div>
+
+                <!-- Login Form -->
+                <div class="login-content" *ngIf="activeTab === 'login'">
+                    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+                        <!-- Username/Email Field -->
+                        <div class="form-group">
+                            <label for="username" class="form-label">שם משתמש או אימייל</label>
+                            <div class="input-wrapper">
+                                <input
+                                    id="username"
+                                    type="text"
+                                    formControlName="username"
+                                    class="form-input"
+                                    [class.error]="username?.invalid && username?.touched"
+                                    placeholder="הזן שם משתמש או אימייל"
+                                    autocomplete="username"
+                                    required>
+                            </div>
+                            <div class="error-message" *ngIf="username?.invalid && username?.touched">
+                                <span *ngIf="username?.errors?.['required']">שם משתמש נדרש</span>
+                            </div>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="form-group">
+                            <label for="password" class="form-label">סיסמה</label>
+                            <div class="input-wrapper">
+                                <input
+                                    id="password"
+                                    type="password"
+                                    formControlName="password"
+                                    class="form-input"
+                                    [class.error]="password?.invalid && password?.touched"
+                                    placeholder="הזן סיסמה"
+                                    autocomplete="current-password"
+                                    required>
+                            </div>
+                            <div class="error-message" *ngIf="password?.invalid && password?.touched">
+                                <span *ngIf="password?.errors?.['required']">סיסמה נדרשת</span>
+                                <span *ngIf="password?.errors?.['minlength']">סיסמה חייבת להיות לפחות 6 תווים</span>
+                            </div>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div class="alert-error" *ngIf="errorMessage">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span>{{ errorMessage }}</span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button 
+                            type="submit" 
+                            class="submit-button"
+                            [disabled]="isLoading || loginForm.invalid">
+                            <span *ngIf="!isLoading">התחבר</span>
+                            <span *ngIf="isLoading">מתחבר...</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Register Tab (placeholder for future implementation) -->
+                <div class="login-content" *ngIf="activeTab === 'register'">
+                    <div class="coming-soon">
+                        <p>הרשמה זמינה בקרוב</p>
+                        <p class="coming-soon-subtitle">בינתיים, אנא צרו קשר דרך עמוד <a routerLink="/contact" class="link" (click)="closeModal()">צור קשר</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" (click)="closeModal()"></div>

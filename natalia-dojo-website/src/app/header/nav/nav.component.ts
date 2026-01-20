@@ -1,14 +1,45 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../_services/auth.service';
+import { LoginModalService } from '../../_services/login-modal.service';
+import { UserMenuComponent } from '../../user-menu/user-menu.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css'],
   standalone: true,
-  imports: [RouterModule]
+  imports: [RouterModule, CommonModule, UserMenuComponent]
 })
-export class NavComponent {
+export class NavComponent implements OnInit, OnDestroy {
+  isAuthenticated = false;
+  private authSubscription?: Subscription;
+
+  constructor(
+    private authService: AuthService,
+    private loginModalService: LoginModalService
+  ) {}
+
+  openLoginModal(): void {
+    this.loginModalService.open();
+  }
+
+  ngOnInit(): void {
+    // Check initial authentication status
+    this.isAuthenticated = this.authService.isAuthenticated();
+    
+    // Subscribe to authentication changes
+    this.authSubscription = this.authService.token$.subscribe(token => {
+      this.isAuthenticated = !!token;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
+  }
+
   
   closeMobileMenu(): void {
     // Only close menu on mobile/tablet devices (non-desktop)
