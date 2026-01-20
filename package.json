@@ -1,4 +1,9 @@
 {
+  "name": "dojo-natalia-client",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "cd natalia-dojo-website && npm test"
+  },
   "dependencies": {
     "@kolkov/ngx-gallery": "^2.0.1",
     "jquery": "^3.7.1",
