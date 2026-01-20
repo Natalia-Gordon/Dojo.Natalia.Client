@@ -17,6 +17,12 @@ RUN npm install
 #Copy other files and folder to working directory
 COPY . .
 
+# Clean any existing build artifacts
+RUN rm -rf dist
+
+# Verify environment file before build
+RUN cat environments/environment.ts
+
 # Generate the build of the application (production configuration)
 RUN npm run build -- --configuration production
 

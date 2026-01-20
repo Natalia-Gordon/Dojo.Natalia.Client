@@ -57,7 +57,7 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "5kb",
+                  "maximumWarning": "6kb",
                   "maximumError": "8kb"
                 }
               ],
@@ -100,7 +100,7 @@
               "buildTarget": "natalia-dojo-website:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "production"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",

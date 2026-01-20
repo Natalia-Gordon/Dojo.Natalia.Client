@@ -5,6 +5,11 @@ import { map, catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
+// Force explicit check - ensure we're using the correct environment
+if (!environment.apiUrl) {
+  console.error('CRITICAL: environment.apiUrl is undefined!');
+}
+
 export interface LoginRequest {
   identifier: string | null;
   password: string | null;
@@ -55,13 +60,23 @@ export class AuthService {
   public userInfo$ = this.userInfoSubject.asObservable();
 
   constructor() {
+    // Log environment info for debugging (only in production to help diagnose issues)
+    if (environment.production) {
+      console.log('Production mode detected');
+      console.log('Environment API URL:', environment.apiUrl);
+      console.log('Service API URL:', this.apiUrl);
+      console.log('Environment production flag:', environment.production);
+    }
+    
     // Validate API URL configuration
     if (!this.apiUrl) {
       console.error('API URL is not configured in environment!');
       throw new Error('API URL is not configured. Please check environment configuration.');
     }
     if (this.apiUrl.includes('localhost') && environment.production) {
-      console.error('ERROR: Using localhost API URL in production mode! Current API URL:', this.apiUrl);
+      console.error('ERROR: Using localhost API URL in production mode!');
+      console.error('Current API URL:', this.apiUrl);
+      console.error('Environment object:', environment);
       throw new Error('Production build is using localhost API URL. Check environment configuration.');
     }
     
