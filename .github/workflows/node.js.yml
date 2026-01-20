@@ -21,11 +21,29 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+
+    - name: Install root dependencies
+      run: npm ci
+
+    - name: Build (if present)
+      run: npm run build --if-present
+
+    - name: Install natalia-dojo-website dependencies
+      working-directory: natalia-dojo-website
+      run: |
+        # Use npm ci if a package-lock.json exists in natalia-dojo-website, otherwise use npm install
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          npm install
+        fi
+
+    - name: Run natalia-dojo-website tests
+      working-directory: natalia-dojo-website
+      run: npm test -- --watch=false --browsers=ChromeHeadless
