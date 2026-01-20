@@ -43,10 +43,12 @@ import { LetGoZenJudoComponent } from './sensei/articles/zen/let-go-zen-judo/let
 import { TeacherStudentRelationshipComponent } from './sensei/articles/zen/teacher-student-relationship/teacher-student-relationship.component';
 import { ZenDisabilitiesComponent } from './sensei/articles/zen/zen-disabilities/zen-disabilities.component';
 import { HumanLifeImportanceComponent } from './sensei/articles/zen/human-life-importance/human-life-importance.component';
+import { LoginComponent } from './login/login.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
     {path: "home", component: HomeComponent},
+    {path: "login", component: LoginComponent},
     {path: "gallery", component: PhotoGalleryComponent},
     {path: "about", component: AboutComponent},
     {path: "contact", component: ContactComponent},
