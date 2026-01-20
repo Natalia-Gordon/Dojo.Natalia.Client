@@ -43,7 +43,7 @@ export interface UserInfo {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = environment.apiUrl || 'http://localhost:5000/api';
+  private apiUrl = environment.apiUrl;
   
   private tokenSubject = new BehaviorSubject<string | null>(this.getStoredToken());
   public token$ = this.tokenSubject.asObservable();
@@ -55,6 +55,16 @@ export class AuthService {
   public userInfo$ = this.userInfoSubject.asObservable();
 
   constructor() {
+    // Validate API URL configuration
+    if (!this.apiUrl) {
+      console.error('API URL is not configured in environment!');
+      throw new Error('API URL is not configured. Please check environment configuration.');
+    }
+    if (this.apiUrl.includes('localhost') && environment.production) {
+      console.error('ERROR: Using localhost API URL in production mode! Current API URL:', this.apiUrl);
+      throw new Error('Production build is using localhost API URL. Check environment configuration.');
+    }
+    
     // Check for stored token and user info on initialization
     const token = this.getStoredToken();
     if (token) {
