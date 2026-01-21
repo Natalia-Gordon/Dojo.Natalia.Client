@@ -48,25 +48,34 @@ export interface User {
   id: number;
   username: string | null;
   email: string | null;
+  passwordHash?: string | null; // Not displayed, but may be in response
+  firstName?: string | null;
+  lastName?: string | null;
   displayName: string | null;
+  phone?: string | null; // API uses 'phone', not 'phoneNumber'
+  phoneNumber?: string | null; // For backward compatibility
+  dateOfBirth?: string | null;
   role: string | null;
   level: string | null;
-  address?: string | null;
-  phoneNumber?: string | null;
-  dateOfBirth?: string | null;
+  currentRankId?: number | null;
+  senseiDiplomaId?: number | null;
+  profileImageUrl?: string | null;
+  bio?: string | null;
   joinDate?: string | null;
-  lastLoginAt?: string | null;
   isActive?: boolean;
+  isEmailVerified?: boolean;
+  lastLoginAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
 export interface UpdateUserRequest {
-  username?: string | null;
-  email?: string | null;
   displayName?: string | null;
-  address?: string | null;
-  phoneNumber?: string | null;
-  dateOfBirth?: string | null;
-  password?: string | null;
+  phone?: string | null;
+  profileImageUrl?: string | null;
+  bio?: string | null;
+  dateOfBirth?: string | null; // Format: YYYY-MM-DD
+  isActive?: boolean;
 }
 
 @Injectable({

@@ -76,6 +76,19 @@
   gap: 1rem;
 }
 
+.user-avatar-large-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.user-avatar-large-btn:hover {
+  transform: scale(1.1);
+}
+
 .user-avatar-large {
   width: 48px;
   height: 48px;
@@ -85,7 +98,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.user-avatar-large-btn:hover .user-avatar-large {
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+  border-color: #fff;
 }
 
 .avatar-initial-large {

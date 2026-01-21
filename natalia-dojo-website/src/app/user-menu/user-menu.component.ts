@@ -45,6 +45,11 @@ export class UserMenuComponent implements OnInit, OnDestroy {
     this.router.navigate(['/user-details']);
   }
 
+  onMenuAvatarClick(): void {
+    this.closeMenu();
+    this.router.navigate(['/user-details']);
+  }
+
   closeMenu(): void {
     this.isMenuOpen = false;
   }

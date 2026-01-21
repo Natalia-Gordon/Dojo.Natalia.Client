@@ -14,10 +14,16 @@
                     <div class="user-avatar-large">
                         <span class="avatar-initial-large">{{ getUserInitials() }}</span>
                     </div>
-                    <h4 class="user-info-card__name">{{ user.displayName || user.username }}</h4>
+                    <h4 class="user-info-card__name">
+                        {{ getDisplayName() }}
+                    </h4>
                     <p class="user-info-card__email">
                         <i class="bi bi-envelope me-1"></i>
                         {{ user.email }}
+                    </p>
+                    <p class="user-info-card__full-name" *ngIf="user.firstName || user.lastName">
+                        <i class="bi bi-person me-1"></i>
+                        {{ user.firstName }} {{ user.lastName }}
                     </p>
                 </div>
 
@@ -34,14 +40,14 @@
                         </div>
                     </div>
 
-                    <!-- Join Date -->
-                    <div class="info-item" *ngIf="user.joinDate">
+                    <!-- Join Date or Created At -->
+                    <div class="info-item" *ngIf="user.joinDate || user.createdAt">
                         <div class="info-item__icon">
                             <i class="bi bi-calendar-date"></i>
                         </div>
                         <div class="info-item__content">
                             <div class="info-item__label">תאריך הצטרפות</div>
-                            <div class="info-item__value">{{ formatDate(user.joinDate) }}</div>
+                            <div class="info-item__value">{{ formatDate(user.joinDate || user.createdAt) }}</div>
                         </div>
                     </div>
 
@@ -86,6 +92,43 @@
                                     {{ user.isActive ? 'פעיל' : 'לא פעיל' }}
                                 </span>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Verified -->
+                    <div class="info-item" *ngIf="user.isEmailVerified !== undefined">
+                        <div class="info-item__icon">
+                            <i class="bi" [class.bi-check-circle-fill]="user.isEmailVerified" [class.bi-x-circle-fill]="!user.isEmailVerified" [ngClass]="user.isEmailVerified ? 'text-success' : 'text-warning'"></i>
+                        </div>
+                        <div class="info-item__content">
+                            <div class="info-item__label">אימות דוא"ל</div>
+                            <div class="info-item__value">
+                                <span class="badge" [ngClass]="user.isEmailVerified ? 'bg-success' : 'bg-warning'">
+                                    {{ user.isEmailVerified ? 'מאומת' : 'לא מאומת' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Created At -->
+                    <div class="info-item" *ngIf="user.createdAt">
+                        <div class="info-item__icon">
+                            <i class="bi bi-calendar-plus"></i>
+                        </div>
+                        <div class="info-item__content">
+                            <div class="info-item__label">תאריך יצירה</div>
+                            <div class="info-item__value">{{ formatDate(user.createdAt) }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Updated At -->
+                    <div class="info-item" *ngIf="user.updatedAt">
+                        <div class="info-item__icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="info-item__content">
+                            <div class="info-item__label">עודכן לאחרונה</div>
+                            <div class="info-item__value">{{ formatDate(user.updatedAt) }}</div>
                         </div>
                     </div>
                 </div>
@@ -181,6 +224,28 @@
                                     </div>
                                 </div>
 
+                                <!-- First Name -->
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label text-secondary fw-bold">שם פרטי</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control bg-white border-0 shadow-sm" 
+                                        formControlName="firstName"
+                                        [readonly]="!isEditMode"
+                                        style="height: 45px;">
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label text-secondary fw-bold">שם משפחה</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control bg-white border-0 shadow-sm" 
+                                        formControlName="lastName"
+                                        [readonly]="!isEditMode"
+                                        style="height: 45px;">
+                                </div>
+
                                 <!-- Display Name -->
                                 <div class="col-12 col-md-6">
                                     <label class="form-label text-secondary fw-bold">שם תצוגה</label>
@@ -198,18 +263,7 @@
                                     <input 
                                         type="tel" 
                                         class="form-control bg-white border-0 shadow-sm" 
-                                        formControlName="phoneNumber"
-                                        [readonly]="!isEditMode"
-                                        style="height: 45px;">
-                                </div>
-
-                                <!-- Address -->
-                                <div class="col-12">
-                                    <label class="form-label text-secondary fw-bold">כתובת</label>
-                                    <input 
-                                        type="text" 
-                                        class="form-control bg-white border-0 shadow-sm" 
-                                        formControlName="address"
+                                        formControlName="phone"
                                         [readonly]="!isEditMode"
                                         style="height: 45px;">
                                 </div>
@@ -218,11 +272,25 @@
                                 <div class="col-12 col-md-6">
                                     <label class="form-label text-secondary fw-bold">תאריך לידה</label>
                                     <input 
+                                        *ngIf="isEditMode"
                                         type="date" 
                                         class="form-control bg-white border-0 shadow-sm" 
                                         formControlName="dateOfBirth"
-                                        [readonly]="!isEditMode"
                                         style="height: 45px;">
+                                    <div *ngIf="!isEditMode && user" class="form-control bg-white border-0 shadow-sm d-flex align-items-center" style="height: 45px; min-height: 45px;">
+                                        {{ formatDate(user.dateOfBirth) || 'לא הוגדר' }}
+                                    </div>
+                                </div>
+
+                                <!-- Bio -->
+                                <div class="col-12">
+                                    <label class="form-label text-secondary fw-bold">אודות</label>
+                                    <textarea 
+                                        class="form-control bg-white border-0 shadow-sm" 
+                                        formControlName="bio"
+                                        [readonly]="!isEditMode"
+                                        rows="4"
+                                        placeholder="ספר על עצמך..."></textarea>
                                 </div>
                             </div>
                         </div>

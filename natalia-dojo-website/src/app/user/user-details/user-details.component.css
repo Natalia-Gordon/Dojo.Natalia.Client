@@ -32,7 +32,14 @@
 .user-info-card__email {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.user-info-card__full-name {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
   margin: 0;
+  font-style: italic;
 }
 
 .user-info-card__body {

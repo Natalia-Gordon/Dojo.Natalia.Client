@@ -34,12 +34,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private loginModalService: LoginModalService
   ) {
     this.profileForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      username: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
+      firstName: [''],
+      lastName: [''],
       displayName: [''],
-      address: [''],
-      phoneNumber: [''],
+      phone: [''], // Use 'phone' to match API
       dateOfBirth: [''],
+      bio: [''],
       password: ['', [Validators.minLength(6)]],
       confirmPassword: ['']
     }, { validators: this.passwordMatchValidator });
@@ -93,13 +95,18 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   populateForm(user: User): void {
+    // Map phone from API (can be 'phone' or 'phoneNumber')
+    const phoneValue = user.phone || user.phoneNumber || '';
+    
     this.profileForm.patchValue({
       username: user.username || '',
       email: user.email || '',
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
       displayName: user.displayName || '',
-      address: user.address || '',
-      phoneNumber: user.phoneNumber || '',
+      phone: phoneValue,
       dateOfBirth: user.dateOfBirth ? user.dateOfBirth.split('T')[0] : '',
+      bio: user.bio || '',
       password: '',
       confirmPassword: ''
     });
@@ -111,17 +118,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     if (!this.isEditMode) {
       // Disable form controls in view mode
       this.profileForm.get('email')?.disable({ onlySelf: true });
+      this.profileForm.get('firstName')?.disable({ onlySelf: true });
+      this.profileForm.get('lastName')?.disable({ onlySelf: true });
       this.profileForm.get('displayName')?.disable({ onlySelf: true });
-      this.profileForm.get('address')?.disable({ onlySelf: true });
-      this.profileForm.get('phoneNumber')?.disable({ onlySelf: true });
+      this.profileForm.get('phone')?.disable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.disable({ onlySelf: true });
+      this.profileForm.get('bio')?.disable({ onlySelf: true });
     } else {
       // Enable form controls in edit mode (username stays disabled)
       this.profileForm.get('email')?.enable({ onlySelf: true });
+      this.profileForm.get('firstName')?.enable({ onlySelf: true });
+      this.profileForm.get('lastName')?.enable({ onlySelf: true });
       this.profileForm.get('displayName')?.enable({ onlySelf: true });
-      this.profileForm.get('address')?.enable({ onlySelf: true });
-      this.profileForm.get('phoneNumber')?.enable({ onlySelf: true });
+      this.profileForm.get('phone')?.enable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.enable({ onlySelf: true });
+      this.profileForm.get('bio')?.enable({ onlySelf: true });
     }
   }
 
@@ -156,18 +167,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       // Disable form controls (view mode)
       this.profileForm.get('username')?.disable({ onlySelf: true });
       this.profileForm.get('email')?.disable({ onlySelf: true });
+      this.profileForm.get('firstName')?.disable({ onlySelf: true });
+      this.profileForm.get('lastName')?.disable({ onlySelf: true });
       this.profileForm.get('displayName')?.disable({ onlySelf: true });
-      this.profileForm.get('address')?.disable({ onlySelf: true });
-      this.profileForm.get('phoneNumber')?.disable({ onlySelf: true });
+      this.profileForm.get('phone')?.disable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.disable({ onlySelf: true });
+      this.profileForm.get('bio')?.disable({ onlySelf: true });
     } else {
-      // Enable form controls for editing
-      this.profileForm.get('username')?.enable({ onlySelf: true });
+      // Enable form controls for editing (username remains disabled)
       this.profileForm.get('email')?.enable({ onlySelf: true });
+      this.profileForm.get('firstName')?.enable({ onlySelf: true });
+      this.profileForm.get('lastName')?.enable({ onlySelf: true });
       this.profileForm.get('displayName')?.enable({ onlySelf: true });
-      this.profileForm.get('address')?.enable({ onlySelf: true });
-      this.profileForm.get('phoneNumber')?.enable({ onlySelf: true });
+      this.profileForm.get('phone')?.enable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.enable({ onlySelf: true });
+      this.profileForm.get('bio')?.enable({ onlySelf: true });
     }
     this.isEditMode = !this.isEditMode;
     this.errorMessage = null;
@@ -184,21 +198,25 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.errorMessage = null;
     this.successMessage = null;
 
-    const formValue = this.profileForm.value;
+    // Use getRawValue() to get all values including disabled controls
+    const formValue = this.profileForm.getRawValue();
+    
+    // Build update request according to API specification
     const updateRequest: UpdateUserRequest = {
-      // Username is not included - it cannot be changed after creation
-      email: formValue.email,
       displayName: formValue.displayName || null,
-      address: formValue.address || null,
-      phoneNumber: formValue.phoneNumber || null,
-      dateOfBirth: formValue.dateOfBirth || null,
-      password: formValue.password || null
+      phone: formValue.phone || null,
+      profileImageUrl: this.user?.profileImageUrl || null,
+      bio: formValue.bio || null,
+      dateOfBirth: formValue.dateOfBirth ? formValue.dateOfBirth.trim() || null : null,
+      isActive: this.user?.isActive !== undefined ? this.user.isActive : true
     };
 
-    // Remove password from request if it's empty
-    if (!updateRequest.password) {
-      delete updateRequest.password;
-    }
+    // Remove null/empty values to keep request clean
+    Object.keys(updateRequest).forEach(key => {
+      if (updateRequest[key as keyof UpdateUserRequest] === null || updateRequest[key as keyof UpdateUserRequest] === '') {
+        delete updateRequest[key as keyof UpdateUserRequest];
+      }
+    });
 
     this.authService.updateUser(this.user.id, updateRequest)
       .pipe(takeUntil(this.destroy$))
@@ -257,6 +275,17 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  getDisplayName(): string {
+    if (!this.user) return '';
+    if (this.user.displayName) {
+      return this.user.displayName;
+    }
+    if (this.user.firstName && this.user.lastName) {
+      return `${this.user.firstName} ${this.user.lastName}`;
+    }
+    return this.user.username || '';
+  }
+
   getUserInitials(): string {
     if (this.user?.displayName) {
       const names = this.user.displayName.split(' ');
@@ -285,13 +314,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   formatDate(dateString: string | null | undefined): string {
     if (!dateString) return '';
     try {
+      // Handle date-only strings (YYYY-MM-DD) or ISO datetime strings
+      const dateStr = dateString.split('T')[0]; // Extract date part if it's a datetime
+      const [year, month, day] = dateStr.split('-');
+      if (year && month && day) {
+        return `${day}/${month}/${year}`;
+      }
+      // Fallback to Date object parsing
       const date = new Date(dateString);
-      return date.toLocaleDateString('he-IL', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
+      if (isNaN(date.getTime())) return '';
+      const dayStr = String(date.getDate()).padStart(2, '0');
+      const monthStr = String(date.getMonth() + 1).padStart(2, '0');
+      const yearStr = date.getFullYear();
+      return `${dayStr}/${monthStr}/${yearStr}`;
     } catch (error) {
+      console.error('Error formatting date:', error);
       return '';
     }
   }

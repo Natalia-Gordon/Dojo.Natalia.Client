@@ -14,9 +14,15 @@
   <div class="user-menu-dropdown" *ngIf="isMenuOpen">
     <!-- User Header Section -->
     <div class="user-menu-header">
-      <div class="user-avatar-large">
-        <span class="avatar-initial-large">{{ getInitials() }}</span>
-      </div>
+      <button 
+        type="button"
+        class="user-avatar-large-btn"
+        (click)="onMenuAvatarClick()"
+        title="פרטי משתמש">
+        <div class="user-avatar-large">
+          <span class="avatar-initial-large">{{ getInitials() }}</span>
+        </div>
+      </button>
       <div class="user-info">
         <div class="user-name">{{ userInfo.displayName || userInfo.username }}</div>
         <div class="user-last-login" *ngIf="userInfo.lastLoginAt">
@@ -38,10 +44,6 @@
 
     <!-- Menu Items -->
     <div class="menu-items">
-      <a href="#" class="menu-item" (click)="onUserDetailsClick(); $event.preventDefault()">
-        <span class="menu-icon">👤</span>
-        <span>פרטי משתמש</span>
-      </a>
       <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
         <span class="menu-icon">⚙️</span>
         <span>הגדרות פרופיל</span>
