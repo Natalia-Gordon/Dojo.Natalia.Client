@@ -23,6 +23,7 @@ export interface TokenResponse {
   displayName: string | null;
   role: string | null;
   level: string | null;
+  lastLoginAt?: string | null;
   accessToken: string | null;
   accessTokenExpiresAt: string;
   refreshToken: string | null;
@@ -40,6 +41,32 @@ export interface UserInfo {
   displayName: string | null;
   role: string | null;
   level: string | null;
+  lastLoginAt?: string | null;
+}
+
+export interface User {
+  id: number;
+  username: string | null;
+  email: string | null;
+  displayName: string | null;
+  role: string | null;
+  level: string | null;
+  address?: string | null;
+  phoneNumber?: string | null;
+  dateOfBirth?: string | null;
+  joinDate?: string | null;
+  lastLoginAt?: string | null;
+  isActive?: boolean;
+}
+
+export interface UpdateUserRequest {
+  username?: string | null;
+  email?: string | null;
+  displayName?: string | null;
+  address?: string | null;
+  phoneNumber?: string | null;
+  dateOfBirth?: string | null;
+  password?: string | null;
 }
 
 @Injectable({
@@ -125,7 +152,8 @@ export class AuthService {
           email: response.email,
           displayName: response.displayName,
           role: response.role,
-          level: response.level
+          level: response.level,
+          lastLoginAt: response.lastLoginAt || null
         };
         this.setUserInfo(userInfo);
       }),
@@ -281,6 +309,55 @@ export class AuthService {
       this.tokenSubject.next(null);
       this.refreshTokenSubject.next(null);
     }
+  }
+
+  /**
+   * Get user details by ID
+   * @param userId User ID
+   * @returns Observable with user details
+   */
+  getUserDetails(userId: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/users/${userId}`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError((error: any) => {
+        console.error('Get user details error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Update user details
+   * @param userId User ID
+   * @param updateRequest User update data
+   * @returns Observable with updated user details
+   */
+  updateUser(userId: number, updateRequest: UpdateUserRequest): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/users/${userId}`, updateRequest, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap((updatedUser: User) => {
+        // Update stored user info if this is the current user
+        const currentUserInfo = this.getUserInfo();
+        if (currentUserInfo && currentUserInfo.userId === userId) {
+          const updatedUserInfo: UserInfo = {
+            userId: updatedUser.id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            displayName: updatedUser.displayName,
+            role: updatedUser.role,
+            level: updatedUser.level,
+            lastLoginAt: updatedUser.lastLoginAt || null
+          };
+          this.setUserInfo(updatedUserInfo);
+        }
+      }),
+      catchError((error: any) => {
+        console.error('Update user error:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   /**

@@ -1,0 +1,85 @@
+.user-details-hero {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  background-image: linear-gradient(rgba(220, 38, 38, 0.7), rgba(153, 27, 27, 0.75)), url('/assets/img/blog-zen-1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.user-details-hero__overlay {
+  width: 100%;
+  padding: 4rem 1.5rem;
+}
+
+.user-details-hero__content {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: right;
+  color: #ffffff;
+}
+
+.user-details-hero__title {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.user-details-hero__subtitle {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.user-details-hero__breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(26, 26, 26, 0.7);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.user-details-hero__breadcrumbs a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.user-details-hero__breadcrumbs a:hover {
+  color: #fff;
+}
+
+.user-details-hero__breadcrumbs .divider {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media (max-width: 768px) {
+  .user-details-hero {
+    min-height: 300px;
+  }
+
+  .user-details-hero__overlay {
+    padding: 3rem 1.25rem;
+  }
+
+  .user-details-hero__breadcrumbs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    row-gap: 0.25rem;
+    justify-content: center;
+  }
+}

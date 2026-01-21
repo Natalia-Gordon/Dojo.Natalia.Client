@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService, UserInfo } from '../_services/auth.service';
 import { Subscription } from 'rxjs';
 
@@ -17,6 +18,7 @@ export class UserMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -36,6 +38,11 @@ export class UserMenuComponent implements OnInit, OnDestroy {
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  onUserDetailsClick(): void {
+    this.closeMenu();
+    this.router.navigate(['/user-details']);
   }
 
   closeMenu(): void {
@@ -68,6 +75,23 @@ export class UserMenuComponent implements OnInit, OnDestroy {
       case 'Advanced': return 'bg-purple-600';
       case 'Master': return 'bg-red-600';
       default: return 'bg-gray-600';
+    }
+  }
+
+  formatLastLogin(lastLoginAt: string | null | undefined): string {
+    if (!lastLoginAt) return '';
+    try {
+      const date = new Date(lastLoginAt);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    } catch (error) {
+      console.error('Error formatting last login date:', error);
+      return '';
     }
   }
 

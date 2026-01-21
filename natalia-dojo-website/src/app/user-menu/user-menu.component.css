@@ -110,9 +110,9 @@
   text-overflow: ellipsis;
 }
 
-.user-email {
+.user-last-login {
   color: #94a3b8;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   margin-bottom: 0.5rem;
   white-space: nowrap;
   overflow: hidden;

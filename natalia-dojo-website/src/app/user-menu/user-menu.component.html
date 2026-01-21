@@ -19,7 +19,9 @@
       </div>
       <div class="user-info">
         <div class="user-name">{{ userInfo.displayName || userInfo.username }}</div>
-        <div class="user-email">{{ userInfo.email }}</div>
+        <div class="user-last-login" *ngIf="userInfo.lastLoginAt">
+          התחברות אחרונה: {{ formatLastLogin(userInfo.lastLoginAt) }}
+        </div>
         <div class="user-badges">
           <span class="badge" [ngClass]="getLevelColor(userInfo.level)">
             {{ userInfo.level || 'User' }}
@@ -36,8 +38,12 @@
 
     <!-- Menu Items -->
     <div class="menu-items">
-      <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
+      <a href="#" class="menu-item" (click)="onUserDetailsClick(); $event.preventDefault()">
         <span class="menu-icon">👤</span>
+        <span>פרטי משתמש</span>
+      </a>
+      <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
+        <span class="menu-icon">⚙️</span>
         <span>הגדרות פרופיל</span>
       </a>
       <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
