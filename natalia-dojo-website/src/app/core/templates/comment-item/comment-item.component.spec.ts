@@ -14,6 +14,15 @@ describe('CommentItemComponent', () => {
     
     fixture = TestBed.createComponent(CommentItemComponent);
     component = fixture.componentInstance;
+    // Provide a mock comment to avoid undefined errors
+    component.comment = {
+      author: 'Test User',
+      date: '2024-01-01',
+      text: 'Test comment',
+      avatar: 'test.jpg',
+      avatarError: false,
+      replies: []
+    };
     fixture.detectChanges();
   });
 
