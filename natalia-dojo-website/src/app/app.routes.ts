@@ -49,6 +49,8 @@ export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
     {path: "home", component: HomeComponent},
     {path: "login", component: LoginComponent},
+    {path: "profile", redirectTo: "home", pathMatch: "full"}, // TODO: Create ProfileComponent
+    {path: "purchases", redirectTo: "home", pathMatch: "full"}, // TODO: Create PurchasesComponent
     {path: "gallery", component: PhotoGalleryComponent},
     {path: "about", component: AboutComponent},
     {path: "contact", component: ContactComponent},

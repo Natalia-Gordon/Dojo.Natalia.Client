@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../_services/auth.service';
+import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { UserMenuComponent } from '../../user-menu/user-menu.component';
 import { Subscription } from 'rxjs';
@@ -15,7 +15,9 @@ import { Subscription } from 'rxjs';
 })
 export class NavComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
+  userInfo: UserInfo | null = null;
   private authSubscription?: Subscription;
+  private userInfoSubscription?: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -26,18 +28,44 @@ export class NavComponent implements OnInit, OnDestroy {
     this.loginModalService.open();
   }
 
+  onLogout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        // Logout successful, user info will be cleared automatically
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+      }
+    });
+  }
+
+  getUserInitials(): string {
+    if (!this.userInfo?.username) return 'U';
+    return this.userInfo.username.charAt(0).toUpperCase();
+  }
+
   ngOnInit(): void {
     // Check initial authentication status
     this.isAuthenticated = this.authService.isAuthenticated();
+    this.userInfo = this.authService.getUserInfo();
     
     // Subscribe to authentication changes
     this.authSubscription = this.authService.token$.subscribe(token => {
       this.isAuthenticated = !!token;
+      if (!token) {
+        this.userInfo = null;
+      }
+    });
+    
+    // Subscribe to user info changes
+    this.userInfoSubscription = this.authService.userInfo$.subscribe(userInfo => {
+      this.userInfo = userInfo;
     });
   }
 
   ngOnDestroy(): void {
     this.authSubscription?.unsubscribe();
+    this.userInfoSubscription?.unsubscribe();
   }
 
   

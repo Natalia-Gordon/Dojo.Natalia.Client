@@ -12,7 +12,24 @@
     </div>
     
     <div class="collapse navbar-collapse" id="navbarCollapse">
+        <!-- Mobile: User Info Section (only when authenticated) -->
+        <div class="mobile-user-section d-lg-none" *ngIf="isAuthenticated && userInfo">
+            <div class="mobile-user-header">
+                <div class="mobile-user-avatar">
+                    <span class="mobile-avatar-initial">{{ getUserInitials() }}</span>
+                </div>
+                <div class="mobile-user-details">
+                    <div class="mobile-user-name">{{ userInfo.displayName || userInfo.username }}</div>
+                    <div class="mobile-user-email">{{ userInfo.email }}</div>
+                </div>
+            </div>
+        </div>
+        
         <div class="navbar-nav py-0">
+            <!-- Desktop: Profile Settings and Purchases (only when authenticated) -->
+            <a routerLink="/profile" routerLinkActive="active" class="nav-item nav-link d-none d-lg-block" *ngIf="isAuthenticated" (click)="closeMobileMenu()">הגדרות פרופיל</a>
+            <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-none d-lg-block" *ngIf="isAuthenticated" (click)="closeMobileMenu()">רכישות</a>
+            
             <a routerLink="/home" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">בית</a>
             <a routerLink="/about" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">אודות</a>
             <a routerLink="/workouts" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">יומן אימונים</a>
@@ -25,6 +42,12 @@
             </div>
             <a routerLink="/testimonial" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">ממליצים</a>
             <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">צור קשר</a>
+            
+            <!-- Mobile: Profile Settings and Purchases (only when authenticated) -->
+            <a routerLink="/profile" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">הגדרות פרופיל</a>
+            <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">רכישות</a>
+            
+            <!-- Login Button (when not authenticated) -->
             <div class="nav-item nav-link-auth" *ngIf="!isAuthenticated">
                 <button 
                     type="button" 
@@ -38,8 +61,25 @@
                     <span class="login-text">התחברות</span>
                 </button>
             </div>
-            <div class="nav-item nav-link-auth" *ngIf="isAuthenticated">
+            
+            <!-- Desktop: User Menu (when authenticated) -->
+            <div class="nav-item nav-link-auth d-none d-lg-flex" *ngIf="isAuthenticated">
                 <app-user-menu></app-user-menu>
+            </div>
+            
+            <!-- Mobile: Logout Button (when authenticated) -->
+            <div class="nav-item nav-link-auth d-lg-none" *ngIf="isAuthenticated">
+                <button 
+                    type="button" 
+                    class="btn-login btn-logout"
+                    (click)="onLogout(); closeMobileMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span class="login-text">התנתקות</span>
+                </button>
             </div>
         </div>
     </div>

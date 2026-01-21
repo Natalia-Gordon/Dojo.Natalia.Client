@@ -135,6 +135,67 @@
     white-space: nowrap;
 }
 
+/* Mobile User Section */
+.mobile-user-section {
+    padding: 1.5rem 1.25rem;
+    background: rgba(30, 41, 59, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+.mobile-user-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mobile-user-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    border: 2px solid #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mobile-avatar-initial {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 24px;
+    text-transform: uppercase;
+}
+
+.mobile-user-details {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+}
+
+.mobile-user-name {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.125rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mobile-user-email {
+    color: #94a3b8;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-logout {
+    /* Same styling as btn-login, no changes needed */
+}
+
 @media (max-width: 991px) {
     .nav-link-auth {
         margin-right: 0;
@@ -147,7 +208,8 @@
         width: 100%;
     }
 
-    .btn-login {
+    .btn-login,
+    .btn-logout {
         width: 100%;
         justify-content: center;
         padding: 0.75rem 1rem;
