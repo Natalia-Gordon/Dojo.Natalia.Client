@@ -16,7 +16,7 @@ import { RecentArticlesComponent } from "./recent-articles/recent-articles.compo
 export class HomeComponent implements OnInit, AfterViewInit {
     constructor(private title: Title, private meta: Meta) {}
     ngOnInit(): void {
-        this.title.setTitle('דוג׳ו נטליה - נינג׳וטסו ואומנויות לחימה באופקים');
+        this.title.setTitle('דוג׳ו נטליה - נינג׳וטסו ואומנויות לחימה');
         this.meta.updateTag({
             name: 'description',
             content: 'דוג׳ו נטליה - בית ספר לנינג׳וטסו ואומנויות לחימה באופקים. אימוני הגנה עצמית, שיטות עבודה יפניות מסורתיות, פילוסופיה וקהילה מקצועית. הירשם לאימון ניסיון.'
@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         // Ensure title is set after child components (like AboutComponent) initialize
         // This prevents child components from overwriting the home page title
         setTimeout(() => {
-            this.title.setTitle('דוג׳ו נטליה - נינג׳וטסו ואומנויות לחימה באופקים');
+            this.title.setTitle('דוג׳ו נטליה - נינג׳וטסו ואומנויות לחימה');
         }, 0);
     }
 }
