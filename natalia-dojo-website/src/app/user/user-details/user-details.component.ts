@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService, User, UpdateUserRequest } from '../../_services/auth.service';
+import { LoginModalService } from '../../_services/login-modal.service';
 import { Title, Meta } from '@angular/platform-browser';
 import { UserDetailsHeroComponent } from '../user-details-hero/user-details-hero.component';
 
@@ -20,6 +21,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  isUnauthorized = false;
   profileForm: FormGroup;
   private destroy$ = new Subject<void>();
 
@@ -28,7 +30,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private title: Title,
-    private meta: Meta
+    private meta: Meta,
+    private loginModalService: LoginModalService
   ) {
     this.profileForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -63,6 +66,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   loadUserDetails(userId: number): void {
     this.isLoading = true;
     this.errorMessage = null;
+    this.isUnauthorized = false;
     
     this.authService.getUserDetails(userId)
       .pipe(takeUntil(this.destroy$))
@@ -71,10 +75,18 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           this.user = user;
           this.populateForm(user);
           this.isLoading = false;
+          this.isUnauthorized = false;
         },
         error: (error: any) => {
           console.error('Error loading user details:', error);
-          this.errorMessage = 'שגיאה בטעינת פרטי המשתמש';
+          if (error.status === 401 || error.status === 403) {
+            // Unauthorized or Forbidden
+            this.isUnauthorized = true;
+            this.errorMessage = 'הגישה נדחתה. יש להתחבר מחדש';
+          } else {
+            this.errorMessage = 'שגיאה בטעינת פרטי המשתמש';
+            this.isUnauthorized = false;
+          }
           this.isLoading = false;
         }
       });
@@ -206,7 +218,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         },
         error: (error: any) => {
           console.error('Error updating user:', error);
-          this.errorMessage = error.error?.message || 'שגיאה בעדכון הפרופיל';
+          if (error.status === 401 || error.status === 403) {
+            // Unauthorized or Forbidden
+            this.isUnauthorized = true;
+            this.errorMessage = 'הגישה נדחתה. יש להתחבר מחדש';
+          } else {
+            this.errorMessage = error.error?.message || 'שגיאה בעדכון הפרופיל';
+            this.isUnauthorized = false;
+          }
           this.isLoading = false;
         }
       });
@@ -291,5 +310,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     } catch (error) {
       return '';
     }
+  }
+
+  openLoginModal(): void {
+    this.loginModalService.open();
   }
 }
