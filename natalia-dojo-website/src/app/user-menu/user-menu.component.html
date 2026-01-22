@@ -3,7 +3,7 @@
   <button 
     type="button" 
     class="user-avatar-btn"
-    (click)="toggleMenu()"
+    (click)="onAvatarClick()"
     [class.active]="isMenuOpen">
     <div class="user-avatar">
       <span class="avatar-initial">{{ getInitials() }}</span>

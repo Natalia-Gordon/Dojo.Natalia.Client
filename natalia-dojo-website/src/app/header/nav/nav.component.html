@@ -15,12 +15,18 @@
         <!-- Mobile: User Info Section (only when authenticated) -->
         <div class="mobile-user-section d-lg-none" *ngIf="isAuthenticated && userInfo">
             <div class="mobile-user-header">
-                <div class="mobile-user-avatar">
+                <button
+                    type="button"
+                    class="mobile-user-avatar"
+                    (click)="openUserDetails(); closeMobileMenu()"
+                    title="פרטי משתמש">
                     <span class="mobile-avatar-initial">{{ getUserInitials() }}</span>
-                </div>
+                </button>
                 <div class="mobile-user-details">
                     <div class="mobile-user-name">{{ userInfo.displayName || userInfo.username }}</div>
-                    <div class="mobile-user-email">{{ userInfo.email }}</div>
+                    <div class="mobile-user-last-login" *ngIf="userInfo.lastLoginAt">
+                        {{ formatLastLogin(userInfo.lastLoginAt) }}
+                    </div>
                 </div>
             </div>
         </div>

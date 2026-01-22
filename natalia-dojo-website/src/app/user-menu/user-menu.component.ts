@@ -15,6 +15,7 @@ export class UserMenuComponent implements OnInit, OnDestroy {
   userInfo: UserInfo | null = null;
   isMenuOpen = false;
   private userSubscription?: Subscription;
+  private readonly mobileMaxWidth = 640;
 
   constructor(
     private authService: AuthService,
@@ -38,6 +39,14 @@ export class UserMenuComponent implements OnInit, OnDestroy {
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  onAvatarClick(): void {
+    if (this.isMobileView()) {
+      this.onUserDetailsClick();
+      return;
+    }
+    this.toggleMenu();
   }
 
   onUserDetailsClick(): void {
@@ -68,8 +77,27 @@ export class UserMenuComponent implements OnInit, OnDestroy {
   }
 
   getInitials(): string {
-    if (!this.userInfo?.username) return 'U';
-    return this.userInfo.username.charAt(0).toUpperCase();
+    const source =
+      (this.userInfo?.displayName || '').trim() ||
+      (this.userInfo?.username || '').trim();
+
+    if (!source) return 'U';
+
+    const parts = source.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase();
+    }
+
+    const first = parts[0].charAt(0).toUpperCase();
+    const last = parts[parts.length - 1].charAt(0).toUpperCase();
+    return `${first}${last}`;
+  }
+
+  private isMobileView(): boolean {
+    if (!isPlatformBrowser(this.platformId)) {
+      return false;
+    }
+    return window.innerWidth <= this.mobileMaxWidth;
   }
 
   getLevelColor(level: string | null): string {

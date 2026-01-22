@@ -159,6 +159,9 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
 }
 
 .mobile-avatar-initial {
@@ -166,6 +169,21 @@
     font-weight: 700;
     font-size: 24px;
     text-transform: uppercase;
+}
+
+.mobile-user-avatar:hover {
+    transform: scale(1.05);
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.mobile-user-avatar:active {
+    transform: scale(1.02);
+}
+
+.mobile-user-avatar:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35);
 }
 
 .mobile-user-details {
@@ -184,9 +202,9 @@
     text-overflow: ellipsis;
 }
 
-.mobile-user-email {
+.mobile-user-last-login {
     color: #94a3b8;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

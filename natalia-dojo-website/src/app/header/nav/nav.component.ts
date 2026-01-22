@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
@@ -21,7 +21,8 @@ export class NavComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private loginModalService: LoginModalService
+    private loginModalService: LoginModalService,
+    private router: Router
   ) {}
 
   openLoginModal(): void {
@@ -39,9 +40,42 @@ export class NavComponent implements OnInit, OnDestroy {
     });
   }
 
+  openUserDetails(): void {
+    this.router.navigate(['/user-details']);
+  }
+
   getUserInitials(): string {
-    if (!this.userInfo?.username) return 'U';
-    return this.userInfo.username.charAt(0).toUpperCase();
+    const source =
+      (this.userInfo?.displayName || '').trim() ||
+      (this.userInfo?.username || '').trim();
+
+    if (!source) return 'U';
+
+    const parts = source.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase();
+    }
+
+    const first = parts[0].charAt(0).toUpperCase();
+    const last = parts[parts.length - 1].charAt(0).toUpperCase();
+    return `${first}${last}`;
+  }
+
+  formatLastLogin(lastLoginAt: string | null | undefined): string {
+    if (!lastLoginAt) return '';
+    try {
+      const date = new Date(lastLoginAt);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    } catch (error) {
+      console.error('Error formatting last login date:', error);
+      return '';
+    }
   }
 
   ngOnInit(): void {
