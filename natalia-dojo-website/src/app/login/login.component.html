@@ -83,19 +83,205 @@
                         <button 
                             type="submit" 
                             class="submit-button"
-                            [disabled]="isLoading || loginForm.invalid">
-                            <span *ngIf="!isLoading">התחבר</span>
-                            <span *ngIf="isLoading">מתחבר...</span>
+                            [disabled]="isLoginLoading || loginForm.invalid">
+                            <span *ngIf="!isLoginLoading">התחבר</span>
+                            <span *ngIf="isLoginLoading">מתחבר...</span>
                         </button>
                     </form>
                 </div>
 
-                <!-- Register Tab (placeholder for future implementation) -->
+                <!-- Register Form -->
                 <div class="login-content" *ngIf="activeTab === 'register'">
-                    <div class="coming-soon">
-                        <p>הרשמה זמינה בקרוב</p>
-                        <p class="coming-soon-subtitle">בינתיים, אנא צרו קשר דרך עמוד <a routerLink="/contact" class="link" (click)="closeModal()">צור קשר</a></p>
-                    </div>
+                    <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="login-form">
+                        <div class="register-grid">
+                            <div class="form-group">
+                                <label for="register-first-name" class="form-label">שם פרטי</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="register-first-name"
+                                        type="text"
+                                        formControlName="firstName"
+                                        class="form-input"
+                                        placeholder="הזן שם פרטי">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="register-last-name" class="form-label">שם משפחה</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="register-last-name"
+                                        type="text"
+                                        formControlName="lastName"
+                                        class="form-input"
+                                        placeholder="הזן שם משפחה">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-display-name" class="form-label">שם תצוגה</label>
+                            <div class="input-wrapper">
+                                <input
+                                    id="register-display-name"
+                                    type="text"
+                                    formControlName="displayName"
+                                    class="form-input"
+                                    placeholder="שם שמוצג בפרופיל">
+                            </div>
+                        </div>
+
+                        <div class="register-grid">
+                            <div class="form-group">
+                                <label for="register-username" class="form-label">שם משתמש</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="register-username"
+                                        type="text"
+                                        formControlName="username"
+                                        class="form-input"
+                                        [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+                                        placeholder="בחר/י שם משתמש"
+                                        autocomplete="username"
+                                        required>
+                                </div>
+                                <div class="error-message" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+                                    <span *ngIf="registerForm.get('username')?.errors?.['required']">שם משתמש נדרש</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="register-email" class="form-label">אימייל</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="register-email"
+                                        type="email"
+                                        formControlName="email"
+                                        class="form-input"
+                                        [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+                                        placeholder="הזן אימייל"
+                                        autocomplete="email"
+                                        required>
+                                </div>
+                                <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+                                    <span *ngIf="registerForm.get('email')?.errors?.['required']">אימייל נדרש</span>
+                                    <span *ngIf="registerForm.get('email')?.errors?.['email']">אימייל אינו תקין</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="register-grid">
+                            <div class="form-group">
+                                <label for="register-password" class="form-label">סיסמה</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="register-password"
+                                        type="password"
+                                        formControlName="password"
+                                        class="form-input"
+                                        [class.error]="registerPassword?.invalid && registerPassword?.touched"
+                                        placeholder="בחר/י סיסמה"
+                                        autocomplete="new-password"
+                                        required>
+                                </div>
+                                <div class="error-message" *ngIf="registerPassword?.invalid && registerPassword?.touched">
+                                    <span *ngIf="registerPassword?.errors?.['required']">סיסמה נדרשת</span>
+                                    <span *ngIf="registerPassword?.errors?.['minlength']">סיסמה חייבת להיות לפחות 6 תווים</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="register-confirm-password" class="form-label">אימות סיסמה</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="register-confirm-password"
+                                        type="password"
+                                        formControlName="confirmPassword"
+                                        class="form-input"
+                                        [class.error]="(registerConfirmPassword?.invalid && registerConfirmPassword?.touched) || registerForm.errors?.['passwordMismatch']"
+                                        placeholder="הזן שוב את הסיסמה"
+                                        autocomplete="new-password"
+                                        required>
+                                </div>
+                                <div class="error-message" *ngIf="registerConfirmPassword?.touched && registerForm.errors?.['passwordMismatch']">
+                                    הסיסמאות אינן תואמות
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="register-grid">
+                            <div class="form-group">
+                                <label for="register-phone" class="form-label">טלפון</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="register-phone"
+                                        type="tel"
+                                        formControlName="phone"
+                                        class="form-input"
+                                        placeholder="מספר טלפון">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="register-dob" class="form-label">תאריך לידה</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="register-dob"
+                                        type="date"
+                                        formControlName="dateOfBirth"
+                                        class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-profile-image" class="form-label">קישור לתמונה</label>
+                            <div class="input-wrapper">
+                                <input
+                                    id="register-profile-image"
+                                    type="url"
+                                    formControlName="profileImageUrl"
+                                    class="form-input"
+                                    placeholder="https://...">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-bio" class="form-label">ביוגרפיה קצרה</label>
+                            <div class="input-wrapper">
+                                <textarea
+                                    id="register-bio"
+                                    formControlName="bio"
+                                    class="form-input form-textarea"
+                                    rows="3"
+                                    placeholder="כמה מילים עליך"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="alert-error" *ngIf="registerError">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span>{{ registerError }}</span>
+                        </div>
+
+                        <div class="alert-success" *ngIf="registerSuccess">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 6L9 17l-5-5"></path>
+                            </svg>
+                            <span>{{ registerSuccess }}</span>
+                        </div>
+
+                        <button 
+                            type="submit" 
+                            class="submit-button"
+                            [disabled]="isRegisterLoading || registerForm.invalid">
+                            <span *ngIf="!isRegisterLoading">צור חשבון</span>
+                            <span *ngIf="isRegisterLoading">יוצר חשבון...</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

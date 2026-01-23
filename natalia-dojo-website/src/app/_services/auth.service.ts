@@ -16,6 +16,19 @@ export interface LoginRequest {
   deviceInfo?: string | null;
 }
 
+export interface CreateUserRequest {
+  username?: string | null;
+  email?: string | null;
+  password?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
+  phone?: string | null;
+  dateOfBirth?: string | null;
+  profileImageUrl?: string | null;
+  bio?: string | null;
+}
+
 export interface TokenResponse {
   userId: number;
   username: string | null;
@@ -168,6 +181,22 @@ export class AuthService {
       }),
       catchError(error => {
         console.error('Login error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Register a new user
+   */
+  register(request: CreateUserRequest): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/users/register`, request, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    }).pipe(
+      catchError(error => {
+        console.error('Register error:', error);
         return throwError(() => error);
       })
     );

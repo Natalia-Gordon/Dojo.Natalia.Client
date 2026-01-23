@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../_services/auth.service';
@@ -16,8 +16,12 @@ import { Subscription } from 'rxjs';
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
-  isLoading = false;
+  registerForm!: FormGroup;
+  isLoginLoading = false;
+  isRegisterLoading = false;
   errorMessage = '';
+  registerError = '';
+  registerSuccess = '';
   activeTab: 'login' | 'register' = 'login';
   showModal = false;
   private modalSubscription?: Subscription;
@@ -67,7 +71,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   closeModal(): void {
     this.loginModalService.close();
     this.errorMessage = '';
+    this.registerError = '';
+    this.registerSuccess = '';
     this.loginForm.reset();
+    this.registerForm.reset();
   }
 
   onBackdropClick(event: Event): void {
@@ -82,6 +89,20 @@ export class LoginComponent implements OnInit, OnDestroy {
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+
+    this.registerForm = this.fb.group({
+      username: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
+      firstName: [''],
+      lastName: [''],
+      displayName: [''],
+      phone: [''],
+      dateOfBirth: [''],
+      profileImageUrl: [''],
+      bio: ['']
+    }, { validators: [this.passwordsMatchValidator] });
   }
 
   onLogin(): void {
@@ -90,14 +111,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoginLoading = true;
     this.errorMessage = '';
 
     const { username, password } = this.loginForm.value;
 
     this.authService.login(username, password).subscribe({
       next: (response) => {
-        this.isLoading = false;
+        this.isLoginLoading = false;
         this.closeModal();
         // Redirect only if we came from a route, otherwise stay on current page
         if (this.route.snapshot.url.length > 0) {
@@ -105,7 +126,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
-        this.isLoading = false;
+        this.isLoginLoading = false;
         console.error('Login error:', error);
         
         // Handle different error scenarios
@@ -115,6 +136,43 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.errorMessage = error.error?.message || 'שגיאה בהתחברות. נסה שוב מאוחר יותר.';
         } else {
           this.errorMessage = 'שגיאה בהתחברות. אנא נסה שוב.';
+        }
+      }
+    });
+  }
+
+  onRegister(): void {
+    if (this.registerForm.invalid) {
+      this.markFormGroupTouched(this.registerForm);
+      return;
+    }
+
+    this.isRegisterLoading = true;
+    this.registerError = '';
+    this.registerSuccess = '';
+
+    const {
+      confirmPassword,
+      ...request
+    } = this.registerForm.value;
+
+    this.authService.register(request).subscribe({
+      next: () => {
+        this.isRegisterLoading = false;
+        this.registerSuccess = 'ההרשמה הושלמה. ניתן להתחבר כעת.';
+        this.activeTab = 'login';
+        this.loginForm.patchValue({
+          username: request.username || request.email || ''
+        });
+        this.registerForm.reset();
+      },
+      error: (error) => {
+        this.isRegisterLoading = false;
+        console.error('Register error:', error);
+        if (error.status === 400) {
+          this.registerError = error.error?.message || 'פרטי הרשמה אינם תקינים';
+        } else {
+          this.registerError = 'שגיאה בהרשמה. אנא נסה שוב.';
         }
       }
     });
@@ -130,7 +188,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   setActiveTab(tab: 'login' | 'register'): void {
     this.activeTab = tab;
     this.errorMessage = '';
+    this.registerError = '';
+    this.registerSuccess = '';
     this.loginForm.reset();
+    this.registerForm.reset();
   }
 
   get username() {
@@ -139,5 +200,22 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   get password() {
     return this.loginForm.get('password');
+  }
+
+  get registerPassword() {
+    return this.registerForm.get('password');
+  }
+
+  get registerConfirmPassword() {
+    return this.registerForm.get('confirmPassword');
+  }
+
+  private passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password')?.value;
+    const confirmPassword = control.get('confirmPassword')?.value;
+    if (!password || !confirmPassword) {
+      return null;
+    }
+    return password === confirmPassword ? null : { passwordMismatch: true };
   }
 }
