@@ -24,13 +24,14 @@ describe('AppComponent', () => {
   it(`should have the 'natalia-dojo-website' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('natalia-dojo-website');
+    expect(app.title).toEqual('Natalia Ninjutsu Dojo');
   });
 
-  it('should render title', () => {
+  it('should render header and footer', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, natalia-dojo-website');
+    expect(compiled.querySelector('app-header')).toBeTruthy();
+    expect(compiled.querySelector('app-footer')).toBeTruthy();
   });
 });
