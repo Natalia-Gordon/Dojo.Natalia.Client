@@ -17,7 +17,11 @@
     <button type="button" class="btn btn-primary" (click)="openLogin()">התחברות / הרשמה</button>
   </div>
 
-  <div class="events-grid" *ngIf="isAuthenticated">
+  <div class="empty-state" *ngIf="isAuthenticated && !isLoading && events.length === 0">
+    <p class="text-light">אין סמינרים זמינים כרגע.</p>
+  </div>
+
+  <div class="events-grid" *ngIf="isAuthenticated && events.length > 0">
     <div class="event-card bg-dark" *ngFor="let eventItem of events; trackBy: trackByEventId">
       <div class="event-image" *ngIf="eventItem.imageUrl">
         <img [src]="eventItem.imageUrl" [alt]="eventItem.title || 'Seminar'" loading="lazy">

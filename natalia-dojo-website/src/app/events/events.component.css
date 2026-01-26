@@ -58,6 +58,19 @@
   text-align: center;
 }
 
+.empty-state {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px dashed rgba(148, 163, 184, 0.7);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.empty-state h4 {
+  margin-bottom: 0.75rem;
+}
+
 .form-control,
 .form-control:focus {
   background-color: rgba(51, 65, 85, 0.6);
