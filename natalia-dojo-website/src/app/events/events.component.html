@@ -96,8 +96,15 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label seminar-form__label">סוג אירוע</label>
-                <input class="form-control seminar-form__input" type="text" formControlName="eventType" placeholder="Seminar">
-                <small class="seminar-form__hint">לדוגמה: Seminar / Workshop / Masterclass.</small>
+                <select class="form-control seminar-form__input" formControlName="eventType">
+                  <option value="Seminar">סמינר</option>
+                  <option value="Workshop">סדנה</option>
+                  <option value="Masterclass">כיתת אמן</option>
+                  <option value="Grading">מבחן דרגה</option>
+                  <option value="Retreat">ריטריט</option>
+                  <option value="Special">אירוע מיוחד</option>
+                </select>
+                <small class="seminar-form__hint">בחר/י את סוג האירוע מתוך הרשימה.</small>
               </div>
               <div class="col-12">
                 <label class="form-label seminar-form__label">תיאור</label>
