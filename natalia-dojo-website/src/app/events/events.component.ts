@@ -35,22 +35,25 @@ export class EventsComponent implements OnInit, OnDestroy {
     private loginModalService: LoginModalService,
     private fb: FormBuilder
   ) {
+    const now = new Date();
+    const nowLocal = this.toLocalDateTime(now);
+    const todayLocal = this.toLocalDate(now);
     this.createForm = this.fb.group({
       title: ['', [Validators.required]],
       description: [''],
       eventType: ['Seminar', [Validators.required]],
       instructorId: [''],
       status: ['published'],
-      startDateTime: ['', [Validators.required]],
-      endDateTime: ['', [Validators.required]],
+      startDateTime: [nowLocal, [Validators.required]],
+      endDateTime: [nowLocal, [Validators.required]],
       location: [''],
       locationUrl: [''],
       maxAttendees: [''],
       price: [0, [Validators.required, Validators.min(0)]],
       earlyBirdPrice: [''],
-      earlyBirdDeadline: [''],
+      earlyBirdDeadline: [todayLocal],
       registrationOpen: [true],
-      registrationDeadline: [''],
+      registrationDeadline: [nowLocal],
       imageUrl: [''],
       isPublished: [true]
     });
@@ -198,6 +201,13 @@ export class EventsComponent implements OnInit, OnDestroy {
     });
   }
 
+  openGoogleMapsIfEmpty(): void {
+    const url = this.createForm.get('locationUrl')?.value;
+    if (!url) {
+      window.open('https://maps.google.com', '_blank');
+    }
+  }
+
   trackByEventId(index: number, eventItem: Event): number {
     return eventItem.id;
   }
@@ -213,5 +223,23 @@ export class EventsComponent implements OnInit, OnDestroy {
     }
     const date = new Date(value);
     return date.toISOString();
+  }
+
+  private toLocalDateTime(date: Date): string {
+    const pad = (value: number) => String(value).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  private toLocalDate(date: Date): string {
+    const pad = (value: number) => String(value).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    return `${year}-${month}-${day}`;
   }
 }

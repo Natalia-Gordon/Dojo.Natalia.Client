@@ -125,7 +125,8 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label seminar-form__label">קישור למיקום</label>
-                <input class="form-control seminar-form__input" type="url" formControlName="locationUrl">
+                <input class="form-control seminar-form__input" type="url" formControlName="locationUrl" placeholder="https://maps.google.com/..." (click)="openGoogleMapsIfEmpty()">
+                <small class="seminar-form__hint">הדבק/י קישור למיקום מ-Google Maps.</small>
               </div>
             </div>
           </div>
