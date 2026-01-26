@@ -46,7 +46,7 @@
             <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">צור קשר</a>
             
             <!-- Mobile: Profile Settings and Purchases (only when authenticated) -->
-            <a routerLink="/profile" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">הגדרות פרופיל</a>
+            <a routerLink="/user-details" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">פרופיל משתמש</a>
             <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">רכישות</a>
             
             <!-- Login Button (when not authenticated) -->
