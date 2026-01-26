@@ -1,142 +1,198 @@
 <app-events-hero></app-events-hero>
 <div class="container-fluid p-5">
-  <div class="mb-5 text-center">
-    <h5 class="text-primary text-uppercase">אירועים מיוחדים</h5>
-    <p class="text-light mt-3">הצטרפו לסמינרים המתקדמים שלנו – יש להתחבר או להירשם כאורח כדי להירשם.</p>
-  </div>
-
-  <div class="alert alert-danger" *ngIf="errorMessage">
-    {{ errorMessage }}
-  </div>
-  <div class="alert alert-success" *ngIf="successMessage">
-    {{ successMessage }}
-  </div>
-
-  <div class="login-required" *ngIf="!isAuthenticated">
-    <p class="text-light mb-3">על מנת לצפות באירועים ולהירשם אליהם, יש להתחבר או להירשם כאורח.</p>
-    <button type="button" class="btn btn-primary" (click)="openLogin()">התחברות / הרשמה</button>
-  </div>
-
-  <div class="empty-state" *ngIf="isAuthenticated && !isLoading && events.length === 0">
-    <p class="text-light">אין סמינרים זמינים כרגע.</p>
-  </div>
-
-  <div class="events-grid" *ngIf="isAuthenticated && events.length > 0">
-    <div class="event-card bg-dark" *ngFor="let eventItem of events; trackBy: trackByEventId">
-      <div class="event-image" *ngIf="eventItem.imageUrl">
-        <img [src]="eventItem.imageUrl" [alt]="eventItem.title || 'Seminar'" loading="lazy">
-      </div>
-      <div class="event-body">
-        <div class="event-meta">
-          <span class="badge bg-primary text-uppercase">{{ eventItem.eventType || 'Seminar' }}</span>
-          <span class="badge bg-secondary" *ngIf="!eventItem.isPublished">טיוטה</span>
-        </div>
-        <h4 class="event-title text-white">{{ eventItem.title || 'סמינר' }}</h4>
-        <p class="event-description text-light" *ngIf="eventItem.description">{{ eventItem.description }}</p>
-        <div class="event-details text-light">
-          <div><strong>מועד:</strong> {{ eventItem.startDateTime | date:'dd/MM/yyyy HH:mm' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy HH:mm' }}</div>
-          <div *ngIf="eventItem.location"><strong>מיקום:</strong> {{ eventItem.location }}</div>
-          <div *ngIf="eventItem.locationUrl">
-            <a class="text-primary" [href]="eventItem.locationUrl" target="_blank" rel="noopener">למפה</a>
+  <div class="row g-5">
+    <div class="col-12" dir="rtl">
+      <div class="events-content-card">
+        <div class="events-header-card">
+          <div class="events-header-card__content">
+            <h3 class="events-header-card__title">סמינרים של הדוג'ו</h3>
+            <p class="events-header-card__subtitle">הצטרפו לסמינרים המתקדמים שלנו – יש להתחבר או להירשם כאורח כדי להירשם.</p>
           </div>
-          <div><strong>מחיר:</strong> {{ eventItem.price | currency:'ILS':'symbol':'1.0-0' }}</div>
-          <div *ngIf="eventItem.earlyBirdPrice"><strong>מחיר הרשמה מוקדמת:</strong> {{ eventItem.earlyBirdPrice | currency:'ILS':'symbol':'1.0-0' }}</div>
-          <div *ngIf="eventItem.earlyBirdDeadline"><strong>עד תאריך:</strong> {{ eventItem.earlyBirdDeadline | date:'dd/MM/yyyy' }}</div>
+          <div class="events-header-card__badge">
+            <i class="bi bi-calendar-event"></i>
+            אירועים מיוחדים
+          </div>
         </div>
-        <button
-          type="button"
-          class="btn btn-primary w-100 mt-4"
-          [disabled]="!eventItem.registrationOpen || enrollingIds.has(eventItem.id)"
-          (click)="enroll(eventItem.id)">
-          <span *ngIf="eventItem.registrationOpen && !enrollingIds.has(eventItem.id)">הירשם לסמינר</span>
-          <span *ngIf="enrollingIds.has(eventItem.id)">מבצע הרשמה...</span>
-          <span *ngIf="!eventItem.registrationOpen && !enrollingIds.has(eventItem.id)">ההרשמה סגורה</span>
-        </button>
+
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+        <div class="alert alert-success" *ngIf="successMessage">
+          {{ successMessage }}
+        </div>
+
+        <div class="login-required" *ngIf="!isAuthenticated">
+          <p class="text-muted mb-3">על מנת לצפות באירועים ולהירשם אליהם, יש להתחבר או להירשם כאורח.</p>
+          <button type="button" class="btn btn-primary" (click)="openLogin()">התחברות / הרשמה</button>
+        </div>
+
+        <div class="empty-state" *ngIf="isAuthenticated && !isLoading && events.length === 0">
+          <div class="empty-state__icon">
+            <i class="bi bi-calendar-x"></i>
+          </div>
+          <h4 class="empty-state__title">אירועים מיוחדים</h4>
+          <p class="empty-state__text">כרגע אין סמינרים פתוחים להרשמה, חזרו אלינו בקרוב.</p>
+        </div>
+
+        <div class="events-grid" *ngIf="isAuthenticated && events.length > 0">
+          <div class="event-card" *ngFor="let eventItem of events; trackBy: trackByEventId">
+            <div class="event-image" *ngIf="eventItem.imageUrl">
+              <img [src]="eventItem.imageUrl" [alt]="eventItem.title || 'Seminar'" loading="lazy">
+            </div>
+            <div class="event-body">
+              <div class="event-meta">
+                <span class="badge bg-primary text-uppercase">{{ eventItem.eventType || 'Seminar' }}</span>
+                <span class="badge bg-secondary" *ngIf="!eventItem.isPublished">טיוטה</span>
+              </div>
+              <h4 class="event-title text-dark">{{ eventItem.title || 'סמינר' }}</h4>
+              <p class="event-description text-muted" *ngIf="eventItem.description">{{ eventItem.description }}</p>
+              <div class="event-details text-secondary">
+                <div><strong>מועד:</strong> {{ eventItem.startDateTime | date:'dd/MM/yyyy HH:mm' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy HH:mm' }}</div>
+                <div *ngIf="eventItem.location"><strong>מיקום:</strong> {{ eventItem.location }}</div>
+                <div *ngIf="eventItem.locationUrl">
+                  <a class="text-primary" [href]="eventItem.locationUrl" target="_blank" rel="noopener">למפה</a>
+                </div>
+                <div><strong>מחיר:</strong> {{ eventItem.price | currency:'ILS':'symbol':'1.0-0' }}</div>
+                <div *ngIf="eventItem.earlyBirdPrice"><strong>מחיר הרשמה מוקדמת:</strong> {{ eventItem.earlyBirdPrice | currency:'ILS':'symbol':'1.0-0' }}</div>
+                <div *ngIf="eventItem.earlyBirdDeadline"><strong>עד תאריך:</strong> {{ eventItem.earlyBirdDeadline | date:'dd/MM/yyyy' }}</div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-primary w-100 mt-4"
+                [disabled]="!eventItem.registrationOpen || enrollingIds.has(eventItem.id)"
+                (click)="enroll(eventItem.id)">
+                <span *ngIf="eventItem.registrationOpen && !enrollingIds.has(eventItem.id)">הירשם לסמינר</span>
+                <span *ngIf="enrollingIds.has(eventItem.id)">מבצע הרשמה...</span>
+                <span *ngIf="!eventItem.registrationOpen && !enrollingIds.has(eventItem.id)">ההרשמה סגורה</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section" *ngIf="isAdminOrInstructor">
+        <div class="admin-form-header">
+          <div class="admin-form-header__content">
+            <h3 class="admin-form-header__title">יצירת סמינר חדש</h3>
+            <p class="admin-form-header__subtitle">בנו חוויה מקצועית למתאמנים – פרטים מדויקים, תמחור ברור, והרשמה פשוטה.</p>
+          </div>
+          <div class="admin-form-header__badge">
+            <i class="bi bi-shield-check"></i>
+            מנהל/מדריך
+          </div>
+        </div>
+
+        <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="seminar-form">
+          <div class="seminar-form__section">
+            <h5 class="seminar-form__title">
+              <i class="bi bi-journal-text me-2"></i>
+              פרטי סמינר
+            </h5>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">כותרת</label>
+                <input class="form-control seminar-form__input" type="text" formControlName="title" placeholder="כותרת לסמינר">
+                <small class="seminar-form__hint">שם קצר וברור שמסביר את מטרת הסמינר.</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">סוג אירוע</label>
+                <input class="form-control seminar-form__input" type="text" formControlName="eventType" placeholder="Seminar">
+                <small class="seminar-form__hint">לדוגמה: Seminar / Workshop / Masterclass.</small>
+              </div>
+              <div class="col-12">
+                <label class="form-label seminar-form__label">תיאור</label>
+                <textarea class="form-control seminar-form__input" rows="3" formControlName="description" placeholder="תיאור קצר"></textarea>
+                <small class="seminar-form__hint">ספרו למשתתפים למה הסמינר מיועד ולמי הוא מתאים.</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">תאריך התחלה</label>
+                <input class="form-control seminar-form__input" type="datetime-local" formControlName="startDateTime">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">תאריך סיום</label>
+                <input class="form-control seminar-form__input" type="datetime-local" formControlName="endDateTime">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">מיקום</label>
+                <input class="form-control seminar-form__input" type="text" formControlName="location">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">קישור למיקום</label>
+                <input class="form-control seminar-form__input" type="url" formControlName="locationUrl">
+              </div>
+            </div>
+          </div>
+
+          <div class="seminar-form__section">
+            <h5 class="seminar-form__title">
+              <i class="bi bi-cash-stack me-2"></i>
+              תמחור והרשמה
+            </h5>
+            <div class="row g-4">
+              <div class="col-md-4">
+                <label class="form-label seminar-form__label">כמות משתתפים</label>
+                <input class="form-control seminar-form__input" type="number" formControlName="maxAttendees" min="0">
+                <small class="seminar-form__hint">השאירו ריק אם אין הגבלה.</small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label seminar-form__label">מחיר</label>
+                <input class="form-control seminar-form__input" type="number" formControlName="price" min="0" step="1">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label seminar-form__label">מחיר הרשמה מוקדמת</label>
+                <input class="form-control seminar-form__input" type="number" formControlName="earlyBirdPrice" min="0" step="1">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">תאריך יעד להרשמה מוקדמת</label>
+                <input class="form-control seminar-form__input" type="date" formControlName="earlyBirdDeadline">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">דדליין הרשמה</label>
+                <input class="form-control seminar-form__input" type="datetime-local" formControlName="registrationDeadline">
+              </div>
+            </div>
+          </div>
+
+          <div class="seminar-form__section">
+            <h5 class="seminar-form__title">
+              <i class="bi bi-gear me-2"></i>
+              הגדרות נוספות
+            </h5>
+            <div class="row g-4 align-items-center">
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">קישור לתמונה</label>
+                <input class="form-control seminar-form__input" type="url" formControlName="imageUrl">
+                <small class="seminar-form__hint">שדרגו את הכרטיס עם תמונה רחבה ואיכותית.</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">מזהה מדריך (אופציונלי)</label>
+                <input class="form-control seminar-form__input" type="number" formControlName="instructorId" min="1">
+              </div>
+              <div class="col-md-6">
+                <div class="form-check seminar-form__check">
+                  <input class="form-check-input" type="checkbox" formControlName="registrationOpen" id="registrationOpen">
+                  <label class="form-check-label" for="registrationOpen">פתוח להרשמה</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check seminar-form__check">
+                  <input class="form-check-input" type="checkbox" formControlName="isPublished" id="isPublished">
+                  <label class="form-check-label" for="isPublished">פרסום מיידי</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="seminar-form__actions">
+            <button class="btn btn-danger px-5 py-3" type="submit" [disabled]="isCreating">
+              <span *ngIf="isCreating" class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!isCreating" class="bi bi-check-lg me-2"></i>
+              <span *ngIf="!isCreating">צור סמינר</span>
+              <span *ngIf="isCreating">שומר...</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-  </div>
-
-  <div class="admin-section" *ngIf="isAdminOrInstructor">
-    <div class="mb-4">
-      <h3 class="text-primary text-uppercase">יצירת סמינר חדש</h3>
-      <p class="text-light">רק מנהל/מדריך יכול ליצור סמינר חדש ולפרסם אותו.</p>
-    </div>
-
-    <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="bg-dark p-4 rounded">
-      <div class="row g-4">
-        <div class="col-md-6">
-          <label class="form-label text-light">כותרת</label>
-          <input class="form-control" type="text" formControlName="title" placeholder="כותרת לסמינר">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">סוג אירוע</label>
-          <input class="form-control" type="text" formControlName="eventType" placeholder="Seminar">
-        </div>
-        <div class="col-12">
-          <label class="form-label text-light">תיאור</label>
-          <textarea class="form-control" rows="3" formControlName="description" placeholder="תיאור קצר"></textarea>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">תאריך התחלה</label>
-          <input class="form-control" type="datetime-local" formControlName="startDateTime">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">תאריך סיום</label>
-          <input class="form-control" type="datetime-local" formControlName="endDateTime">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">מיקום</label>
-          <input class="form-control" type="text" formControlName="location">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">קישור למיקום</label>
-          <input class="form-control" type="url" formControlName="locationUrl">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label text-light">כמות משתתפים</label>
-          <input class="form-control" type="number" formControlName="maxAttendees" min="0">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label text-light">מחיר</label>
-          <input class="form-control" type="number" formControlName="price" min="0" step="1">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label text-light">מחיר הרשמה מוקדמת</label>
-          <input class="form-control" type="number" formControlName="earlyBirdPrice" min="0" step="1">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">תאריך יעד להרשמה מוקדמת</label>
-          <input class="form-control" type="date" formControlName="earlyBirdDeadline">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">דדליין הרשמה</label>
-          <input class="form-control" type="datetime-local" formControlName="registrationDeadline">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">קישור לתמונה</label>
-          <input class="form-control" type="url" formControlName="imageUrl">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label text-light">מזהה מדריך (אופציונלי)</label>
-          <input class="form-control" type="number" formControlName="instructorId" min="1">
-        </div>
-        <div class="col-md-6">
-          <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" formControlName="registrationOpen" id="registrationOpen">
-            <label class="form-check-label text-light" for="registrationOpen">פתוח להרשמה</label>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" formControlName="isPublished" id="isPublished">
-            <label class="form-check-label text-light" for="isPublished">פרסום מיידי</label>
-          </div>
-        </div>
-      </div>
-      <button class="btn btn-primary mt-4" type="submit" [disabled]="isCreating">
-        <span *ngIf="!isCreating">צור סמינר</span>
-        <span *ngIf="isCreating">שומר...</span>
-      </button>
-    </form>
   </div>
 </div>
