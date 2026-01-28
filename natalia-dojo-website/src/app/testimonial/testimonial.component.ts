@@ -1,13 +1,14 @@
 import { Component, AfterViewInit, Inject, PLATFORM_ID, OnInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
+import { TestimonialHeroComponent } from './testimonial-hero/testimonial-hero.component';
 
 declare var $: any; // Declare $ to avoid TypeScript errors with jQuery
 
 @Component({
   selector: 'app-testimonial',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TestimonialHeroComponent],
   templateUrl: './testimonial.component.html',
   styleUrl: './testimonial.component.css'
 })
