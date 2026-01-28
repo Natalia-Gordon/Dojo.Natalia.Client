@@ -64,25 +64,25 @@ export class EventsComponent implements OnInit, OnDestroy {
     this.userInfo = this.authService.getUserInfo();
     this.isAdminOrInstructor = this.isAllowedToManageEvents(this.userInfo);
 
+    // Load events for all users (public)
+    this.loadEvents();
+
     this.authSubscription = this.authService.token$.subscribe(token => {
       this.isAuthenticated = !!token;
       if (!token) {
         this.userInfo = null;
         this.isAdminOrInstructor = false;
-        this.events = [];
-      } else {
-        this.loadEvents();
       }
+      // Reload events when authentication state changes (to show unpublished if admin)
+      this.loadEvents();
     });
 
     this.userSubscription = this.authService.userInfo$.subscribe(userInfo => {
       this.userInfo = userInfo;
       this.isAdminOrInstructor = this.isAllowedToManageEvents(userInfo);
-    });
-
-    if (this.isAuthenticated) {
+      // Reload events when user info changes (to show unpublished if admin/instructor)
       this.loadEvents();
-    }
+    });
   }
 
   ngOnDestroy(): void {
@@ -95,14 +95,11 @@ export class EventsComponent implements OnInit, OnDestroy {
   }
 
   loadEvents(): void {
-    if (!this.isAuthenticated) {
-      return;
-    }
     this.isLoading = true;
     this.errorMessage = '';
 
     this.eventsService.getEvents({
-      includeUnpublished: this.isAdminOrInstructor,
+      includeUnpublished: this.isAdminOrInstructor, // Only admin/instructor can see unpublished events
       type: 'Seminar'
     }).subscribe({
       next: (events) => {

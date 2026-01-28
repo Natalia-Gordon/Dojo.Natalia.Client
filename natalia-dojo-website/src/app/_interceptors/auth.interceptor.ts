@@ -21,11 +21,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
+  // Check if this is a public events request or if we're on events page
+  const isPublicEventsRequest = req.url.includes('/events') && !req.headers.has('Authorization');
+  const isOnEventsPage = router.url.includes('/events');
+
   // Handle the request and catch errors
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // If we get a 401 Unauthorized, clear token and redirect to login
-      if (error.status === 401) {
+      // But skip redirect for public events requests or when already on events page
+      if (error.status === 401 && !isPublicEventsRequest && !isOnEventsPage) {
         authService.logout();
         router.navigate(['/login']);
       }

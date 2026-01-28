@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
@@ -95,8 +95,13 @@ export class EventsService {
       httpParams = httpParams.set('userId', params.userId.toString());
     }
 
+    // For public events (when includeUnpublished is false), don't send auth headers
+    // Only send auth headers if explicitly requesting unpublished events (admin/instructor)
+    const needsAuth = params?.includeUnpublished === true;
+    const headers = needsAuth ? this.getAuthHeaders() : new HttpHeaders();
+
     return this.http.get(`${this.apiUrl}/events`, {
-      headers: this.getAuthHeaders(),
+      headers: headers,
       params: httpParams,
       responseType: 'text'
     }).pipe(
@@ -114,6 +119,11 @@ export class EventsService {
       }),
       catchError(error => {
         console.error('Get events error:', error);
+        // For 401 errors on public events, return empty array instead of throwing
+        // This prevents the interceptor from redirecting to login
+        if (error.status === 401 && !needsAuth) {
+          return of([]);
+        }
         return throwError(() => error);
       })
     );
