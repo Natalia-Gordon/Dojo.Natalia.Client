@@ -173,6 +173,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       ...request
     } = this.registerForm.value;
 
+    request.CreatorRole = (this.authService.getUserInfo()?.role || '').trim().toLowerCase();
+
     this.authService.register(request).subscribe({
       next: (createdUser) => {
         this.isRegisterLoading = false;

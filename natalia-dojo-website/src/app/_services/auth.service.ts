@@ -27,6 +27,7 @@ export interface CreateUserRequest {
   dateOfBirth?: string | null;
   profileImageUrl?: string | null;
   bio?: string | null;
+  CreatorRole?: string | null;
 }
 
 export interface TokenResponse {
