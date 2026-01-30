@@ -83,6 +83,10 @@ export interface User {
 }
 
 export interface UpdateUserRequest {
+  email?: string | null;
+  password?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   displayName?: string | null;
   phone?: string | null;
   profileImageUrl?: string | null;

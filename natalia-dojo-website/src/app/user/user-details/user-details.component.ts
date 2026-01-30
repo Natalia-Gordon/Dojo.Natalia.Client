@@ -203,6 +203,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     
     // Build update request according to API specification
     const updateRequest: UpdateUserRequest = {
+      email: formValue.email || null,
+      password: formValue.password || null,
+      firstName: formValue.firstName || null,
+      lastName: formValue.lastName || null,
       displayName: formValue.displayName || null,
       phone: formValue.phone || null,
       profileImageUrl: this.user?.profileImageUrl || null,
