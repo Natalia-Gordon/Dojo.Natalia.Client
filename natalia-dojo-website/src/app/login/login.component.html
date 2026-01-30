@@ -4,13 +4,15 @@
         <div class="modal-content login-modal-content">
             <div class="modal-header login-modal-header">
                 <button type="button" class="btn-close btn-close-white login-close-btn" (click)="closeModal()" aria-label="Close"></button>
-                <h5 class="modal-title login-title">התחברות לדוג'ו</h5>
+                <h5 class="modal-title login-title">
+                    {{ showLoginTab ? "התחברות לדוג'ו" : "הרשמה לדוג'ו" }}
+                </h5>
             </div>
             <div class="modal-body login-modal-body">
-                <p class="login-subtitle">היכנסו לחשבון שלכם כדי לגשת לאימונים ומשאבי הנינג'וטסו</p>
+                <p class="login-subtitle" *ngIf="showLoginTab">היכנסו לחשבון שלכם כדי לגשת לאימונים ומשאבי הנינג'וטסו</p>
 
                 <!-- Tabs -->
-                <div class="login-tabs">
+                <div class="login-tabs" *ngIf="showLoginTab">
                     <button 
                         type="button"
                         class="tab-button" 
@@ -28,7 +30,7 @@
                 </div>
 
                 <!-- Login Form -->
-                <div class="login-content" *ngIf="activeTab === 'login'">
+                <div class="login-content" *ngIf="showLoginTab && activeTab === 'login'">
                     <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
                         <!-- Username/Email Field -->
                         <div class="form-group">
@@ -102,7 +104,7 @@
                                         type="text"
                                         formControlName="firstName"
                                         class="form-input"
-                                        placeholder="הזן שם פרטי">
+                                    placeholder="הזן שם פרטי">
                                 </div>
                             </div>
 
@@ -114,7 +116,7 @@
                                         type="text"
                                         formControlName="lastName"
                                         class="form-input"
-                                        placeholder="הזן שם משפחה">
+                                    placeholder="הזן שם משפחה">
                                 </div>
                             </div>
                         </div>
@@ -143,7 +145,8 @@
                                         [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
                                         placeholder="בחר/י שם משתמש"
                                         autocomplete="username"
-                                        required>
+                                    required
+                                    >
                                 </div>
                                 <div class="error-message" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
                                     <span *ngIf="registerForm.get('username')?.errors?.['required']">שם משתמש נדרש</span>
@@ -161,7 +164,8 @@
                                         [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
                                         placeholder="הזן אימייל"
                                         autocomplete="email"
-                                        required>
+                                    required
+                                    >
                                 </div>
                                 <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
                                     <span *ngIf="registerForm.get('email')?.errors?.['required']">אימייל נדרש</span>
@@ -182,7 +186,8 @@
                                         [class.error]="registerPassword?.invalid && registerPassword?.touched"
                                         placeholder="בחר/י סיסמה"
                                         autocomplete="new-password"
-                                        required>
+                                    required
+                                    >
                                 </div>
                                 <div class="error-message" *ngIf="registerPassword?.invalid && registerPassword?.touched">
                                     <span *ngIf="registerPassword?.errors?.['required']">סיסמה נדרשת</span>
@@ -201,7 +206,8 @@
                                         [class.error]="(registerConfirmPassword?.invalid && registerConfirmPassword?.touched) || registerForm.errors?.['passwordMismatch']"
                                         placeholder="הזן שוב את הסיסמה"
                                         autocomplete="new-password"
-                                        required>
+                                    required
+                                    >
                                 </div>
                                 <div class="error-message" *ngIf="registerConfirmPassword?.touched && registerForm.errors?.['passwordMismatch']">
                                     הסיסמאות אינן תואמות
@@ -218,7 +224,7 @@
                                         type="tel"
                                         formControlName="phone"
                                         class="form-input"
-                                        placeholder="מספר טלפון">
+                                    placeholder="מספר טלפון">
                                 </div>
                             </div>
 
@@ -229,7 +235,7 @@
                                         id="register-dob"
                                         type="date"
                                         formControlName="dateOfBirth"
-                                        class="form-input">
+                                    class="form-input">
                                 </div>
                             </div>
                         </div>
@@ -242,7 +248,8 @@
                                     type="url"
                                     formControlName="profileImageUrl"
                                     class="form-input"
-                                    placeholder="https://...">
+                                    placeholder="https://..."
+                                    >
                             </div>
                         </div>
 
@@ -254,7 +261,8 @@
                                     formControlName="bio"
                                     class="form-input form-textarea"
                                     rows="3"
-                                    placeholder="כמה מילים עליך"></textarea>
+                                    placeholder="כמה מילים עליך"
+                                    ></textarea>
                             </div>
                         </div>
 
@@ -267,7 +275,14 @@
                             <span>{{ registerError }}</span>
                         </div>
 
-                        <div class="alert-success" *ngIf="registerSuccess">
+                        <div class="alert-success" *ngIf="registerSuccess && showLoginTab">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 6L9 17l-5-5"></path>
+                            </svg>
+                            <span>{{ registerSuccess }}</span>
+                        </div>
+
+                        <div class="alert-success" *ngIf="showConnectedRegistrationMessage">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20 6L9 17l-5-5"></path>
                             </svg>
@@ -275,11 +290,22 @@
                         </div>
 
                         <button 
-                            type="submit" 
+                            type="submit"
                             class="submit-button"
-                            [disabled]="isRegisterLoading || registerForm.invalid">
+                            [disabled]="isRegisterLoading || registerForm.invalid"
+                            *ngIf="!showConnectedRegistrationSuccess">
                             <span *ngIf="!isRegisterLoading">צור חשבון</span>
                             <span *ngIf="isRegisterLoading">יוצר חשבון...</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="submit-button"
+                            [disabled]="isRegisterLoading || registerForm.invalid"
+                            *ngIf="showConnectedRegistrationUpdateButton"
+                            (click)="onUpdateRegisteredUser()">
+                            <span *ngIf="!isRegisterLoading">עדכן חשבון</span>
+                            <span *ngIf="isRegisterLoading">מעדכן חשבון...</span>
                         </button>
                     </form>
                 </div>

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService, UserInfo } from '../_services/auth.service';
+import { LoginModalService } from '../_services/login-modal.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -20,6 +21,7 @@ export class UserMenuComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private loginModalService: LoginModalService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -59,6 +61,11 @@ export class UserMenuComponent implements OnInit, OnDestroy {
     this.router.navigate(['/user-details']);
   }
 
+  onRegisterNewUserClick(): void {
+    this.closeMenu();
+    this.loginModalService.open('register');
+  }
+
   closeMenu(): void {
     this.isMenuOpen = false;
   }
@@ -91,6 +98,11 @@ export class UserMenuComponent implements OnInit, OnDestroy {
     const first = parts[0].charAt(0).toUpperCase();
     const last = parts[parts.length - 1].charAt(0).toUpperCase();
     return `${first}${last}`;
+  }
+
+  isTeacherOrInstructor(): boolean {
+    const role = (this.userInfo?.role || '').trim().toLowerCase();
+    return role === 'teacher' || role === 'instructor' || role === 'admin';
   }
 
   private isMobileView(): boolean {
