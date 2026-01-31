@@ -1,15 +1,17 @@
-<app-events-hero></app-events-hero>
+<app-event-detail-hero 
+  [eventTitle]="event?.title || null" 
+  [eventDescription]="event?.description || null"
+  [eventType]="event?.eventType || null"
+  [startDateTime]="event?.startDateTime || null"
+  [price]="event?.price || 0"
+  [earlyBirdPrice]="event?.earlyBirdPrice || null"
+  [earlyBirdDeadline]="event?.earlyBirdDeadline || null">
+</app-event-detail-hero>
 
-<div class="container-fluid p-5" dir="rtl">
+<div class="container-fluid px-2 px-md-5 py-2 py-md-5" dir="rtl">
   <div class="row g-5">
     <div class="col-12">
       <div class="event-detail-content">
-        <!-- Back Button -->
-        <button type="button" class="btn btn-outline-secondary mb-4" (click)="goBack()">
-          <i class="bi bi-arrow-right me-2"></i>
-          חזור לרשימת האירועים
-        </button>
-
         <!-- Loading State -->
         <div class="text-center py-5" *ngIf="isLoading">
           <div class="spinner-border text-primary" role="status">
@@ -56,10 +58,24 @@
               <div class="detail-item">
                 <i class="bi bi-calendar-event"></i>
                 <div class="detail-content">
-                  <strong>מועד:</strong>
-                  <div>
-                    {{ event.startDateTime | date:'dd/MM/yyyy HH:mm' }} - {{ event.endDateTime | date:'dd/MM/yyyy HH:mm' }}
-                  </div>
+                  <strong>תאריך התחלה:</strong>
+                  <div>{{ event.startDateTime | date:'dd/MM/yyyy HH:mm' }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <i class="bi bi-calendar-check"></i>
+                <div class="detail-content">
+                  <strong>תאריך סיום:</strong>
+                  <div>{{ event.endDateTime | date:'dd/MM/yyyy HH:mm' }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <i class="bi bi-hourglass-split"></i>
+                <div class="detail-content">
+                  <strong>משך האירוע:</strong>
+                  <div>{{ getEventDuration() }} שעות</div>
                 </div>
               </div>
 
@@ -68,36 +84,21 @@
                 <div class="detail-content">
                   <strong>מיקום:</strong>
                   <div>{{ event.location }}</div>
-                  <a *ngIf="event.locationUrl" [href]="event.locationUrl" target="_blank" rel="noopener" class="text-primary">
-                    <i class="bi bi-map"></i> למפה
+                  <a *ngIf="event.locationUrl" [href]="event.locationUrl" target="_blank" rel="noopener" class="text-primary mt-1 d-inline-block">
+                    <i class="bi bi-map"></i> פתח במפה
                   </a>
                 </div>
               </div>
 
               <div class="detail-item">
-                <i class="bi bi-currency-exchange"></i>
+                <i class="bi bi-info-circle"></i>
                 <div class="detail-content">
-                  <strong>מחיר:</strong>
-                  <div>{{ event.price | currency:'ILS':'symbol':'1.0-0' }}</div>
-                </div>
-              </div>
-
-              <div class="detail-item" *ngIf="event.earlyBirdPrice">
-                <i class="bi bi-tag"></i>
-                <div class="detail-content">
-                  <strong>מחיר הרשמה מוקדמת:</strong>
-                  <div>{{ event.earlyBirdPrice | currency:'ILS':'symbol':'1.0-0' }}</div>
-                  <div *ngIf="event.earlyBirdDeadline" class="text-muted small">
-                    עד {{ event.earlyBirdDeadline | date:'dd/MM/yyyy' }}
+                  <strong>סטטוס הרשמה:</strong>
+                  <div>
+                    <span class="badge" [class.bg-success]="event.registrationOpen" [class.bg-secondary]="!event.registrationOpen">
+                      {{ event.registrationOpen ? 'פתוח להרשמה' : 'הרשמה סגורה' }}
+                    </span>
                   </div>
-                </div>
-              </div>
-
-              <div class="detail-item" *ngIf="event.maxAttendees">
-                <i class="bi bi-people"></i>
-                <div class="detail-content">
-                  <strong>מספר משתתפים מקסימלי:</strong>
-                  <div>{{ event.maxAttendees }}</div>
                 </div>
               </div>
 
@@ -106,6 +107,35 @@
                 <div class="detail-content">
                   <strong>דדליין הרשמה:</strong>
                   <div>{{ event.registrationDeadline | date:'dd/MM/yyyy HH:mm' }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <i class="bi bi-currency-exchange"></i>
+                <div class="detail-content">
+                  <strong>מחיר רגיל:</strong>
+                  <div class="fs-5 fw-bold text-primary">{{ event.price | currency:'ILS':'symbol':'1.0-0' }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="event.earlyBirdPrice">
+                <i class="bi bi-tag-fill"></i>
+                <div class="detail-content">
+                  <strong>מחיר הרשמה מוקדמת:</strong>
+                  <div class="fs-5 fw-bold text-success">{{ event.earlyBirdPrice | currency:'ILS':'symbol':'1.0-0' }}</div>
+                  <div *ngIf="event.earlyBirdDeadline" class="mt-1">
+                    <span class="badge" [class.bg-success]="isEarlyBirdAvailable()" [class.bg-secondary]="!isEarlyBirdAvailable()">
+                      {{ isEarlyBirdAvailable() ? 'זמין עד' : 'פג תוקף' }} {{ event.earlyBirdDeadline | date:'dd/MM/yyyy' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="event.maxAttendees">
+                <i class="bi bi-people"></i>
+                <div class="detail-content">
+                  <strong>מספר משתתפים מקסימלי:</strong>
+                  <div>{{ event.maxAttendees }} משתתפים</div>
                 </div>
               </div>
             </div>

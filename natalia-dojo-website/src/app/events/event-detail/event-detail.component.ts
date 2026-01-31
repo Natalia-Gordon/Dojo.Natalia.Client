@@ -6,12 +6,12 @@ import { Subscription } from 'rxjs';
 import { EventsService, Event } from '../../_services/events.service';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
-import { EventsHeroComponent } from '../events-hero/events-hero.component';
+import { EventDetailHeroComponent } from './event-detail-hero/event-detail-hero.component';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, EventsHeroComponent],
+  imports: [CommonModule, RouterModule, EventDetailHeroComponent],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.css'
 })
@@ -285,6 +285,39 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     // Use bypassSecurityTrustHtml to allow HTML tags (use with caution - only for trusted content)
     // For production, consider using a more restrictive sanitizer
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  /**
+   * Calculate event duration in hours
+   */
+  getEventDuration(): number {
+    if (!this.event) return 0;
+    const start = new Date(this.event.startDateTime);
+    const end = new Date(this.event.endDateTime);
+    const diffMs = end.getTime() - start.getTime();
+    return Math.round(diffMs / (1000 * 60 * 60) * 10) / 10; // Round to 1 decimal
+  }
+
+  /**
+   * Get Hebrew status text
+   */
+  getStatusText(status: string | null | undefined): string {
+    if (!status) return '';
+    const statusMap: { [key: string]: string } = {
+      'draft': 'טיוטה',
+      'published': 'פורסם',
+      'closed': 'נסגר'
+    };
+    return statusMap[status.toLowerCase()] || status;
+  }
+
+  /**
+   * Check if early bird pricing is still available
+   */
+  isEarlyBirdAvailable(): boolean {
+    if (!this.event?.earlyBirdDeadline) return false;
+    const deadline = new Date(this.event.earlyBirdDeadline);
+    return deadline > new Date();
   }
 
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {

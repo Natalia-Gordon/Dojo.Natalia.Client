@@ -1,0 +1,15 @@
+<section class="event-detail-hero">
+  <div class="event-detail-hero__overlay">
+    <div class="event-detail-hero__content" dir="rtl">
+      <h1 class="event-detail-hero__title">{{ eventTitle || 'פרטי סמינר' }}</h1>
+      <p class="event-detail-hero__description" *ngIf="eventDescription">{{ getDescriptionSummary() }}</p>
+      <div class="event-detail-hero__breadcrumbs">
+        <a routerLink="/home">דף הבית</a>
+        <span class="divider">/</span>
+        <a routerLink="/events">סמינרים</a>
+        <span class="divider" *ngIf="eventTitle">/</span>
+        <span *ngIf="eventTitle" class="current-page">{{ eventTitle }}</span>
+      </div>
+    </div>
+  </div>
+</section>
