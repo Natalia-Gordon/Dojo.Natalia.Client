@@ -20,6 +20,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
   isAuthenticated = false;
+  isAdminOrInstructor = false;
   userInfo: UserInfo | null = null;
   isEnrolling = false;
 
@@ -39,16 +40,24 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.isAuthenticated = this.authService.isAuthenticated();
     this.userInfo = this.authService.getUserInfo();
+    this.isAdminOrInstructor = this.isAllowedToManageEvents(this.userInfo);
 
     this.authSubscription = this.authService.token$.subscribe(token => {
       this.isAuthenticated = !!token;
       if (!token) {
         this.userInfo = null;
+        this.isAdminOrInstructor = false;
       }
     });
 
     this.userInfoSubscription = this.authService.userInfo$.subscribe(userInfo => {
       this.userInfo = userInfo;
+      this.isAdminOrInstructor = this.isAllowedToManageEvents(userInfo);
+      // Reload event if user info changes (to get unpublished events if admin/instructor)
+      const eventId = this.route.snapshot.params['id'];
+      if (eventId) {
+        this.loadEvent(+eventId);
+      }
     });
 
     this.routeSubscription = this.route.params.subscribe(params => {
@@ -70,7 +79,10 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.eventsService.getEventById(eventId).subscribe({
+    // If user is admin/instructor, send auth headers to potentially see unpublished events
+    const requireAuth = this.isAdminOrInstructor;
+
+    this.eventsService.getEventById(eventId, requireAuth).subscribe({
       next: (event) => {
         this.event = event;
         this.isLoading = false;
@@ -111,12 +123,24 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.isEnrolling = false;
         console.error('Error enrolling for event:', error);
-        this.errorMessage = 'שגיאה בהרשמה לאירוע. ייתכן שכבר נרשמת או שההרשמה נסגרה.';
+        
+        // If 401 and no token, show login modal
+        if (error.status === 401 && !this.authService.getToken()) {
+          this.loginModalService.open();
+          this.errorMessage = 'יש להתחבר או להירשם כאורח כדי להירשם לסמינר.';
+        } else {
+          this.errorMessage = 'שגיאה בהרשמה לאירוע. ייתכן שכבר נרשמת או שההרשמה נסגרה.';
+        }
       }
     });
   }
 
   goBack(): void {
     this.router.navigate(['/events']);
+  }
+
+  private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {
+    const role = (userInfo?.role || '').toLowerCase();
+    return role === 'admin' || role === 'instructor';
   }
 }

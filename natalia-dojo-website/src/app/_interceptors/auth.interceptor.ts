@@ -23,19 +23,28 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  // Check if this is a public events request or if we're on events page
-  const isPublicEventsRequest = req.url.includes('/events') && !req.headers.has('Authorization');
-  const isOnEventsPage = router.url.includes('/events');
+  // Check if this is a public events list request (GET /events without auth, not a specific event)
+  const isPublicEventsListRequest = req.url.includes('/events') && 
+                                    req.method === 'GET' && 
+                                    !req.url.includes('/events/') && // Not a specific event (e.g., /events/1)
+                                    !req.url.includes('/registrations') && // Not registration endpoint
+                                    !req.headers.has('Authorization');
   const isRefreshTokenRequest = req.url.includes('/refresh-token');
-
+  const isRegistrationRequest = req.url.includes('/registrations');
+  
   // Handle the request and catch errors
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // If we get a 401 Unauthorized, show dialog to user
-      // But skip for public events requests, refresh token requests, or when already on events page
-      if (error.status === 401 && !isPublicEventsRequest && !isOnEventsPage && !isRefreshTokenRequest && token) {
+      // But skip for public events list requests and refresh token requests
+      if (error.status === 401 && !isPublicEventsListRequest && !isRefreshTokenRequest) {
         // Check if dialog is already open to avoid multiple dialogs
         if (!authDialogService.isOpen) {
+          // For registration requests without token, let the component handle it (show login modal)
+          if (isRegistrationRequest && !token) {
+            return throwError(() => error);
+          }
+          
           // Check if user has a refresh token available
           const hasRefreshToken = !!authService.getRefreshToken();
           

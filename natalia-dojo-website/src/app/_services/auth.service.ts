@@ -208,6 +208,15 @@ export class AuthService {
    */
   logout(): Observable<void> {
     const refreshToken = this.getRefreshToken();
+    
+    // If no refresh token, just clear local data and navigate
+    if (!refreshToken) {
+      this.clearToken();
+      this.clearUserInfo();
+      this.router.navigate(['/home']);
+      return of(void 0);
+    }
+
     const logoutRequest: LogoutRequest = {
       refreshToken: refreshToken
     };
@@ -228,7 +237,8 @@ export class AuthService {
         this.clearToken();
         this.clearUserInfo();
         this.router.navigate(['/home']);
-        return throwError(() => error);
+        // Return void instead of throwing error to prevent error propagation
+        return of(void 0);
       })
     );
   }
