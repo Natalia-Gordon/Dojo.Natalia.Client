@@ -138,18 +138,6 @@
                   <div>{{ event.maxAttendees }} משתתפים</div>
                 </div>
               </div>
-
-              <div class="detail-item" *ngIf="event.status">
-                <i class="bi bi-file-earmark-text"></i>
-                <div class="detail-content">
-                  <strong>סטטוס אירוע:</strong>
-                  <div>
-                    <span class="badge" [class.bg-primary]="event.status === 'published'" [class.bg-warning]="event.status === 'draft'" [class.bg-secondary]="event.status === 'closed'">
-                      {{ getStatusText(event.status) }}
-                    </span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <!-- Enroll Button -->
