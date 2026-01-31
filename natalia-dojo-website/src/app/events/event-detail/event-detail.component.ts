@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { EventsService, Event } from '../../_services/events.service';
 import { AuthService, UserInfo } from '../../_services/auth.service';
@@ -36,6 +37,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     private eventsService: EventsService,
     private authService: AuthService,
     private loginModalService: LoginModalService,
+    private sanitizer: DomSanitizer,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -266,6 +268,23 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">אנא ודא שהקובץ ב-Google Drive משותף עם "כל אחד עם הקישור"</p>
     `;
     container.appendChild(errorMsg);
+  }
+
+  /**
+   * Convert description text to safe HTML, preserving newlines and allowing HTML tags
+   */
+  getDescriptionHtml(description: string | null | undefined): SafeHtml {
+    if (!description) return this.sanitizer.bypassSecurityTrustHtml('');
+    
+    // Convert \n to <br> tags for line breaks
+    let html = description
+      .replace(/\r\n/g, '<br>') // Windows line breaks first
+      .replace(/\n/g, '<br>')   // Unix line breaks
+      .replace(/\r/g, '<br>');  // Old Mac line breaks
+    
+    // Use bypassSecurityTrustHtml to allow HTML tags (use with caution - only for trusted content)
+    // For production, consider using a more restrictive sanitizer
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {

@@ -48,7 +48,7 @@
             <!-- Description -->
             <div class="event-detail-section" *ngIf="event.description">
               <h3 class="section-title">תיאור</h3>
-              <p class="section-content">{{ event.description }}</p>
+              <div class="section-content" [innerHTML]="getDescriptionHtml(event.description)"></div>
             </div>
 
             <!-- Event Details Grid -->

@@ -86,6 +86,9 @@
   line-height: 1.8;
   color: #475569;
   margin: 0;
+  white-space: pre-wrap; /* Preserve newlines and whitespace, wrap text */
+  word-wrap: break-word; /* Break long words if needed */
+  overflow-wrap: break-word; /* Additional word breaking support */
 }
 
 .event-details-grid {
