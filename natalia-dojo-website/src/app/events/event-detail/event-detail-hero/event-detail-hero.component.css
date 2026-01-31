@@ -1,0 +1,103 @@
+.event-detail-hero {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  background-image: linear-gradient(rgba(220, 38, 38, 0.7), rgba(153, 27, 27, 0.75)), url('/assets/img/carousel-1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.event-detail-hero__overlay {
+  width: 100%;
+  padding: 3rem 1.5rem;
+}
+
+.event-detail-hero__content {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: right;
+  color: #ffffff;
+}
+
+.event-detail-hero__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 1rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.event-detail-hero__description {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.8;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+}
+
+.event-detail-hero__breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(26, 26, 26, 0.7);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.event-detail-hero__breadcrumbs a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.event-detail-hero__breadcrumbs a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.event-detail-hero__breadcrumbs .divider {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.event-detail-hero__breadcrumbs .current-page {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .event-detail-hero {
+    min-height: 250px;
+  }
+
+  .event-detail-hero__overlay {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .event-detail-hero__breadcrumbs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    row-gap: 0.25rem;
+    justify-content: center;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  .event-detail-hero__title {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+  }
+
+  .event-detail-hero__description {
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    margin-bottom: 1.25rem;
+  }
+}
