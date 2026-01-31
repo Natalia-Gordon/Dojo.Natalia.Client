@@ -23,6 +23,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   isAdminOrInstructor = false;
   userInfo: UserInfo | null = null;
   isEnrolling = false;
+  imageLoadAttempt = 0;
+  private imageId: string | null = null;
 
   private routeSubscription?: Subscription;
   private authSubscription?: Subscription;
@@ -137,6 +139,133 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.router.navigate(['/events']);
+  }
+
+  /**
+   * Convert Google Drive file link to direct image URL
+   * Extracts IMAGE_ID from: https://drive.google.com/file/d/IMAGE_ID/view?usp=sharing
+   * Tries multiple URL formats for better compatibility
+   */
+  getImageUrl(imageUrl: string | null | undefined): string {
+    if (!imageUrl) return '';
+    
+    // Extract IMAGE_ID from Google Drive file link
+    // Pattern: https://drive.google.com/file/d/IMAGE_ID/view?usp=sharing
+    const driveFileMatch = imageUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveFileMatch) {
+      this.imageId = driveFileMatch[1];
+      this.imageLoadAttempt = 0;
+      // Try uc?export=view first (most common format)
+      return `https://drive.google.com/uc?export=view&id=${this.imageId}`;
+    }
+    
+    // If it's already in a direct format, extract the ID for fallbacks
+    const idMatch = imageUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (idMatch) {
+      this.imageId = idMatch[1];
+      this.imageLoadAttempt = 0;
+    }
+    
+    // If it's already in the direct format, return as is
+    if (imageUrl.includes('drive.google.com/uc?export=')) {
+      return imageUrl;
+    }
+    
+    // For other URLs (including Google CDN), return as is
+    return imageUrl;
+  }
+
+  /**
+   * Handle image load error - try alternative Google Drive URL formats
+   */
+  onImageError(event: ErrorEvent): void {
+    const imgElement = event.target as HTMLImageElement;
+    if (!imgElement) return;
+
+    const currentSrc = imgElement.src;
+    
+    // Try alternative formats if we have a file ID
+    if (this.imageId && this.imageLoadAttempt < 3) {
+      this.imageLoadAttempt++;
+      let fallbackUrl = '';
+      
+      switch (this.imageLoadAttempt) {
+        case 1:
+          // Try thumbnail API
+          fallbackUrl = `https://drive.google.com/thumbnail?id=${this.imageId}&sz=w1920`;
+          break;
+        case 2:
+          // Try export=download format
+          fallbackUrl = `https://drive.google.com/uc?export=download&id=${this.imageId}`;
+          break;
+        case 3:
+          // Last resort: use iframe embed
+          this.showIframeEmbed(imgElement);
+          return;
+      }
+      
+      if (fallbackUrl) {
+        console.log(`Trying alternative format ${this.imageLoadAttempt}:`, fallbackUrl);
+        imgElement.src = fallbackUrl;
+        return;
+      }
+    }
+    
+    // All attempts failed - show iframe embed or error message
+    console.error('All image load attempts failed:', currentSrc);
+    this.showIframeEmbed(imgElement);
+  }
+
+  /**
+   * Show Google Drive iframe embed as fallback
+   */
+  private showIframeEmbed(imgElement: HTMLImageElement): void {
+    if (!this.imageId) {
+      this.showErrorMessage(imgElement);
+      return;
+    }
+
+    const container = imgElement.parentElement;
+    if (!container) return;
+
+    // Hide the image
+    imgElement.style.display = 'none';
+
+    // Check if iframe already exists
+    if (container.querySelector('.drive-iframe-embed')) return;
+
+    // Create iframe embed
+    const iframeWrapper = document.createElement('div');
+    iframeWrapper.className = 'drive-iframe-embed';
+    iframeWrapper.style.cssText = 'width: 100%; border-radius: 12px; overflow: hidden;';
+    
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://drive.google.com/file/d/${this.imageId}/preview`;
+    iframe.style.cssText = 'width: 100%; min-height: 600px; border: none; border-radius: 12px;';
+    iframe.allow = 'fullscreen';
+    iframe.title = 'Google Drive Image';
+    iframe.loading = 'lazy';
+    
+    iframeWrapper.appendChild(iframe);
+    container.appendChild(iframeWrapper);
+  }
+
+  /**
+   * Show error message when all methods fail
+   */
+  private showErrorMessage(imgElement: HTMLImageElement): void {
+    const container = imgElement.parentElement;
+    if (!container || container.querySelector('.image-error-message')) return;
+
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'image-error-message';
+    errorMsg.style.cssText = 'padding: 2rem; text-align: center; color: #6b7280; background: #f8f9fa; border-radius: 8px; margin-top: 1rem;';
+    errorMsg.innerHTML = `
+      <i class="bi bi-exclamation-triangle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #dc2626; opacity: 0.7;"></i>
+      <p style="margin: 0; font-weight: 600; color: #1f2937;">התמונה לא נטענה</p>
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">אנא ודא שהקובץ ב-Google Drive משותף עם "כל אחד עם הקישור"</p>
+    `;
+    container.appendChild(errorMsg);
   }
 
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {

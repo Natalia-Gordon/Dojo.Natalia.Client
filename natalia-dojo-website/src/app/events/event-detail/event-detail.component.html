@@ -31,7 +31,7 @@
         <div class="event-detail-card" *ngIf="event && !isLoading">
           <!-- Event Image -->
           <div class="event-detail-image" *ngIf="event.imageUrl">
-            <img [src]="event.imageUrl" [alt]="event.title || 'Event'" loading="lazy">
+            <img [src]="getImageUrl(event.imageUrl)" [alt]="event.title || 'Event'" loading="lazy" (error)="onImageError($event)">
           </div>
 
           <!-- Event Header -->
