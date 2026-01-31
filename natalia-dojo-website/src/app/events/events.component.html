@@ -22,41 +22,38 @@
         </div>
 
         <div class="empty-state" *ngIf="!isLoading && events.length === 0">
+          <div class="empty-state__icon">
+            <i class="bi bi-calendar-x"></i>
+          </div>
+          <h4 class="empty-state__title">אירועים מיוחדים</h4>
           <p class="empty-state__text">כרגע אין סמינרים פתוחים להרשמה, חזרו אלינו בקרוב.</p>
         </div>
 
-        <div class="events-grid" *ngIf="events.length > 0">
-          <div class="event-card" *ngFor="let eventItem of events; trackBy: trackByEventId">
-            <div class="event-image" *ngIf="eventItem.imageUrl">
-              <img [src]="eventItem.imageUrl" [alt]="eventItem.title || 'Seminar'" loading="lazy">
-            </div>
-            <div class="event-body">
-              <div class="event-meta">
+        <div class="events-list" *ngIf="events.length > 0">
+          <div class="event-list-item" *ngFor="let eventItem of events; trackBy: trackByEventId">
+            <div class="event-list-content">
+              <div class="event-list-header">
+                <h4 class="event-list-title">{{ eventItem.title || 'סמינר' }}</h4>
                 <span class="badge bg-primary text-uppercase">{{ eventItem.eventType || 'Seminar' }}</span>
-                <span class="badge bg-secondary" *ngIf="!eventItem.isPublished">טיוטה</span>
               </div>
-              <h4 class="event-title text-dark">{{ eventItem.title || 'סמינר' }}</h4>
-              <p class="event-description text-muted" *ngIf="eventItem.description">{{ eventItem.description }}</p>
-              <div class="event-details text-secondary">
-                <div><strong>מועד:</strong> {{ eventItem.startDateTime | date:'dd/MM/yyyy HH:mm' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy HH:mm' }}</div>
-                <div *ngIf="eventItem.location"><strong>מיקום:</strong> {{ eventItem.location }}</div>
-                <div *ngIf="eventItem.locationUrl">
-                  <a class="text-primary" [href]="eventItem.locationUrl" target="_blank" rel="noopener">למפה</a>
-                </div>
-                <div><strong>מחיר:</strong> {{ eventItem.price | currency:'ILS':'symbol':'1.0-0' }}</div>
-                <div *ngIf="eventItem.earlyBirdPrice"><strong>מחיר הרשמה מוקדמת:</strong> {{ eventItem.earlyBirdPrice | currency:'ILS':'symbol':'1.0-0' }}</div>
-                <div *ngIf="eventItem.earlyBirdDeadline"><strong>עד תאריך:</strong> {{ eventItem.earlyBirdDeadline | date:'dd/MM/yyyy' }}</div>
+              <p class="event-list-description" *ngIf="eventItem.description">{{ eventItem.description }}</p>
+              <div class="event-list-date">
+                <i class="bi bi-calendar-event me-2"></i>
+                <strong>מועד:</strong> {{ eventItem.startDateTime | date:'dd/MM/yyyy HH:mm' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy HH:mm' }}
               </div>
-              <button
-                type="button"
-                class="btn btn-primary w-100 mt-4"
-                [disabled]="!eventItem.registrationOpen || enrollingIds.has(eventItem.id)"
-                (click)="enroll(eventItem.id)">
-                <span *ngIf="eventItem.registrationOpen && !enrollingIds.has(eventItem.id) && isAuthenticated">הירשם לסמינר</span>
-                <span *ngIf="eventItem.registrationOpen && !enrollingIds.has(eventItem.id) && !isAuthenticated">התחבר/י כדי להירשם</span>
-                <span *ngIf="enrollingIds.has(eventItem.id)">מבצע הרשמה...</span>
-                <span *ngIf="!eventItem.registrationOpen && !enrollingIds.has(eventItem.id)">ההרשמה סגורה</span>
-              </button>
+              <div class="event-list-status">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>סטטוס הרשמה:</strong>
+                <span class="badge" [class.bg-success]="eventItem.registrationOpen" [class.bg-secondary]="!eventItem.registrationOpen">
+                  {{ eventItem.registrationOpen ? 'פתוח להרשמה' : 'הרשמה סגורה' }}
+                </span>
+              </div>
+            </div>
+            <div class="event-list-actions">
+              <a [routerLink]="['/events', eventItem.id]" class="btn btn-primary">
+                <i class="bi bi-eye me-2"></i>
+                תצוגה מקדימה
+              </a>
             </div>
           </div>
         </div>

@@ -46,6 +46,7 @@ import { HumanLifeImportanceComponent } from './sensei/articles/zen/human-life-i
 import { LoginComponent } from './login/login.component';
 import { UserDetailsComponent } from './user/user-details/user-details.component';
 import { EventsComponent } from './events/events.component';
+import { EventDetailComponent } from './events/event-detail/event-detail.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
@@ -53,6 +54,7 @@ export const routes: Routes = [
     {path: "login", component: LoginComponent},
     {path: "user-details", component: UserDetailsComponent},
     {path: "events", component: EventsComponent},
+    {path: "events/:id", component: EventDetailComponent},
     {path: "profile", redirectTo: "home", pathMatch: "full"}, // TODO: Create ProfileComponent
     {path: "purchases", redirectTo: "home", pathMatch: "full"}, // TODO: Create PurchasesComponent
     {path: "gallery", component: PhotoGalleryComponent},

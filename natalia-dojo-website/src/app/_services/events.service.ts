@@ -140,6 +140,22 @@ export class EventsService {
     );
   }
 
+  getEventById(eventId: number, requireAuth: boolean = false): Observable<Event> {
+    // Public endpoint - no auth required by default
+    // But if requireAuth is true (admin/instructor), send auth headers to see unpublished events or more details
+    const headers = requireAuth ? this.getAuthHeaders() : new HttpHeaders();
+    
+    return this.http.get<Event>(`${this.apiUrl}/events/${eventId}`, {
+      headers: headers,
+      responseType: 'json'
+    }).pipe(
+      catchError(error => {
+        console.error('Get event by id error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   registerForEvent(eventId: number, request: CreateEventRegistrationRequest): Observable<EventRegistration> {
     return this.http.post<EventRegistration>(`${this.apiUrl}/events/${eventId}/registrations`, request, {
       headers: this.getAuthHeaders()

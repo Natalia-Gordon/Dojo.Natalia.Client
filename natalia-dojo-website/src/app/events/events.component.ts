@@ -1,16 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService, UserInfo } from '../_services/auth.service';
 import { EventsService, Event } from '../_services/events.service';
-import { LoginModalService } from '../_services/login-modal.service';
 import { EventsHeroComponent } from './events-hero/events-hero.component';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, EventsHeroComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, EventsHeroComponent],
   templateUrl: './events.component.html',
   styleUrl: './events.component.css'
 })
@@ -24,7 +24,6 @@ export class EventsComponent implements OnInit, OnDestroy {
   userInfo: UserInfo | null = null;
   createForm: FormGroup;
   isCreating = false;
-  enrollingIds = new Set<number>();
 
   private authSubscription?: Subscription;
   private userSubscription?: Subscription;
@@ -32,7 +31,6 @@ export class EventsComponent implements OnInit, OnDestroy {
   constructor(
     private eventsService: EventsService,
     private authService: AuthService,
-    private loginModalService: LoginModalService,
     private fb: FormBuilder
   ) {
     const now = new Date();
@@ -88,10 +86,6 @@ export class EventsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.authSubscription?.unsubscribe();
     this.userSubscription?.unsubscribe();
-  }
-
-  openLogin(): void {
-    this.loginModalService.open();
   }
 
   loadEvents(): void {
@@ -164,36 +158,6 @@ export class EventsComponent implements OnInit, OnDestroy {
       error: () => {
         this.isCreating = false;
         this.errorMessage = 'שגיאה ביצירת האירוע.';
-      }
-    });
-  }
-
-  enroll(eventId: number): void {
-    if (!this.isAuthenticated || !this.userInfo?.userId) {
-      this.openLogin();
-      this.errorMessage = 'יש להתחבר או להירשם כאורח כדי להירשם לסמינר.';
-      return;
-    }
-
-    if (this.enrollingIds.has(eventId)) {
-      return;
-    }
-
-    this.enrollingIds.add(eventId);
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    this.eventsService.registerForEvent(eventId, {
-      userId: this.userInfo.userId,
-      notes: null
-    }).subscribe({
-      next: () => {
-        this.enrollingIds.delete(eventId);
-        this.successMessage = 'נרשמת בהצלחה לאירוע.';
-      },
-      error: () => {
-        this.enrollingIds.delete(eventId);
-        this.errorMessage = 'שגיאה בהרשמה לאירוע.';
       }
     });
   }

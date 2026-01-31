@@ -1,12 +1,14 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, switchMap, take, throwError, EMPTY, of } from 'rxjs';
 import { AuthService } from '../_services/auth.service';
+import { AuthDialogService } from '../_services/auth-dialog.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const authDialogService = inject(AuthDialogService);
 
   // Get the token from auth service
   const token = authService.getToken();
@@ -24,15 +26,65 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Check if this is a public events request or if we're on events page
   const isPublicEventsRequest = req.url.includes('/events') && !req.headers.has('Authorization');
   const isOnEventsPage = router.url.includes('/events');
+  const isRefreshTokenRequest = req.url.includes('/refresh-token');
 
   // Handle the request and catch errors
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // If we get a 401 Unauthorized, clear token and redirect to login
-      // But skip redirect for public events requests or when already on events page
-      if (error.status === 401 && !isPublicEventsRequest && !isOnEventsPage) {
-        authService.logout();
-        router.navigate(['/login']);
+      // If we get a 401 Unauthorized, show dialog to user
+      // But skip for public events requests, refresh token requests, or when already on events page
+      if (error.status === 401 && !isPublicEventsRequest && !isOnEventsPage && !isRefreshTokenRequest && token) {
+        // Check if dialog is already open to avoid multiple dialogs
+        if (!authDialogService.isOpen) {
+          // Check if user has a refresh token available
+          const hasRefreshToken = !!authService.getRefreshToken();
+          
+          if (!hasRefreshToken) {
+            // No refresh token available, just logout
+            authService.logout().subscribe();
+            return EMPTY;
+          }
+          
+          // Open dialog and wait for user's choice
+          const choice$ = authDialogService.open();
+          
+          return choice$.pipe(
+            take(1),
+            switchMap((choice) => {
+              if (choice === 'refresh') {
+                // Try to refresh the token
+                return authService.refreshToken().pipe(
+                  switchMap((tokenResponse) => {
+                    // Retry the original request with new token
+                    const newToken = tokenResponse.accessToken;
+                    if (newToken) {
+                      const retryReq = req.clone({
+                        setHeaders: {
+                          Authorization: `Bearer ${newToken}`
+                        }
+                      });
+                      return next(retryReq);
+                    }
+                    return throwError(() => new Error('Failed to refresh token'));
+                  }),
+                  catchError((refreshError) => {
+                    // If refresh fails, logout
+                    authService.logout().subscribe();
+                    return throwError(() => refreshError);
+                  })
+                );
+              } else if (choice === 'logout') {
+                // User chose to logout
+                authService.logout().subscribe();
+                return EMPTY;
+              }
+              // Should not reach here, but return error just in case
+              return throwError(() => error);
+            })
+          );
+        }
+        // If dialog is already open, just return the error
+        // The first request that opened the dialog will handle the user's choice
       }
       return throwError(() => error);
     })

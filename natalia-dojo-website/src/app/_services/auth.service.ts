@@ -400,6 +400,53 @@ export class AuthService {
   }
 
   /**
+   * Refresh access token using refresh token
+   */
+  refreshToken(): Observable<TokenResponse> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    return this.http.post<TokenResponse>(`${this.apiUrl}/users/refresh-token`, {
+      refreshToken: refreshToken
+    }, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    }).pipe(
+      tap(response => {
+        if (response.accessToken) {
+          this.setToken(response.accessToken);
+        }
+        if (response.refreshToken) {
+          this.setRefreshToken(response.refreshToken);
+        }
+        // Update user info if provided
+        if (response.userId) {
+          const userInfo: UserInfo = {
+            userId: response.userId,
+            username: response.username,
+            email: response.email,
+            displayName: response.displayName,
+            role: response.role,
+            level: response.level,
+            lastLoginAt: response.lastLoginAt || null
+          };
+          this.setUserInfo(userInfo);
+        }
+      }),
+      catchError(error => {
+        console.error('Refresh token error:', error);
+        // If refresh fails, clear tokens
+        this.clearToken();
+        this.clearUserInfo();
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Get HTTP headers with Bearer token for authenticated requests
    */
   getAuthHeaders(): HttpHeaders {
