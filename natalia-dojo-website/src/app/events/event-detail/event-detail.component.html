@@ -1,0 +1,143 @@
+<app-events-hero></app-events-hero>
+
+<div class="container-fluid p-5" dir="rtl">
+  <div class="row g-5">
+    <div class="col-12">
+      <div class="event-detail-content">
+        <!-- Back Button -->
+        <button type="button" class="btn btn-outline-secondary mb-4" (click)="goBack()">
+          <i class="bi bi-arrow-right me-2"></i>
+          חזור לרשימת האירועים
+        </button>
+
+        <!-- Loading State -->
+        <div class="text-center py-5" *ngIf="isLoading">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">טוען...</span>
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div class="alert alert-danger" *ngIf="errorMessage && !isLoading">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Success Message -->
+        <div class="alert alert-success" *ngIf="successMessage">
+          {{ successMessage }}
+        </div>
+
+        <!-- Event Details -->
+        <div class="event-detail-card" *ngIf="event && !isLoading">
+          <!-- Event Image -->
+          <div class="event-detail-image" *ngIf="event.imageUrl">
+            <img [src]="getImageUrl(event.imageUrl)" [alt]="event.title || 'Event'" loading="lazy" (error)="onImageError($event)">
+          </div>
+
+          <!-- Event Header -->
+          <div class="event-detail-header">
+            <div class="event-detail-badges">
+              <span class="badge bg-primary text-uppercase">{{ event.eventType || 'סמינר' }}</span>
+              <span class="badge bg-secondary" *ngIf="!event.isPublished">טיוטה</span>
+            </div>
+            <h1 class="event-detail-title">{{ event.title || 'סמינר' }}</h1>
+          </div>
+
+          <!-- Event Body -->
+          <div class="event-detail-body">
+            <!-- Description -->
+            <div class="event-detail-section" *ngIf="event.description">
+              <h3 class="section-title">תיאור</h3>
+              <div class="section-content" [innerHTML]="getDescriptionHtml(event.description)"></div>
+            </div>
+
+            <!-- Event Details Grid -->
+            <div class="event-details-grid">
+              <div class="detail-item">
+                <i class="bi bi-calendar-event"></i>
+                <div class="detail-content">
+                  <strong>מועד:</strong>
+                  <div>
+                    {{ event.startDateTime | date:'dd/MM/yyyy HH:mm' }} - {{ event.endDateTime | date:'dd/MM/yyyy HH:mm' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="event.location">
+                <i class="bi bi-geo-alt"></i>
+                <div class="detail-content">
+                  <strong>מיקום:</strong>
+                  <div>{{ event.location }}</div>
+                  <a *ngIf="event.locationUrl" [href]="event.locationUrl" target="_blank" rel="noopener" class="text-primary">
+                    <i class="bi bi-map"></i> למפה
+                  </a>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <i class="bi bi-currency-exchange"></i>
+                <div class="detail-content">
+                  <strong>מחיר:</strong>
+                  <div>{{ event.price | currency:'ILS':'symbol':'1.0-0' }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="event.earlyBirdPrice">
+                <i class="bi bi-tag"></i>
+                <div class="detail-content">
+                  <strong>מחיר הרשמה מוקדמת:</strong>
+                  <div>{{ event.earlyBirdPrice | currency:'ILS':'symbol':'1.0-0' }}</div>
+                  <div *ngIf="event.earlyBirdDeadline" class="text-muted small">
+                    עד {{ event.earlyBirdDeadline | date:'dd/MM/yyyy' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="event.maxAttendees">
+                <i class="bi bi-people"></i>
+                <div class="detail-content">
+                  <strong>מספר משתתפים מקסימלי:</strong>
+                  <div>{{ event.maxAttendees }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="event.registrationDeadline">
+                <i class="bi bi-clock"></i>
+                <div class="detail-content">
+                  <strong>דדליין הרשמה:</strong>
+                  <div>{{ event.registrationDeadline | date:'dd/MM/yyyy HH:mm' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enroll Button -->
+            <div class="event-detail-actions">
+              <button
+                type="button"
+                class="btn btn-primary btn-lg w-100"
+                [disabled]="!event.registrationOpen || isEnrolling"
+                (click)="enroll()">
+                <span *ngIf="event.registrationOpen && !isEnrolling && isAuthenticated">
+                  <i class="bi bi-check-circle me-2"></i>
+                  הירשם לסמינר
+                </span>
+                <span *ngIf="event.registrationOpen && !isEnrolling && !isAuthenticated">
+                  <i class="bi bi-box-arrow-in-right me-2"></i>
+                  התחבר/י כדי להירשם
+                </span>
+                <span *ngIf="isEnrolling">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  מבצע הרשמה...
+                </span>
+                <span *ngIf="!event.registrationOpen && !isEnrolling">
+                  <i class="bi bi-x-circle me-2"></i>
+                  ההרשמה סגורה
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

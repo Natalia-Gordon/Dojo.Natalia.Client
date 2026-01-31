@@ -20,6 +20,7 @@ export interface CreateUserRequest {
   username?: string | null;
   email?: string | null;
   password?: string | null;
+  userType?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   displayName?: string | null;
@@ -207,6 +208,15 @@ export class AuthService {
    */
   logout(): Observable<void> {
     const refreshToken = this.getRefreshToken();
+    
+    // If no refresh token, just clear local data and navigate
+    if (!refreshToken) {
+      this.clearToken();
+      this.clearUserInfo();
+      this.router.navigate(['/home']);
+      return of(void 0);
+    }
+
     const logoutRequest: LogoutRequest = {
       refreshToken: refreshToken
     };
@@ -227,7 +237,8 @@ export class AuthService {
         this.clearToken();
         this.clearUserInfo();
         this.router.navigate(['/home']);
-        return throwError(() => error);
+        // Return void instead of throwing error to prevent error propagation
+        return of(void 0);
       })
     );
   }
@@ -393,6 +404,53 @@ export class AuthService {
       }),
       catchError((error: any) => {
         console.error('Update user error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Refresh access token using refresh token
+   */
+  refreshToken(): Observable<TokenResponse> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    return this.http.post<TokenResponse>(`${this.apiUrl}/users/refresh-token`, {
+      refreshToken: refreshToken
+    }, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    }).pipe(
+      tap(response => {
+        if (response.accessToken) {
+          this.setToken(response.accessToken);
+        }
+        if (response.refreshToken) {
+          this.setRefreshToken(response.refreshToken);
+        }
+        // Update user info if provided
+        if (response.userId) {
+          const userInfo: UserInfo = {
+            userId: response.userId,
+            username: response.username,
+            email: response.email,
+            displayName: response.displayName,
+            role: response.role,
+            level: response.level,
+            lastLoginAt: response.lastLoginAt || null
+          };
+          this.setUserInfo(userInfo);
+        }
+      }),
+      catchError(error => {
+        console.error('Refresh token error:', error);
+        // If refresh fails, clear tokens
+        this.clearToken();
+        this.clearUserInfo();
         return throwError(() => error);
       })
     );

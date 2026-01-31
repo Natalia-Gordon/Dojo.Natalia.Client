@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { ZenSidebarComponent } from "./sidebar/sidebar.component";
-import { SharedHeroComponent } from "../../../shared/components/hero/hero.component";
+import { ZenHeroComponent } from "./zen-hero/zen-hero.component";
 
 @Component({
   selector: 'app-zen',
   standalone: true,
-  imports: [ZenSidebarComponent, SharedHeroComponent],
+  imports: [ZenSidebarComponent, ZenHeroComponent],
   templateUrl: './zen.component.html',
   styleUrl: './zen.component.css'
 })
