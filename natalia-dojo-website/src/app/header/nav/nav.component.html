@@ -6,12 +6,12 @@
                 <img src="/assets/img/logo.svg" alt="Dojo Natalia" loading="lazy">
             </a>
         </div>
-        <button type="button" class="navbar-toggler order-1" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <button type="button" class="navbar-toggler order-1" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-controls="navbarCollapse">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
     
-    <div class="collapse navbar-collapse" id="navbarCollapse">
+    <div class="collapse navbar-collapse" [class.show]="isMobileMenuOpen" id="navbarCollapse">
         <!-- Mobile: User Info Section (only when authenticated) -->
         <div class="mobile-user-section d-lg-none" *ngIf="isAuthenticated && userInfo">
             <div class="mobile-user-header">
