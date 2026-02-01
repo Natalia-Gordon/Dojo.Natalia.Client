@@ -1,0 +1,31 @@
+<div class="modal fade" [class.show]="showDialog" [class.d-block]="showDialog" tabindex="-1" role="dialog" 
+     (click)="onBackdropClick($event)" [style.display]="showDialog ? 'block' : 'none'">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+    <div class="modal-content auth-dialog-content" dir="rtl">
+      <div class="modal-header auth-dialog-header">
+        <h5 class="modal-title auth-dialog-title">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          תוקף ההתחברות פג
+        </h5>
+      </div>
+      <div class="modal-body auth-dialog-body">
+        <p class="auth-dialog-message">
+          תוקף ההתחברות שלך פג. מה תרצה לעשות?
+        </p>
+        <div class="auth-dialog-options">
+          <button type="button" class="btn btn-primary btn-lg w-100 mb-3" (click)="onRefresh()">
+            <i class="bi bi-arrow-clockwise me-2"></i>
+            להישאר ולהרענן את הטוקן
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-lg w-100" (click)="onLogout()">
+            <i class="bi bi-box-arrow-right me-2"></i>
+            להתנתק ולצאת
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade" [class.show]="showDialog" [style.display]="showDialog ? 'block' : 'none'"></div>

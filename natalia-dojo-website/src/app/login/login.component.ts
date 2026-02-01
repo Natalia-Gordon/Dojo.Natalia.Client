@@ -90,7 +90,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registeredUserId = null;
     this.registeredUserSnapshot = null;
     this.loginForm.reset();
-    this.registerForm.reset();
+    this.registerForm.reset({ userType: 'guest' });
     this.setRegisterModeValidators();
   }
 
@@ -112,6 +112,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
+      userType: ['guest', [Validators.required]],
       firstName: [''],
       lastName: [''],
       displayName: [''],
@@ -193,7 +194,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.loginForm.patchValue({
           username: request.username || request.email || ''
         });
-        this.registerForm.reset();
+        this.registerForm.reset({ userType: 'guest' });
       },
       error: (error) => {
         this.isRegisterLoading = false;
@@ -222,7 +223,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registeredUserId = null;
     this.registeredUserSnapshot = null;
     this.loginForm.reset();
-    this.registerForm.reset();
+    this.registerForm.reset({ userType: 'guest' });
     this.setRegisterModeValidators();
   }
 
