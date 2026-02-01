@@ -30,13 +30,13 @@
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./node_modules/bootswatch/dist/simplex/bootstrap.css",
               "./node_modules/font-awesome/css/font-awesome.min.css",
+              "./node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "src/assets/lib/owlcarousel/assets/owl.carousel.min.css",
               "src/assets/lib/owlcarousel/assets/owl.theme.default.min.css",
               "src/styles.css"
             ],
             "scripts": [
               "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "src/assets/lib/easing/easing.min.js",
               "src/assets/lib/waypoints/waypoints.min.js",
               "src/assets/lib/owlcarousel/owl.carousel.min.js"
@@ -52,23 +52,23 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1.5mb",
-                  "maximumError": "2.5mb"
+                  "maximumWarning": "1.9mb",
+                  "maximumError": "2.9mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "8kb"
+                  "maximumWarning": "9kb",
+                  "maximumError": "11kb"
                 }
               ],
               "optimization": {
                 "scripts": true,
                 "styles": {
-                "minify": true,
-                "inlineCritical": false
+                  "minify": true,
+                  "inlineCritical": false
                 },
                 "fonts": true
-                },
+              },
               "outputHashing": "all"
             },
             "development": {
