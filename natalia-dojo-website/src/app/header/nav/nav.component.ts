@@ -16,6 +16,7 @@ import { Subscription } from 'rxjs';
 export class NavComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   userInfo: UserInfo | null = null;
+  isMobileMenuOpen = false;
   private authSubscription?: Subscription;
   private userInfoSubscription?: Subscription;
 
@@ -103,25 +104,20 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   
+  toggleMobileMenu(): void {
+    // Only toggle menu on mobile/tablet devices (non-desktop)
+    if (window.innerWidth >= 992) {
+      return; // Don't toggle on desktop
+    }
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
   closeMobileMenu(): void {
     // Only close menu on mobile/tablet devices (non-desktop)
     if (window.innerWidth >= 992) {
       return; // Don't close on desktop
     }
-    
-    // Close the mobile menu by removing the 'show' class
-    const navbarCollapse = document.getElementById('navbarCollapse');
-    if (navbarCollapse && navbarCollapse.classList.contains('show')) {
-      navbarCollapse.classList.remove('show');
-    }
-    
-    // Alternative: Use Bootstrap's collapse method if available
-    if (typeof (window as any).bootstrap !== 'undefined') {
-      const bsCollapse = new (window as any).bootstrap.Collapse(navbarCollapse, {
-        toggle: false
-      });
-      bsCollapse.hide();
-    }
+    this.isMobileMenuOpen = false;
   }
 
   toggleDropdown(event: Event): void {
