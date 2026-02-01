@@ -30,16 +30,18 @@
                 <span class="badge bg-primary text-uppercase">{{ eventItem.eventType || 'Seminar' }}</span>
               </div>
               <p class="event-list-description" *ngIf="eventItem.description">{{ eventItem.description }}</p>
-              <div class="event-list-date">
-                <i class="bi bi-calendar-event me-2"></i>
-                <strong>מועד:</strong> {{ eventItem.startDateTime | date:'dd/MM/yyyy' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy' }}
-              </div>
-              <div class="event-list-status">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>סטטוס הרשמה:</strong>
-                <span class="badge" [class.bg-success]="eventItem.registrationOpen" [class.bg-secondary]="!eventItem.registrationOpen">
-                  {{ eventItem.registrationOpen ? 'פתוח להרשמה' : 'הרשמה סגורה' }}
-                </span>
+              <div class="event-list-meta-group">
+                <div class="event-list-date">
+                  <i class="bi bi-calendar-event"></i>
+                  <span><strong>מועד:</strong> {{ eventItem.startDateTime | date:'dd/MM/yyyy' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="event-list-status">
+                  <i class="bi bi-info-circle"></i>
+                  <span><strong>סטטוס הרשמה:</strong></span>
+                  <span class="badge" [class.bg-success]="eventItem.registrationOpen" [class.bg-secondary]="!eventItem.registrationOpen">
+                    {{ eventItem.registrationOpen ? 'פתוח להרשמה' : 'הרשמה סגורה' }}
+                  </span>
+                </div>
               </div>
             </div>
             <div class="event-list-actions">
