@@ -1,16 +1,12 @@
 <app-events-hero></app-events-hero>
-<div class="container-fluid p-5">
-  <div class="row g-5">
-    <div class="col-12" dir="rtl">
+<div class="container-fluid px-2 px-md-5 py-2 py-md-5" style="overflow-x: hidden; max-width: 100vw; width: 100%;">
+  <div class="row g-5" style="margin: 0;">
+    <div class="col-12" dir="rtl" style="padding: 0;">
       <div class="events-content-card">
         <div class="events-header-card">
           <div class="events-header-card__content">
             <h3 class="events-header-card__title">סמינרים של הדוג'ו</h3>
             <p class="events-header-card__subtitle">הצטרפו לסמינרים המתקדמים שלנו – יש להתחבר או להירשם כאורח כדי להירשם.</p>
-          </div>
-          <div class="events-header-card__badge">
-            <i class="bi bi-calendar-event"></i>
-            אירועים מיוחדים
           </div>
         </div>
 
@@ -22,10 +18,7 @@
         </div>
 
         <div class="empty-state" *ngIf="!isLoading && events.length === 0">
-          <div class="empty-state__icon">
-            <i class="bi bi-calendar-x"></i>
-          </div>
-          <h4 class="empty-state__title">אירועים מיוחדים</h4>
+          
           <p class="empty-state__text">כרגע אין סמינרים פתוחים להרשמה, חזרו אלינו בקרוב.</p>
         </div>
 
@@ -39,7 +32,7 @@
               <p class="event-list-description" *ngIf="eventItem.description">{{ eventItem.description }}</p>
               <div class="event-list-date">
                 <i class="bi bi-calendar-event me-2"></i>
-                <strong>מועד:</strong> {{ eventItem.startDateTime | date:'dd/MM/yyyy HH:mm' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy HH:mm' }}
+                <strong>מועד:</strong> {{ eventItem.startDateTime | date:'dd/MM/yyyy' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy' }}
               </div>
               <div class="event-list-status">
                 <i class="bi bi-info-circle me-2"></i>
