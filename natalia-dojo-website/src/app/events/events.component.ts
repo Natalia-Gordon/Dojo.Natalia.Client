@@ -113,6 +113,14 @@ export class EventsComponent implements OnInit, OnDestroy {
     }
     if (this.createForm.invalid) {
       this.createForm.markAllAsTouched();
+      this.errorMessage = 'אנא מלא את כל השדות הנדרשים.';
+      setTimeout(() => {
+        const firstInvalid = document.querySelector('.seminar-form .is-invalid');
+        if (firstInvalid) {
+          (firstInvalid as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
+          (firstInvalid as HTMLElement).focus();
+        }
+      }, 100);
       return;
     }
 
@@ -151,13 +159,20 @@ export class EventsComponent implements OnInit, OnDestroy {
           registrationOpen: true,
           isPublished: true,
           price: 0,
-          status: 'published'
+          status: 'published',
+          startDateTime: this.toLocalDateTime(new Date()),
+          endDateTime: this.toLocalDateTime(new Date()),
+          earlyBirdDeadline: this.toLocalDate(new Date()),
+          registrationDeadline: this.toLocalDateTime(new Date())
         });
         this.loadEvents();
+        setTimeout(() => {
+          this.successMessage = '';
+        }, 5000);
       },
-      error: () => {
+      error: (error) => {
         this.isCreating = false;
-        this.errorMessage = 'שגיאה ביצירת האירוע.';
+        this.errorMessage = error.error?.message || 'שגיאה ביצירת האירוע. אנא נסה שוב.';
       }
     });
   }
