@@ -1,18 +1,20 @@
 import { Component } from '@angular/core';
 import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
 import { ZenSidebarComponent } from '../sidebar/sidebar.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { CommentsListComponent, Comment } from '../../../../core/templates/comments-list/comments-list.component';
 import { AddcommentComponent } from '../../../../core/templates/addcomment/addcomment.component';
 
 @Component({
   selector: 'app-zen-disabilities',
   standalone: true,
-  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent],
+  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent, DatePipe],
   templateUrl: './zen-disabilities.component.html',
   styleUrl: './zen-disabilities.component.css'
 })
 export class ZenDisabilitiesComponent {
+  articleDate = new Date('2025-11-27');
+  
   comments: Comment[] = [
     {
       id: 1,

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
 import { ZenSidebarComponent } from '../sidebar/sidebar.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { CommentsListComponent, Comment } from '../../../../core/templates/comments-list/comments-list.component';
 import { AddcommentComponent } from '../../../../core/templates/addcomment/addcomment.component';
 import { AudioPlayerComponent } from '../../../../core/templates/audio-player/audio-player.component';
@@ -9,7 +9,7 @@ import { AudioPlayerComponent } from '../../../../core/templates/audio-player/au
 @Component({
   selector: 'app-zen-today',
   standalone: true,
-  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent, AudioPlayerComponent],
+  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent, AudioPlayerComponent, DatePipe],
   templateUrl: './zen-today.component.html',
   styleUrl: './zen-today.component.css'
 })
@@ -17,6 +17,9 @@ export class ZenTodayComponent {
   // Audio file path - place your audio file at: src/assets/audio/zen-today-dani-waxman.mp3
   // Supported formats: MP3 (recommended), OGG, WAV
   audioSrc = 'assets/audio/zen-today-dani-waxman.mp3';
+  
+  // Article publication date
+  articleDate = new Date('2025-11-27');
 
   comments: Comment[] = [
     {
