@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
@@ -8,11 +8,13 @@ import { ZenSidebarComponent } from '../sidebar/sidebar.component';
 @Component({
   selector: 'app-teacher-message',
   standalone: true,
-  imports: [CommonModule, SenseiZenHeroComponent, ZenSidebarComponent],
+  imports: [CommonModule, SenseiZenHeroComponent, ZenSidebarComponent, DatePipe],
   templateUrl: './teacher-message.component.html',
   styleUrl: './teacher-message.component.css'
 })
 export class TeacherMessageComponent implements OnInit, OnDestroy {
+  articleDate = new Date('2025-11-27');
+  
   constructor(
     private router: Router,
     private titleService: Title,
