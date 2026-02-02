@@ -133,13 +133,38 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" *ngIf="isAdminConnected || isInstructorConnected">
                             <label for="register-user-type" class="form-label">סוג משתמש</label>
                             <div class="input-wrapper">
-                                <select id="register-user-type" formControlName="userType" class="form-input">
-                                    <option value="guest">אורח</option>
+                                <select
+                                    id="register-user-type"
+                                    formControlName="userType"
+                                    class="form-input">
+                                    <option *ngIf="isAdminConnected" value="instructor">מדריך</option>
+                                    <option *ngIf="isInstructorConnected" value="student">תלמיד</option>
+                                    <option *ngIf="isAdminConnected" value="student">תלמיד</option>
+                                    <option *ngIf="isAdminConnected || showLoginTab" value="guest">אורח</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="form-group" *ngIf="showRankSelect">
+                            <label for="register-rank" class="form-label">דרגה</label>
+                            <div class="input-wrapper">
+                                <select
+                                    id="register-rank"
+                                    formControlName="rankId"
+                                    class="form-input">
+                                    <option [ngValue]="null">בחר דרגה</option>
+                                    <option *ngFor="let rank of ranks" [ngValue]="rank.id">
+                                        {{ rank.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="error-message" *ngIf="registerForm.get('rankId')?.invalid && registerForm.get('rankId')?.touched">
+                                דרגה נדרשת
+                            </div>
+                            <div class="error-message" *ngIf="ranksError">{{ ranksError }}</div>
                         </div>
 
                         <div class="register-grid">

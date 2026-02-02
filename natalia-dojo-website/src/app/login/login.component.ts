@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../_services/auth.service';
+import { Rank, RanksService } from '../_services/ranks.service';
 import { LoginModalService, LoginModalTab } from '../_services/login-modal.service';
-import { Title, Meta } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -17,6 +17,9 @@ import { Subscription } from 'rxjs';
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   registerForm!: FormGroup;
+  ranks: Rank[] = [];
+  isRanksLoading = false;
+  ranksError = '';
   isLoginLoading = false;
   isRegisterLoading = false;
   errorMessage = '';
@@ -26,17 +29,18 @@ export class LoginComponent implements OnInit, OnDestroy {
   showModal = false;
   private modalSubscription?: Subscription;
   private tabSubscription?: Subscription;
+  private userInfoSubscription?: Subscription;
+  private userTypeSubscription?: Subscription;
   private registeredUserId: number | null = null;
   private registeredUserSnapshot: Record<string, string | null> | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private ranksService: RanksService,
     private router: Router,
     private route: ActivatedRoute,
     private loginModalService: LoginModalService,
-    private title: Title,
-    private meta: Meta,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.initForms();
@@ -61,6 +65,27 @@ export class LoginComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.userInfoSubscription = this.authService.userInfo$.subscribe(() => {
+      this.syncUserTypeWithRole();
+      this.setUserTypeControlState();
+      if (this.showRankSelect) {
+        this.loadRanks();
+      } else {
+        this.ranks = [];
+        this.setRankValidators();
+      }
+    });
+
+    this.userTypeSubscription = this.registerForm.get('userType')?.valueChanges.subscribe(() => {
+      this.setRankControlState();
+      if (this.showRankSelect) {
+        this.loadRanks();
+      } else {
+        this.ranks = [];
+        this.setRankValidators();
+      }
+    });
+
     // If accessed via route, show as modal initially
     if (this.route.snapshot.url.length > 0) {
       this.showModal = true;
@@ -72,11 +97,19 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (!this.showLoginTab) {
       this.activeTab = 'register';
     }
+
+    if (this.showRankSelect) {
+      this.loadRanks();
+    }
+
+    this.updateRegisterControlStates();
   }
 
   ngOnDestroy(): void {
     this.modalSubscription?.unsubscribe();
     this.tabSubscription?.unsubscribe();
+    this.userInfoSubscription?.unsubscribe();
+    this.userTypeSubscription?.unsubscribe();
     if (isPlatformBrowser(this.platformId)) {
       document.body.classList.remove('modal-open');
     }
@@ -90,8 +123,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registeredUserId = null;
     this.registeredUserSnapshot = null;
     this.loginForm.reset();
-    this.registerForm.reset({ userType: 'guest' });
+    this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null });
     this.setRegisterModeValidators();
+    this.updateRegisterControlStates();
   }
 
   onBackdropClick(event: Event): void {
@@ -112,7 +146,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
-      userType: ['guest', [Validators.required]],
+      userType: [this.getDefaultRegisterUserType(), [Validators.required]],
+      rankId: [null],
       firstName: [''],
       lastName: [''],
       displayName: [''],
@@ -174,6 +209,26 @@ export class LoginComponent implements OnInit, OnDestroy {
       ...request
     } = this.registerForm.value;
 
+    if (request.rankId !== null && request.rankId !== undefined) {
+      request.CurrentRankId = request.rankId;
+    }
+    delete request.rankId;
+
+    if (typeof request.dateOfBirth === 'string' && request.dateOfBirth.trim() === '') {
+      delete request.dateOfBirth;
+    }
+
+    const normalizedUserType = String(request.userType || '').trim().toLowerCase();
+    if (this.isInstructorConnected) {
+      request.userType = 'student';
+    } else if (this.isAdminConnected) {
+      request.userType = ['guest', 'instructor', 'student'].includes(normalizedUserType)
+        ? normalizedUserType
+        : this.getDefaultRegisterUserType();
+    } else {
+      request.userType = 'guest';
+    }
+
     request.CreatorRole = (this.authService.getUserInfo()?.role || '').trim().toLowerCase();
 
     this.authService.register(request).subscribe({
@@ -194,7 +249,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.loginForm.patchValue({
           username: request.username || request.email || ''
         });
-        this.registerForm.reset({ userType: 'guest' });
+        this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null });
+        this.setRegisterModeValidators();
       },
       error: (error) => {
         this.isRegisterLoading = false;
@@ -223,8 +279,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registeredUserId = null;
     this.registeredUserSnapshot = null;
     this.loginForm.reset();
-    this.registerForm.reset({ userType: 'guest' });
+    this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null });
     this.setRegisterModeValidators();
+    this.updateRegisterControlStates();
   }
 
   get username() {
@@ -259,6 +316,28 @@ export class LoginComponent implements OnInit, OnDestroy {
     return this.showConnectedRegistrationSuccess && this.hasRegisterChanges();
   }
 
+  get showRankSelect(): boolean {
+    if (this.showLoginTab) {
+      return false;
+    }
+    if (this.isInstructorConnected) {
+      return true;
+    }
+    if (this.isAdminConnected) {
+      const userType = String(this.registerForm.get('userType')?.value || '').trim().toLowerCase();
+      return userType === 'instructor' || userType === 'student';
+    }
+    return false;
+  }
+
+  get isAdminConnected(): boolean {
+    return this.getConnectedRole() === 'admin';
+  }
+
+  get isInstructorConnected(): boolean {
+    return this.getConnectedRole() === 'instructor';
+  }
+
   onUpdateRegisteredUser(): void {
     if (!this.registeredUserId) {
       return;
@@ -276,6 +355,15 @@ export class LoginComponent implements OnInit, OnDestroy {
       username,
       ...updateRequest
     } = this.registerForm.value;
+
+    if (updateRequest.rankId !== null && updateRequest.rankId !== undefined) {
+      updateRequest.currentRankId = updateRequest.rankId;
+    }
+    delete updateRequest.rankId;
+
+    if (typeof updateRequest.dateOfBirth === 'string' && updateRequest.dateOfBirth.trim() === '') {
+      delete updateRequest.dateOfBirth;
+    }
 
     if (!updateRequest.password || String(updateRequest.password).trim() === '') {
       delete updateRequest.password;
@@ -338,6 +426,135 @@ export class LoginComponent implements OnInit, OnDestroy {
     confirmPasswordControl?.setValidators([Validators.required, Validators.minLength(6)]);
     passwordControl?.updateValueAndValidity();
     confirmPasswordControl?.updateValueAndValidity();
+  }
+
+  private setRankValidators(): void {
+    const rankControl = this.registerForm.get('rankId');
+    if (this.showRankSelect) {
+      rankControl?.setValidators([Validators.required]);
+    } else {
+      rankControl?.clearValidators();
+      rankControl?.setValue(null);
+    }
+    rankControl?.updateValueAndValidity();
+    this.setRankControlState();
+  }
+
+  private getConnectedRole(): string {
+    return (this.authService.getUserInfo()?.role || '').trim().toLowerCase();
+  }
+
+  private getDefaultRegisterUserType(): string {
+    if (this.isInstructorConnected) {
+      return 'student';
+    }
+    if (this.isAdminConnected) {
+      return 'instructor';
+    }
+    return 'guest';
+  }
+
+  private loadRanks(): void {
+    this.isRanksLoading = true;
+    this.ranksError = '';
+    this.setRankValidators();
+    this.setRankControlState();
+    this.ranksService.getRanks().subscribe({
+      next: (ranks) => {
+        const filteredRanks = this.filterRanksByRole(ranks || []);
+        this.ranks = [...filteredRanks].sort((a, b) => {
+          const aOrder = a.display_order ?? 0;
+          const bOrder = b.display_order ?? 0;
+          return aOrder - bOrder;
+        });
+        this.isRanksLoading = false;
+        this.setRankControlState();
+      },
+      error: (error) => {
+        console.error('Ranks load error:', error);
+        this.ranksError = 'שגיאה בטעינת דרגות. נסה שוב מאוחר יותר.';
+        this.isRanksLoading = false;
+        this.setRankControlState();
+      }
+    });
+  }
+
+  private filterRanksByRole(ranks: Rank[]): Rank[] {
+    if (this.isAdminConnected) {
+      return ranks;
+    }
+    if (this.isInstructorConnected) {
+      return ranks.filter(rank => {
+        const typeNormalized = (rank.rank_type || '').replace(/\s+/g, '').trim().toLowerCase();
+        const nameNormalized = (rank.name || '').replace(/\s+/g, '').trim().toLowerCase();
+        const slugNormalized = (rank.slug || '').replace(/\s+/g, '').trim().toLowerCase();
+        return ![typeNormalized, nameNormalized, slugNormalized].includes('daishihan');
+      });
+    }
+    return ranks;
+  }
+
+  private getNormalizedRegisterUserType(): string {
+    return String(this.registerForm.get('userType')?.value || '').trim().toLowerCase();
+  }
+
+  private syncUserTypeWithRole(): void {
+    const control = this.registerForm.get('userType');
+    if (!control) {
+      return;
+    }
+    if (this.isInstructorConnected) {
+      if (this.getNormalizedRegisterUserType() !== 'student') {
+        control.setValue('student', { emitEvent: false });
+      }
+      return;
+    }
+    if (this.isAdminConnected) {
+      if (control.pristine || !control.value) {
+        control.setValue(this.getDefaultRegisterUserType(), { emitEvent: false });
+      }
+      return;
+    }
+    if (control.pristine) {
+      control.setValue('guest', { emitEvent: false });
+    }
+  }
+
+  private updateRegisterControlStates(): void {
+    this.setUserTypeControlState();
+    this.setRankControlState();
+  }
+
+  private setUserTypeControlState(): void {
+    const control = this.registerForm.get('userType');
+    if (!control) {
+      return;
+    }
+    if (this.showLoginTab) {
+      if (this.getNormalizedRegisterUserType() !== 'guest') {
+        control.setValue('guest', { emitEvent: false });
+      }
+      control.enable({ emitEvent: false });
+      return;
+    }
+    if (this.isInstructorConnected) {
+      control.disable({ emitEvent: false });
+    } else {
+      control.enable({ emitEvent: false });
+    }
+  }
+
+  private setRankControlState(): void {
+    const control = this.registerForm.get('rankId');
+    if (!control) {
+      return;
+    }
+    const shouldDisable = this.isRanksLoading || !this.showRankSelect;
+    if (shouldDisable) {
+      control.disable({ emitEvent: false });
+    } else {
+      control.enable({ emitEvent: false });
+    }
   }
 
   private hasRegisterChanges(): boolean {
