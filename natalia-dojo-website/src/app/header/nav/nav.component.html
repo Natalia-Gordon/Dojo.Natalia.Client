@@ -49,6 +49,7 @@
             <!-- Mobile: Profile Settings and Purchases (only when authenticated) -->
             <a routerLink="/user-details" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">פרופיל משתמש</a>
             <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">רכישות</a>
+            <a href="#" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated && isAdminOrInstructor()" (click)="openRegisterNewUser(); closeMobileMenu(); $event.preventDefault()">רישום משתמש חדש</a>
             
             <!-- Login Button (when not authenticated) -->
             <div class="nav-item nav-link-auth" *ngIf="!isAuthenticated">

@@ -30,6 +30,10 @@ export class NavComponent implements OnInit, OnDestroy {
     this.loginModalService.open();
   }
 
+  openRegisterNewUser(): void {
+    this.loginModalService.open('register');
+  }
+
   onLogout(): void {
     this.authService.logout().subscribe({
       next: () => {
@@ -43,6 +47,11 @@ export class NavComponent implements OnInit, OnDestroy {
 
   openUserDetails(): void {
     this.router.navigate(['/user-details']);
+  }
+
+  isAdminOrInstructor(): boolean {
+    const role = (this.userInfo?.role || '').trim().toLowerCase();
+    return role === 'admin' || role === 'instructor' || role === 'teacher';
   }
 
   getUserInitials(): string {
