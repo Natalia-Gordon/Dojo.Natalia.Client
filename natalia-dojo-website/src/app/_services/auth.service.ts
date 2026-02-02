@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
@@ -28,6 +28,7 @@ export interface CreateUserRequest {
   dateOfBirth?: string | null;
   profileImageUrl?: string | null;
   bio?: string | null;
+  CurrentRankId?: number | null;
 }
 
 export interface TokenResponse {
@@ -84,12 +85,17 @@ export interface User {
 }
 
 export interface UpdateUserRequest {
+  email?: string | null;
+  password?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   displayName?: string | null;
   phone?: string | null;
   profileImageUrl?: string | null;
   bio?: string | null;
   dateOfBirth?: string | null; // Format: YYYY-MM-DD
   isActive?: boolean;
+  currentRankId?: number | null;
 }
 
 @Injectable({
