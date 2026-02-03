@@ -1,17 +1,27 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, throwError, of } from 'rxjs';
+import { Observable, throwError, of, BehaviorSubject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
+
+export interface RegistrationDialogState {
+  isOpen: boolean;
+  event: Event | null;
+}
+
+export type EventStatus = 'draft' | 'published' | 'closed';
+export type EventType = 'seminar' | 'workshop' | 'grading' | 'social' | 'special_training' | 'online_session';
+export type PaymentStatus = 'free' | 'pending' | 'paid' | 'refunded' | 'cancelled';
+export type PaymentMethod = 'bit' | 'credit_card' | 'cash' | 'bank_transfer' | 'google_pay' | 'apple_pay' | 'paypal';
 
 export interface Event {
   id: number;
   title: string | null;
   description: string | null;
-  eventType: string | null;
+  eventType: EventType | string | null;
   instructorId: number | null;
-  status: 'draft' | 'published' | 'closed' | string | null;
+  status: EventStatus | string | null;
   startDateTime: string;
   endDateTime: string;
   location: string | null;
@@ -51,6 +61,7 @@ export interface CreateEventRequest {
 export interface CreateEventRegistrationRequest {
   userId: number;
   notes?: string | null;
+  paymentMethod?: PaymentMethod | string | null;
 }
 
 export interface EventRegistration {
@@ -58,13 +69,54 @@ export interface EventRegistration {
   eventId: number;
   userId: number;
   status: string | null;
-  paymentStatus: string | null;
+  paymentStatus: PaymentStatus | string | null;
   attended: boolean;
   checkedInAt: string | null;
   notes: string | null;
   registeredAt: string;
+  approvedBy: number | null;
+  approvedAt: string | null;
+  approvalNotes: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface EventRegistrationDetailsResponse {
+  registrationId: number;
+  eventId: number;
+  userId: number;
+  username: string | null;
+  email: string | null;
+  status: string | null;
+  paymentStatus: string | null;
+  attended: boolean;
+  checkedInAt: string | null;
+  registeredAt: string;
+  notes: string | null;
+}
+
+export interface EventRegistrationHistoryResponse {
+  registrationId: number;
+  eventId: number;
+  eventTitle: string | null;
+  eventType: string | null;
+  startDateTime: string;
+  endDateTime: string;
+  status: string | null;
+  paymentStatus: string | null;
+  attended: boolean;
+  registeredAt: string;
+}
+
+export interface EventRegistrationResponse {
+  registrationNumber: number;
+  eventId: number;
+  eventTitle: string | null;
+  status: string | null;
+  paymentStatus: string | null;
+  paymentMethod: string | null;
+  registeredAt: string;
+  message: string | null;
 }
 
 @Injectable({
@@ -74,6 +126,27 @@ export class EventsService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
   private apiUrl = environment.apiUrl;
+
+  // Registration Dialog State Management
+  private registrationDialogStateSubject = new BehaviorSubject<RegistrationDialogState>({
+    isOpen: false,
+    event: null
+  });
+  public registrationDialogState$ = this.registrationDialogStateSubject.asObservable();
+
+  openRegistrationDialog(event: Event): void {
+    this.registrationDialogStateSubject.next({
+      isOpen: true,
+      event: event
+    });
+  }
+
+  closeRegistrationDialog(): void {
+    this.registrationDialogStateSubject.next({
+      isOpen: false,
+      event: null
+    });
+  }
 
   getEvents(params?: {
     type?: string;
@@ -156,8 +229,8 @@ export class EventsService {
     );
   }
 
-  registerForEvent(eventId: number, request: CreateEventRegistrationRequest): Observable<EventRegistration> {
-    return this.http.post<EventRegistration>(`${this.apiUrl}/events/${eventId}/registrations`, request, {
+  registerForEvent(eventId: number, request: CreateEventRegistrationRequest): Observable<EventRegistrationResponse> {
+    return this.http.post<EventRegistrationResponse>(`${this.apiUrl}/events/${eventId}/registrations`, request, {
       headers: this.getAuthHeaders()
     }).pipe(
       catchError(error => {

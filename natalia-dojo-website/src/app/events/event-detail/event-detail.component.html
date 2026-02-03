@@ -1,3 +1,6 @@
+<!-- Registration Dialog -->
+<app-registration-dialog></app-registration-dialog>
+
 <app-event-detail-hero 
   [eventTitle]="event?.title || null" 
   [eventDescription]="event?.description || null"
@@ -145,21 +148,17 @@
               <button
                 type="button"
                 class="btn btn-primary btn-lg w-100"
-                [disabled]="!event.registrationOpen || isEnrolling"
+                [disabled]="!event.registrationOpen"
                 (click)="enroll()">
-                <span *ngIf="event.registrationOpen && !isEnrolling && isAuthenticated">
+                <span *ngIf="event.registrationOpen && isAuthenticated">
                   <i class="bi bi-check-circle me-2"></i>
                   הירשם לסמינר
                 </span>
-                <span *ngIf="event.registrationOpen && !isEnrolling && !isAuthenticated">
+                <span *ngIf="event.registrationOpen && !isAuthenticated">
                   <i class="bi bi-box-arrow-in-right me-2"></i>
                   התחבר/י כדי להירשם
                 </span>
-                <span *ngIf="isEnrolling">
-                  <span class="spinner-border spinner-border-sm me-2"></span>
-                  מבצע הרשמה...
-                </span>
-                <span *ngIf="!event.registrationOpen && !isEnrolling">
+                <span *ngIf="!event.registrationOpen">
                   <i class="bi bi-x-circle me-2"></i>
                   ההרשמה סגורה
                 </span>

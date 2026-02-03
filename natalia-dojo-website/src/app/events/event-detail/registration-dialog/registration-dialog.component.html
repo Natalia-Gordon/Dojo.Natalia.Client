@@ -1,0 +1,218 @@
+<!-- Registration Dialog -->
+<div class="modal fade" [class.show]="showDialog" [class.d-block]="showDialog" tabindex="-1" role="dialog" *ngIf="showDialog" (click)="onBackdropClick($event)">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content" dir="rtl">
+      <!-- Header -->
+      <div class="modal-header">
+        <button type="button" class="btn-close" (click)="close()" [disabled]="isEnrolling" *ngIf="!registrationResult"></button>
+        <h5 class="modal-title">
+          <i class="bi bi-calendar-check me-2"></i>
+          הרשמה לאירוע
+        </h5>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+        <!-- Event Summary -->
+        <div class="event-summary mb-4" *ngIf="event">
+          <h5 class="fw-bold mb-3">
+            <i class="bi bi-info-circle me-2"></i>
+            סיכום האירוע
+          </h5>
+          
+          <div class="summary-content">
+            <div class="summary-item">
+              <strong>כותרת:</strong>
+              <span>{{ event.title }}</span>
+            </div>
+            
+            <div class="summary-item" *ngIf="event.eventType">
+              <strong>סוג אירוע:</strong>
+              <span class="badge bg-primary">{{ event.eventType }}</span>
+            </div>
+            
+            <div class="summary-item" *ngIf="event.location">
+              <strong>מיקום:</strong>
+              <span>{{ event.location }}</span>
+            </div>
+            
+            <div class="summary-item">
+              <strong>מחיר:</strong>
+              <span *ngIf="event.price === 0" class="text-success fw-bold">חינם</span>
+              <span *ngIf="event.price > 0 && event.earlyBirdPrice && isEarlyBirdAvailable()" class="fw-bold text-success">
+                {{ event.earlyBirdPrice }} ₪
+                <small class="text-muted ms-2">(מחיר הרשמה מוקדמת - עד {{ event.earlyBirdDeadline | date:'dd/MM/yyyy' }})</small>
+              </span>
+              <span *ngIf="event.price > 0 && (!event.earlyBirdPrice || !isEarlyBirdAvailable())" class="fw-bold text-primary">
+                {{ event.price }} ₪
+              </span>
+            </div>
+            
+            <div class="summary-item" *ngIf="event.maxAttendees">
+              <strong>מספר משתתפים מקסימלי:</strong>
+              <span>{{ event.maxAttendees }} משתתפים</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Form (before submission) -->
+        <div *ngIf="!registrationResult">
+          <!-- Payment Method Selection (only for paid events) -->
+          <div class="payment-method-selection mb-4" *ngIf="event && event.price > 0">
+            <label class="form-label fw-bold mb-2">
+              <i class="bi bi-credit-card me-2"></i>
+              סוג תשלום: <span class="text-danger">*</span>
+            </label>
+            <select
+              class="form-select form-select-lg"
+              [(ngModel)]="selectedPaymentMethod"
+              [disabled]="isEnrolling"
+              required>
+              <option *ngFor="let method of paymentMethods" [value]="method.value">
+                {{ method.label }}
+              </option>
+            </select>
+            
+            <!-- Bank Transfer Details -->
+            <div class="bank-transfer-details mt-3" *ngIf="selectedPaymentMethod === 'bank_transfer'">
+              <div class="alert alert-info">
+                <h6 class="alert-heading mb-2">
+                  <i class="bi bi-bank me-2"></i>
+                  פרטי חשבון להעברה בנקאית
+                </h6>
+                <div class="bank-details">
+                  <div class="detail-item">
+                    <strong>שם הבנק:</strong>
+                    <span>בנק הפועלים</span>
+                  </div>
+                  <div class="detail-item">
+                    <strong>מספר סניף:</strong>
+                    <span>123</span>
+                  </div>
+                  <div class="detail-item">
+                    <strong>מספר חשבון:</strong>
+                    <span>1234567</span>
+                  </div>
+                  <div class="detail-item">
+                    <strong>שם החשבון:</strong>
+                    <span>דוג'ו נטליה</span>
+                  </div>
+                </div>
+                <hr>
+                <p class="mb-2 small">
+                  <i class="bi bi-info-circle me-1"></i>
+                  אנא שלח/י הוכחת העברה לאחר ביצוע התשלום
+                </p>
+                
+                <!-- File Upload for Payment Proof -->
+                <div class="file-upload-section">
+                  <label class="form-label fw-bold small mb-2">
+                    <i class="bi bi-paperclip me-1"></i>
+                    צרף קובץ להוכחת תשלום
+                  </label>
+                  <div class="file-input-wrapper">
+                    <input
+                      type="file"
+                      class="form-control form-control-sm"
+                      id="paymentProofFile"
+                      accept="image/*,.pdf"
+                      (change)="onFileSelected($event)"
+                      [disabled]="isEnrolling">
+                    <label for="paymentProofFile" class="file-input-label">
+                      <i class="bi bi-cloud-upload me-1"></i>
+                      בחר קובץ
+                    </label>
+                  </div>
+                  <div class="file-info mt-2" *ngIf="paymentProofFileName">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-link text-danger p-0"
+                      (click)="removeFile()"
+                      [disabled]="isEnrolling">
+                      <i class="bi bi-x-circle"></i>
+                    </button>
+                    <i class="bi bi-file-check text-success me-1"></i>
+                    <span class="small">{{ paymentProofFileName }}</span>
+                  </div>
+                  <small class="text-muted d-block mt-1">
+                    ניתן להעלות תמונה (JPG, PNG) או קובץ PDF
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div class="alert alert-danger" *ngIf="errorMessage">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ errorMessage }}
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid gap-2">
+            <button
+              type="button"
+              class="btn btn-primary btn-lg"
+              [disabled]="isEnrolling || (event && event.price > 0 && !selectedPaymentMethod)"
+              (click)="enroll()">
+              <span *ngIf="!isEnrolling">
+                <i class="bi bi-check-circle me-2"></i>
+                הירשם לאירוע
+              </span>
+              <span *ngIf="isEnrolling">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                מבצע הרשמה...
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Success Message (after registration) -->
+        <div *ngIf="registrationResult" class="registration-success">
+          <div class="alert alert-success">
+            <h6 class="alert-heading">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              נרשמת בהצלחה!
+            </h6>
+            <hr>
+            <div class="registration-details">
+              <div class="detail-row mb-2">
+                <strong>מספר הרשמה:</strong>
+                <span class="badge bg-primary ms-2">{{ registrationResult.registrationNumber }}</span>
+              </div>
+              <div class="detail-row mb-2">
+                <strong>סטטוס תשלום:</strong>
+                <span class="badge ms-2" 
+                      [class.bg-success]="registrationResult.paymentStatus === 'free' || registrationResult.paymentStatus === 'paid'"
+                      [class.bg-warning]="registrationResult.paymentStatus === 'pending'"
+                      [class.bg-secondary]="registrationResult.paymentStatus === 'cancelled' || registrationResult.paymentStatus === 'refunded'">
+                  {{ getPaymentStatusText(registrationResult.paymentStatus) }}
+                </span>
+              </div>
+              <div class="detail-row mb-2" *ngIf="registrationResult.paymentMethod">
+                <strong>שיטת תשלום:</strong>
+                <span class="ms-2">{{ getPaymentMethodText(registrationResult.paymentMethod) }}</span>
+              </div>
+              <div class="detail-row mb-2" *ngIf="registrationResult.registeredAt">
+                <strong>תאריך הרשמה:</strong>
+                <span class="ms-2">{{ registrationResult.registeredAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </div>
+            <div class="mt-3" *ngIf="registrationResult.message">
+              <p class="mb-0">{{ registrationResult.message }}</p>
+            </div>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-primary" (click)="close()">
+              <i class="bi bi-check-lg me-2"></i>
+              סגור
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade show" *ngIf="showDialog" (click)="close()"></div>

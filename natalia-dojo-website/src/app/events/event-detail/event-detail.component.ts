@@ -7,11 +7,12 @@ import { EventsService, Event } from '../../_services/events.service';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { EventDetailHeroComponent } from './event-detail-hero/event-detail-hero.component';
+import { RegistrationDialogComponent } from './registration-dialog/registration-dialog.component';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, EventDetailHeroComponent],
+  imports: [CommonModule, RouterModule, EventDetailHeroComponent, RegistrationDialogComponent],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.css'
 })
@@ -23,7 +24,6 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   isAdminOrInstructor = false;
   userInfo: UserInfo | null = null;
-  isEnrolling = false;
   imageLoadAttempt = 0;
   private imageId: string | null = null;
 
@@ -108,35 +108,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.isEnrolling) {
-      return;
-    }
-
-    this.isEnrolling = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    this.eventsService.registerForEvent(this.event.id, {
-      userId: this.userInfo.userId,
-      notes: null
-    }).subscribe({
-      next: () => {
-        this.isEnrolling = false;
-        this.successMessage = 'נרשמת בהצלחה לאירוע!';
-      },
-      error: (error) => {
-        this.isEnrolling = false;
-        console.error('Error enrolling for event:', error);
-        
-        // If 401 and no token, show login modal
-        if (error.status === 401 && !this.authService.getToken()) {
-          this.loginModalService.open();
-          this.errorMessage = 'יש להתחבר או להירשם כאורח כדי להירשם לסמינר.';
-        } else {
-          this.errorMessage = 'שגיאה בהרשמה לאירוע. ייתכן שכבר נרשמת או שההרשמה נסגרה.';
-        }
-      }
-    });
+    // Open registration dialog
+    this.eventsService.openRegistrationDialog(this.event);
   }
 
   goBack(): void {
