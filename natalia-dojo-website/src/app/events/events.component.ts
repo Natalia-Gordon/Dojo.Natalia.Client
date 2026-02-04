@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService, UserInfo } from '../_services/auth.service';
-import { EventsService, Event } from '../_services/events.service';
+import { EventsService, Event, Instructor } from '../_services/events.service';
 import { EventsHeroComponent } from './events-hero/events-hero.component';
 
 @Component({
@@ -16,7 +16,9 @@ import { EventsHeroComponent } from './events-hero/events-hero.component';
 })
 export class EventsComponent implements OnInit, OnDestroy {
   events: Event[] = [];
+  instructors: Instructor[] = [];
   isLoading = false;
+  isLoadingInstructors = false;
   errorMessage = '';
   successMessage = '';
   isAuthenticated = false;
@@ -65,6 +67,11 @@ export class EventsComponent implements OnInit, OnDestroy {
     // Load events for all users (public)
     this.loadEvents();
 
+    // Load instructors if user is admin or instructor
+    if (this.isAdminOrInstructor) {
+      this.loadInstructors();
+    }
+
     this.authSubscription = this.authService.token$.subscribe(token => {
       this.isAuthenticated = !!token;
       if (!token) {
@@ -73,6 +80,10 @@ export class EventsComponent implements OnInit, OnDestroy {
       }
       // Reload events when authentication state changes (to show unpublished if admin)
       this.loadEvents();
+      // Load instructors if user is admin or instructor
+      if (this.isAdminOrInstructor) {
+        this.loadInstructors();
+      }
     });
 
     this.userSubscription = this.authService.userInfo$.subscribe(userInfo => {
@@ -80,6 +91,10 @@ export class EventsComponent implements OnInit, OnDestroy {
       this.isAdminOrInstructor = this.isAllowedToManageEvents(userInfo);
       // Reload events when user info changes (to show unpublished if admin/instructor)
       this.loadEvents();
+      // Load instructors if user is admin or instructor
+      if (this.isAdminOrInstructor) {
+        this.loadInstructors();
+      }
     });
   }
 
@@ -103,6 +118,20 @@ export class EventsComponent implements OnInit, OnDestroy {
       error: () => {
         this.isLoading = false;
         this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
+      }
+    });
+  }
+
+  loadInstructors(): void {
+    this.isLoadingInstructors = true;
+    this.eventsService.getInstructors(false).subscribe({
+      next: (instructors) => {
+        this.instructors = instructors || [];
+        this.isLoadingInstructors = false;
+      },
+      error: () => {
+        this.isLoadingInstructors = false;
+        this.instructors = [];
       }
     });
   }

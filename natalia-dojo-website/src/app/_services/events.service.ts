@@ -38,6 +38,19 @@ export interface Event {
   updatedAt: string;
 }
 
+export interface Instructor {
+  instructorId: number;
+  userId: number;
+  username: string | null;
+  displayName: string | null;
+  email: string | null;
+  rank: string | null;
+  yearsOfExperience: number | null;
+  specialization: string | null;
+  hourlyRate: number | null;
+  isAvailable: boolean;
+}
+
 export interface CreateEventRequest {
   title?: string | null;
   description?: string | null;
@@ -236,6 +249,29 @@ export class EventsService {
         if (error.status !== 0) {
           console.error('Get event by id error:', error);
         }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getInstructors(includeUnavailable: boolean = false): Observable<Instructor[]> {
+    const params = new HttpParams().set('includeUnavailable', includeUnavailable.toString());
+    
+    return this.http.get<Instructor[]>(`${this.apiUrl}/instructors`, {
+      headers: this.getAuthHeaders(),
+      params: params
+    }).pipe(
+      catchError(error => {
+        // Only log non-network errors to reduce console noise
+        if (error.status !== 0) {
+          console.error('Get instructors error:', error);
+        }
+        
+        // For network errors (status 0), return empty array to prevent UI crashes
+        if (error.status === 0) {
+          return of([]);
+        }
+        
         return throwError(() => error);
       })
     );

@@ -104,6 +104,22 @@
                 </select>
                 <small class="seminar-form__hint">בחר/י את סוג האירוע מתוך הרשימה.</small>
               </div>
+              <div class="col-md-6">
+                <label class="form-label seminar-form__label">מדריך</label>
+                <select class="form-control seminar-form__input" formControlName="instructorId" [disabled]="isLoadingInstructors">
+                  <option value="">-- בחר/י מדריך --</option>
+                  <option *ngFor="let instructor of instructors" [value]="instructor.instructorId">
+                    {{ instructor.displayName || instructor.username || 'מדריך ' + instructor.instructorId }}
+                  </option>
+                </select>
+                <small class="seminar-form__hint" *ngIf="!isLoadingInstructors">
+                  בחר/י מדריך לאירוע (אופציונלי)
+                </small>
+                <small class="seminar-form__hint text-muted" *ngIf="isLoadingInstructors">
+                  <span class="spinner-border spinner-border-sm me-1"></span>
+                  טוען מדריכים...
+                </small>
+              </div>
               <div class="col-12">
                 <label class="form-label seminar-form__label">תיאור</label>
                 <textarea class="form-control seminar-form__input" rows="3" formControlName="description" placeholder="תיאור קצר"></textarea>
@@ -173,10 +189,6 @@
                 <label class="form-label seminar-form__label">קישור לתמונה</label>
                 <input class="form-control seminar-form__input" type="url" formControlName="imageUrl">
                 <small class="seminar-form__hint">שדרגו את הכרטיס עם תמונה רחבה ואיכותית.</small>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label seminar-form__label">מזהה מדריך (אופציונלי)</label>
-                <input class="form-control seminar-form__input" type="number" formControlName="instructorId" min="1">
               </div>
               <div class="col-md-6">
                 <div class="form-check seminar-form__check">
