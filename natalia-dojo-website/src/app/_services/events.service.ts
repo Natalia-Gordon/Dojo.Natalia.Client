@@ -191,10 +191,17 @@ export class EventsService {
         }
       }),
       catchError(error => {
-        console.error('Get events error:', error);
+        // Only log non-network errors to reduce console noise
+        if (error.status !== 0) {
+          console.error('Get events error:', error);
+        }
         // For 401 errors on public events, return empty array instead of throwing
         // This prevents the interceptor from redirecting to login
         if (error.status === 401 && !needsAuth) {
+          return of([]);
+        }
+        // For network errors (status 0), return empty array to prevent UI crashes
+        if (error.status === 0) {
           return of([]);
         }
         return throwError(() => error);
@@ -223,7 +230,10 @@ export class EventsService {
       responseType: 'json'
     }).pipe(
       catchError(error => {
-        console.error('Get event by id error:', error);
+        // Only log non-network errors (status 0) to reduce console noise
+        if (error.status !== 0) {
+          console.error('Get event by id error:', error);
+        }
         return throwError(() => error);
       })
     );

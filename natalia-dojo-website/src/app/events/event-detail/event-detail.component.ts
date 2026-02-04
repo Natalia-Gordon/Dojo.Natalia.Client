@@ -90,11 +90,27 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       next: (event) => {
         this.event = event;
         this.isLoading = false;
+        this.errorMessage = '';
       },
       error: (error) => {
         this.isLoading = false;
-        console.error('Failed to load event:', error);
-        this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסה שוב מאוחר יותר.';
+        
+        // Only log non-network errors to reduce console noise
+        if (error.status !== 0) {
+          console.error('Failed to load event:', error);
+        }
+        
+        // Provide user-friendly error messages
+        if (error.status === 0) {
+          // Network error - backend not available
+          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+        } else if (error.status === 404) {
+          this.errorMessage = 'האירוע לא נמצא.';
+        } else if (error.status === 401 || error.status === 403) {
+          this.errorMessage = 'אין הרשאה לצפות באירוע זה.';
+        } else {
+          this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסה שוב מאוחר יותר.';
+        }
       }
     });
   }

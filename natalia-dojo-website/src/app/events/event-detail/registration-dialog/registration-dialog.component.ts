@@ -100,9 +100,15 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isEnrolling = false;
-        console.error('Error enrolling for event:', error);
         
-        if (error.status === 401) {
+        // Only log non-network errors to reduce console noise
+        if (error.status !== 0) {
+          console.error('Error enrolling for event:', error);
+        }
+        
+        if (error.status === 0) {
+          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+        } else if (error.status === 401) {
           this.errorMessage = 'יש להתחבר או להירשם כדי להירשם לאירוע.';
         } else {
           this.errorMessage = error.error?.message || 'שגיאה בהרשמה לאירוע. ייתכן שכבר נרשמת או שההרשמה נסגרה.';
