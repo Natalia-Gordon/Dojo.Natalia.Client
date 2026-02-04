@@ -143,6 +143,11 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   getImageUrl(imageUrl: string | null | undefined): string {
     if (!imageUrl) return '';
     
+    // During SSR, return empty string to avoid issues
+    if (!isPlatformBrowser(this.platformId)) {
+      return '';
+    }
+    
     // Clean the URL - remove any extra whitespace
     const cleanUrl = imageUrl.trim();
     
