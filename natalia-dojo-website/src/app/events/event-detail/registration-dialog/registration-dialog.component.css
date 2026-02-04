@@ -292,6 +292,47 @@
   font-weight: 500;
 }
 
+.user-notes-section {
+  padding: 1rem;
+  background: rgba(248, 249, 250, 0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(220, 38, 38, 0.1);
+}
+
+.user-notes-section label.form-label {
+  color: #1f2937;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.user-notes-section textarea {
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  color: #374151;
+  resize: vertical;
+  min-height: 80px;
+  transition: all 0.2s ease;
+}
+
+.user-notes-section textarea:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.25);
+  outline: 0;
+}
+
+.user-notes-section textarea:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.user-notes-section small {
+  font-size: 0.85rem;
+}
+
 .registration-success {
   animation: fadeIn 0.3s ease-in;
 }
@@ -391,5 +432,15 @@
 
   .file-info {
     font-size: 0.8rem;
+  }
+
+  .user-notes-section {
+    padding: 0.875rem;
+  }
+
+  .user-notes-section textarea {
+    font-size: 0.9rem;
+    padding: 0.65rem;
+    min-height: 70px;
   }
 }

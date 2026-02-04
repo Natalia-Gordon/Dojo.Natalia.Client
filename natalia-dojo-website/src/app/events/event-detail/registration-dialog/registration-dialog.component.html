@@ -142,6 +142,20 @@
             </div>
           </div>
 
+          <!-- User Notes -->
+          <div class="user-notes-section mb-4">
+            <label class="form-label fw-bold mb-2">
+              <i class="bi bi-pencil me-2"></i>
+              ניתן להוסיף הערות או בקשות מיוחדות להרשמה:
+            </label>
+            <textarea
+              class="form-control"
+              rows="3"
+              [(ngModel)]="userNotes"
+              [disabled]="isEnrolling"
+              placeholder="יש לך הערות או בקשות מיוחדות? כתוב כאן..."></textarea>
+          </div>
+
           <!-- Error Message -->
           <div class="alert alert-danger" *ngIf="errorMessage">
             <i class="bi bi-exclamation-triangle me-2"></i>

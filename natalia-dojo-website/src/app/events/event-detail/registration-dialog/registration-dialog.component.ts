@@ -19,6 +19,7 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
   selectedPaymentMethod: PaymentMethod | null = null;
   paymentProofFile: File | null = null;
   paymentProofFileName: string = '';
+  userNotes: string = '';
   isEnrolling = false;
   errorMessage = '';
   registrationResult: EventRegistrationResponse | null = null;
@@ -49,6 +50,7 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
           this.selectedPaymentMethod = 'cash';
           this.paymentProofFile = null;
           this.paymentProofFileName = '';
+          this.userNotes = '';
           this.errorMessage = '';
           this.registrationResult = null;
         } else {
@@ -91,7 +93,7 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
 
     this.eventsService.registerForEvent(this.event.id, {
       userId: this.userInfo.userId,
-      notes: null,
+      notes: this.userNotes.trim() || null,
       paymentMethod: this.event.price > 0 ? this.selectedPaymentMethod : null
     }).subscribe({
       next: (response: EventRegistrationResponse) => {
@@ -110,6 +112,8 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
           this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
         } else if (error.status === 401) {
           this.errorMessage = 'יש להתחבר או להירשם כדי להירשם לאירוע.';
+        } else if (error.status === 409) {
+          this.errorMessage = 'את/ה כבר רשום/ה לאירוע זה.';
         } else {
           this.errorMessage = error.error?.message || 'שגיאה בהרשמה לאירוע. ייתכן שכבר נרשמת או שההרשמה נסגרה.';
         }
