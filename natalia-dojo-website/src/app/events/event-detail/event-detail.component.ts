@@ -95,13 +95,16 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.isLoading = false;
         
-        // Only log non-network errors to reduce console noise
-        if (error.status !== 0) {
+        // Only log non-network and non-503 errors to reduce console noise
+        if (error.status !== 0 && error.status !== 503) {
           console.error('Failed to load event:', error);
         }
         
         // Provide user-friendly error messages
-        if (error.status === 0) {
+        if (error.status === 503) {
+          // Service Unavailable - database connection issues
+          this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
+        } else if (error.status === 0) {
           // Network error - backend not available
           this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
         } else if (error.status === 404) {
@@ -140,30 +143,44 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   getImageUrl(imageUrl: string | null | undefined): string {
     if (!imageUrl) return '';
     
+    // Clean the URL - remove any extra whitespace
+    const cleanUrl = imageUrl.trim();
+    
     // Extract IMAGE_ID from Google Drive file link
     // Pattern: https://drive.google.com/file/d/IMAGE_ID/view?usp=sharing
-    const driveFileMatch = imageUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    const driveFileMatch = cleanUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
     if (driveFileMatch) {
       this.imageId = driveFileMatch[1];
       this.imageLoadAttempt = 0;
-      // Try uc?export=view first (most common format)
-      return `https://drive.google.com/uc?export=view&id=${this.imageId}`;
+      // Convert to direct view URL - this format works best for shared images
+      const convertedUrl = `https://drive.google.com/uc?export=view&id=${this.imageId}`;
+      return convertedUrl;
     }
     
     // If it's already in a direct format, extract the ID for fallbacks
-    const idMatch = imageUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    const idMatch = cleanUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
     if (idMatch) {
       this.imageId = idMatch[1];
       this.imageLoadAttempt = 0;
     }
     
     // If it's already in the direct format, return as is
-    if (imageUrl.includes('drive.google.com/uc?export=')) {
-      return imageUrl;
+    if (cleanUrl.includes('drive.google.com/uc?export=')) {
+      return cleanUrl;
     }
     
     // For other URLs (including Google CDN), return as is
-    return imageUrl;
+    return cleanUrl;
+  }
+
+  /**
+   * Handle successful image load
+   */
+  onImageLoad(event: any): void {
+    const imgElement = event.target as HTMLImageElement;
+    if (imgElement && imgElement.parentElement) {
+      imgElement.parentElement.style.display = 'flex';
+    }
   }
 
   /**

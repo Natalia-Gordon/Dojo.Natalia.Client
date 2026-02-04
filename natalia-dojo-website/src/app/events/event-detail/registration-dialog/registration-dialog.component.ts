@@ -103,12 +103,15 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.isEnrolling = false;
         
-        // Only log non-network errors to reduce console noise
-        if (error.status !== 0) {
+        // Only log non-network and non-503 errors to reduce console noise
+        if (error.status !== 0 && error.status !== 503) {
           console.error('Error enrolling for event:', error);
         }
         
-        if (error.status === 0) {
+        if (error.status === 503) {
+          // Service Unavailable - database connection issues
+          this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
+        } else if (error.status === 0) {
           this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
         } else if (error.status === 401) {
           this.errorMessage = 'יש להתחבר או להירשם כדי להירשם לאירוע.';
