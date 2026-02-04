@@ -174,9 +174,11 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
     this.paymentProofFile = null;
     this.paymentProofFileName = '';
     // Reset the file input
-    const fileInput = document.getElementById('paymentProofFile') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
+    if (isPlatformBrowser(this.platformId)) {
+      const fileInput = document.getElementById('paymentProofFile') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
     }
   }
 
