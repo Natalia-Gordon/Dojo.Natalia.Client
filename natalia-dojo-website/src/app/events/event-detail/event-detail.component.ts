@@ -177,6 +177,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
    * Handle successful image load
    */
   onImageLoad(event: any): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     const imgElement = event.target as HTMLImageElement;
     if (imgElement && imgElement.parentElement) {
       imgElement.parentElement.style.display = 'flex';
@@ -187,6 +189,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
    * Handle image load error - try alternative Google Drive URL formats
    */
   onImageError(event: ErrorEvent): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     const imgElement = event.target as HTMLImageElement;
     if (!imgElement) return;
 
@@ -228,6 +232,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
    * Show Google Drive iframe embed as fallback
    */
   private showIframeEmbed(imgElement: HTMLImageElement): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     if (!this.imageId) {
       this.showErrorMessage(imgElement);
       return;
@@ -262,6 +268,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
    * Show error message when all methods fail
    */
   private showErrorMessage(imgElement: HTMLImageElement): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     const container = imgElement.parentElement;
     if (!container || container.querySelector('.image-error-message')) return;
 
