@@ -142,6 +142,16 @@
                 <input class="form-control seminar-form__input" type="url" formControlName="locationUrl" placeholder="https://maps.google.com/..." (click)="openGoogleMapsIfEmpty()">
                 <small class="seminar-form__hint">הדבק/י קישור למיקום מ-Google Maps.</small>
               </div>
+              <div class="col-12">
+                <label class="form-label seminar-form__label">קישור לתמונה</label>
+                <input class="form-control seminar-form__input" type="url" formControlName="imageUrl" placeholder="https://drive.google.com/...">
+                <small class="seminar-form__hint">
+                  <strong>איך לטעון תמונה מ-Google Drive:</strong><br>
+                  1. העלה את התמונה ל-Google Drive<br>
+                  2. לחץ לחיצה ימנית על הקובץ → "קבל קישור" → "כל מי שיש לו את הקישור" → "העתק קישור"<br>
+                  3. הדבק את הקישור כאן (ההמרה תתבצע אוטומטית)
+                </small>
+              </div>
             </div>
           </div>
 
@@ -185,11 +195,6 @@
               הגדרות נוספות
             </h5>
             <div class="row g-4 align-items-center">
-              <div class="col-md-6">
-                <label class="form-label seminar-form__label">קישור לתמונה</label>
-                <input class="form-control seminar-form__input" type="url" formControlName="imageUrl">
-                <small class="seminar-form__hint">שדרגו את הכרטיס עם תמונה רחבה ואיכותית.</small>
-              </div>
               <div class="col-md-6">
                 <div class="form-check seminar-form__check">
                   <input class="form-check-input" type="checkbox" formControlName="registrationOpen" id="registrationOpen">
