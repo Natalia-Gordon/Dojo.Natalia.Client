@@ -1,0 +1,463 @@
+.modal.show {
+  display: block !important;
+}
+
+.modal-backdrop.show {
+  display: block !important;
+  opacity: 0.5;
+}
+
+.modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(220, 38, 38, 0.1);
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row-reverse;
+}
+
+.modal-title {
+  color: #1f2937;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+}
+
+.modal-header .btn-close {
+  margin: 0;
+  margin-left: auto;
+  order: -1;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.event-summary {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, rgba(248, 249, 250, 0.95) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(220, 38, 38, 0.15);
+}
+
+.event-summary h5 {
+  color: #1f2937;
+  font-size: 1.15rem;
+  border-bottom: 2px solid rgba(220, 38, 38, 0.2);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-item strong {
+  color: #374151;
+  font-size: 0.95rem;
+  min-width: 140px;
+}
+
+.summary-item span {
+  color: #1f2937;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.summary-item .badge {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.65rem;
+}
+
+.payment-method-selection {
+  padding: 1.25rem;
+  background: rgba(248, 249, 250, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(220, 38, 38, 0.1);
+}
+
+.payment-method-selection label.form-label {
+  color: #1f2937;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.payment-method-selection .form-select {
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  padding-left: 2.5rem;
+  font-size: 1rem;
+  color: #374151;
+  background-color: white;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  background-size: 16px 12px;
+  transition: all 0.2s ease;
+  direction: rtl;
+}
+
+.payment-method-selection .form-select:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.25);
+  outline: 0;
+}
+
+.payment-method-selection .form-select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.payment-method-selection .form-select option {
+  padding: 0.5rem;
+}
+
+.bank-transfer-details {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.bank-transfer-details .alert {
+  border-radius: 8px;
+  border: 1px solid rgba(13, 110, 253, 0.2);
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.bank-transfer-details .alert-heading {
+  color: #0d6efd;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.bank-details {
+  margin-top: 0.75rem;
+}
+
+.bank-details .detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.bank-details .detail-item:last-child {
+  border-bottom: none;
+}
+
+.bank-details .detail-item strong {
+  color: #374151;
+  font-size: 0.9rem;
+  min-width: 120px;
+}
+
+.bank-details .detail-item span {
+  color: #1f2937;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: left;
+}
+
+.file-upload-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.file-input-wrapper {
+  position: relative;
+}
+
+.file-input-wrapper input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.file-input-label {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  margin-bottom: 0;
+}
+
+.file-input-label:hover {
+  background-color: #0b5ed7;
+}
+
+.file-input-label:active {
+  background-color: #0a58ca;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background-color: rgba(25, 135, 84, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(25, 135, 84, 0.2);
+  flex-direction: row-reverse;
+}
+
+.file-info span {
+  color: #198754;
+  font-weight: 500;
+  flex: 1;
+}
+
+.file-info .btn-link {
+  order: -1;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.file-upload-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.file-input-wrapper {
+  position: relative;
+}
+
+.file-input-wrapper input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.file-input-label {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  margin-bottom: 0;
+}
+
+.file-input-label:hover {
+  background-color: #0b5ed7;
+}
+
+.file-input-label:active {
+  background-color: #0a58ca;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgba(25, 135, 84, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(25, 135, 84, 0.2);
+}
+
+.file-info span {
+  color: #198754;
+  font-weight: 500;
+}
+
+.user-notes-section {
+  padding: 1rem;
+  background: rgba(248, 249, 250, 0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(220, 38, 38, 0.1);
+}
+
+.user-notes-section label.form-label {
+  color: #1f2937;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.user-notes-section textarea {
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  color: #374151;
+  resize: vertical;
+  min-height: 80px;
+  transition: all 0.2s ease;
+}
+
+.user-notes-section textarea:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.25);
+  outline: 0;
+}
+
+.user-notes-section textarea:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.user-notes-section small {
+  font-size: 0.85rem;
+}
+
+.registration-success {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.registration-details {
+  font-size: 0.95rem;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row strong {
+  color: #374151;
+}
+
+.email-status-info {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.email-status-info small {
+  font-size: 0.85rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .event-summary {
+    padding: 1rem;
+  }
+
+  .event-summary h5 {
+    font-size: 1rem;
+  }
+
+  .summary-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .summary-item strong {
+    min-width: auto;
+    font-size: 0.9rem;
+  }
+
+  .summary-item span {
+    font-size: 0.9rem;
+  }
+
+  .payment-method-selection {
+    padding: 1rem;
+  }
+
+  .payment-method-selection .form-select {
+    font-size: 0.95rem;
+    padding: 0.65rem 0.85rem;
+    padding-left: 2.25rem;
+  }
+
+  .bank-details .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .bank-details .detail-item strong {
+    min-width: auto;
+    font-size: 0.85rem;
+  }
+
+  .bank-details .detail-item span {
+    font-size: 0.85rem;
+  }
+
+  .file-input-label {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .file-info {
+    font-size: 0.8rem;
+  }
+
+  .user-notes-section {
+    padding: 0.875rem;
+  }
+
+  .user-notes-section textarea {
+    font-size: 0.9rem;
+    padding: 0.65rem;
+    min-height: 70px;
+  }
+
+  .email-status-info {
+    padding-top: 0.65rem;
+  }
+
+  .email-status-info small {
+    font-size: 0.8rem;
+  }
+}
