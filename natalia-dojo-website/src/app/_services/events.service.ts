@@ -117,6 +117,8 @@ export interface EventRegistrationResponse {
   paymentMethod: string | null;
   registeredAt: string;
   message: string | null;
+  emailSentToUser: boolean;
+  emailSentToEventCreator: boolean;
 }
 
 @Injectable({

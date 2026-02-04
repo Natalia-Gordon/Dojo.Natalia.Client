@@ -357,6 +357,15 @@
   color: #374151;
 }
 
+.email-status-info {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.email-status-info small {
+  font-size: 0.85rem;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -442,5 +451,13 @@
     font-size: 0.9rem;
     padding: 0.65rem;
     min-height: 70px;
+  }
+
+  .email-status-info {
+    padding-top: 0.65rem;
+  }
+
+  .email-status-info small {
+    font-size: 0.8rem;
   }
 }
