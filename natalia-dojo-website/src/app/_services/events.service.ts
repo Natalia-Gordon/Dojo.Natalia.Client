@@ -206,8 +206,13 @@ export class EventsService {
         }
       }),
       catchError(error => {
+        // Handle 503 Service Unavailable (database connection issues) - return empty array silently
+        if (error.status === 503) {
+          // Don't log 503 errors - they're backend database issues, not frontend problems
+          return of([]);
+        }
         // Only log non-network errors to reduce console noise
-        if (error.status !== 0) {
+        if (error.status !== 0 && error.status !== 503) {
           console.error('Get events error:', error);
         }
         // For 401 errors on public events, return empty array instead of throwing
@@ -245,8 +250,13 @@ export class EventsService {
       responseType: 'json'
     }).pipe(
       catchError(error => {
+        // Handle 503 Service Unavailable (database connection issues) - don't log
+        if (error.status === 503) {
+          // Don't log 503 errors - they're backend database issues, not frontend problems
+          return throwError(() => error);
+        }
         // Only log non-network errors (status 0) to reduce console noise
-        if (error.status !== 0) {
+        if (error.status !== 0 && error.status !== 503) {
           console.error('Get event by id error:', error);
         }
         return throwError(() => error);
@@ -262,8 +272,13 @@ export class EventsService {
       params: params
     }).pipe(
       catchError(error => {
+        // Handle 503 Service Unavailable (database connection issues) - return empty array silently
+        if (error.status === 503) {
+          // Don't log 503 errors - they're backend database issues, not frontend problems
+          return of([]);
+        }
         // Only log non-network errors to reduce console noise
-        if (error.status !== 0) {
+        if (error.status !== 0 && error.status !== 503) {
           console.error('Get instructors error:', error);
         }
         
@@ -282,7 +297,10 @@ export class EventsService {
       headers: this.getAuthHeaders()
     }).pipe(
       catchError(error => {
-        console.error('Event registration error:', error);
+        // Don't log 503 errors - they're backend database issues, not frontend problems
+        if (error.status !== 503) {
+          console.error('Event registration error:', error);
+        }
         return throwError(() => error);
       })
     );

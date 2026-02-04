@@ -115,9 +115,14 @@ export class EventsComponent implements OnInit, OnDestroy {
         this.events = events || [];
         this.isLoading = false;
       },
-      error: () => {
+      error: (error) => {
         this.isLoading = false;
-        this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
+        // Handle 503 Service Unavailable with specific message
+        if (error.status === 503) {
+          this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
+        } else {
+          this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
+        }
       }
     });
   }
