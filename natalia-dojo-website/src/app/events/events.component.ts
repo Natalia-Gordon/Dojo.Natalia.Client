@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -33,7 +33,8 @@ export class EventsComponent implements OnInit, OnDestroy {
   constructor(
     private eventsService: EventsService,
     private authService: AuthService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     const now = new Date();
     const nowLocal = this.toLocalDateTime(now);
@@ -148,13 +149,15 @@ export class EventsComponent implements OnInit, OnDestroy {
     if (this.createForm.invalid) {
       this.createForm.markAllAsTouched();
       this.errorMessage = 'אנא מלא את כל השדות הנדרשים.';
-      setTimeout(() => {
-        const firstInvalid = document.querySelector('.seminar-form .is-invalid');
-        if (firstInvalid) {
-          (firstInvalid as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
-          (firstInvalid as HTMLElement).focus();
-        }
-      }, 100);
+      if (isPlatformBrowser(this.platformId)) {
+        setTimeout(() => {
+          const firstInvalid = document.querySelector('.seminar-form .is-invalid');
+          if (firstInvalid) {
+            (firstInvalid as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            (firstInvalid as HTMLElement).focus();
+          }
+        }, 100);
+      }
       return;
     }
 
@@ -212,6 +215,8 @@ export class EventsComponent implements OnInit, OnDestroy {
   }
 
   openGoogleMapsIfEmpty(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     const url = this.createForm.get('locationUrl')?.value;
     if (!url) {
       window.open('https://maps.google.com', '_blank');
