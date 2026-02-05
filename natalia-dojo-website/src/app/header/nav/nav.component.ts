@@ -1,6 +1,6 @@
-import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { UserMenuComponent } from '../../user-menu/user-menu.component';
@@ -17,14 +17,18 @@ export class NavComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   userInfo: UserInfo | null = null;
   isMobileMenuOpen = false;
+  isBrowser = false;
   private authSubscription?: Subscription;
   private userInfoSubscription?: Subscription;
 
   constructor(
     private authService: AuthService,
     private loginModalService: LoginModalService,
-    private router: Router
-  ) {}
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   openLoginModal(): void {
     this.loginModalService.open();
@@ -89,6 +93,11 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Only initialize in browser to avoid SSR issues
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    
     // Check initial authentication status
     this.isAuthenticated = this.authService.isAuthenticated();
     this.userInfo = this.authService.getUserInfo();
@@ -114,6 +123,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   
   toggleMobileMenu(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     // Only toggle menu on mobile/tablet devices (non-desktop)
     if (window.innerWidth >= 992) {
       return; // Don't toggle on desktop
@@ -122,6 +132,7 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   closeMobileMenu(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     // Only close menu on mobile/tablet devices (non-desktop)
     if (window.innerWidth >= 992) {
       return; // Don't close on desktop
@@ -130,6 +141,7 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   toggleDropdown(event: Event): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     // Always prevent event propagation to avoid conflicts
     event.preventDefault();
     event.stopPropagation();
@@ -163,13 +175,14 @@ export class NavComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     const target = event.target as HTMLElement;
     const dropdown = target.closest('.dropdown');
     const isDropdownToggle = target.closest('.dropdown-toggle');
     
     // If click is outside dropdown, close all dropdowns
     // This works for both desktop and mobile
-    if (!dropdown || (!isDropdownToggle && window.innerWidth >= 992)) {
+    if (!dropdown || (!isDropdownToggle && isPlatformBrowser(this.platformId) && window.innerWidth >= 992)) {
       document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
         menu.classList.remove('show');
       });

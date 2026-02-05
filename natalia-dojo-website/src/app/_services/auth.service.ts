@@ -1,8 +1,9 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
 
 // Force explicit check - ensure we're using the correct environment
@@ -105,14 +106,15 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private apiUrl = environment.apiUrl;
+  private platformId = inject(PLATFORM_ID);
   
-  private tokenSubject = new BehaviorSubject<string | null>(this.getStoredToken());
+  private tokenSubject = new BehaviorSubject<string | null>(null);
   public token$ = this.tokenSubject.asObservable();
   
-  private refreshTokenSubject = new BehaviorSubject<string | null>(this.getStoredRefreshToken());
+  private refreshTokenSubject = new BehaviorSubject<string | null>(null);
   public refreshToken$ = this.refreshTokenSubject.asObservable();
 
-  private userInfoSubject = new BehaviorSubject<UserInfo | null>(this.getStoredUserInfo());
+  private userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
   public userInfo$ = this.userInfoSubject.asObservable();
 
   constructor() {
@@ -136,14 +138,20 @@ export class AuthService {
       throw new Error('Production build is using localhost API URL. Check environment configuration.');
     }
     
-    // Check for stored token and user info on initialization
-    const token = this.getStoredToken();
-    if (token) {
-      this.tokenSubject.next(token);
-    }
-    const userInfo = this.getStoredUserInfo();
-    if (userInfo) {
-      this.userInfoSubject.next(userInfo);
+    // Check for stored token and user info on initialization (only in browser)
+    if (isPlatformBrowser(this.platformId)) {
+      const token = this.getStoredToken();
+      if (token) {
+        this.tokenSubject.next(token);
+      }
+      const refreshToken = this.getStoredRefreshToken();
+      if (refreshToken) {
+        this.refreshTokenSubject.next(refreshToken);
+      }
+      const userInfo = this.getStoredUserInfo();
+      if (userInfo) {
+        this.userInfoSubject.next(userInfo);
+      }
     }
   }
 
@@ -281,55 +289,72 @@ export class AuthService {
    * Get stored token from localStorage
    */
   private getStoredToken(): string | null {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem('auth_token');
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
     }
-    return null;
+    try {
+      return localStorage.getItem('auth_token');
+    } catch {
+      return null;
+    }
   }
 
   /**
    * Get stored refresh token from localStorage
    */
   private getStoredRefreshToken(): string | null {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem('refresh_token');
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
     }
-    return null;
+    try {
+      return localStorage.getItem('refresh_token');
+    } catch {
+      return null;
+    }
   }
 
   /**
    * Store token in localStorage and update subject
    */
   private setToken(token: string): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('auth_token', token);
-      this.tokenSubject.next(token);
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        localStorage.setItem('auth_token', token);
+      } catch {
+        // Ignore localStorage errors
+      }
     }
+    this.tokenSubject.next(token);
   }
 
   /**
    * Store refresh token in localStorage and update subject
    */
   private setRefreshToken(token: string): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('refresh_token', token);
-      this.refreshTokenSubject.next(token);
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        localStorage.setItem('refresh_token', token);
+      } catch {
+        // Ignore localStorage errors
+      }
     }
+    this.refreshTokenSubject.next(token);
   }
 
   /**
    * Get stored user info from localStorage
    */
   private getStoredUserInfo(): UserInfo | null {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
+    }
+    try {
       const stored = localStorage.getItem('user_info');
       if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch {
-          return null;
-        }
+        return JSON.parse(stored);
       }
+    } catch {
+      return null;
     }
     return null;
   }
@@ -338,32 +363,44 @@ export class AuthService {
    * Store user info in localStorage and update subject
    */
   private setUserInfo(userInfo: UserInfo): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('user_info', JSON.stringify(userInfo));
-      this.userInfoSubject.next(userInfo);
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        localStorage.setItem('user_info', JSON.stringify(userInfo));
+      } catch {
+        // Ignore localStorage errors
+      }
     }
+    this.userInfoSubject.next(userInfo);
   }
 
   /**
    * Clear user info from localStorage and update subject
    */
   private clearUserInfo(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('user_info');
-      this.userInfoSubject.next(null);
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        localStorage.removeItem('user_info');
+      } catch {
+        // Ignore localStorage errors
+      }
     }
+    this.userInfoSubject.next(null);
   }
 
   /**
    * Clear token from localStorage and update subject
    */
   private clearToken(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('refresh_token');
-      this.tokenSubject.next(null);
-      this.refreshTokenSubject.next(null);
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
+      } catch {
+        // Ignore localStorage errors
+      }
     }
+    this.tokenSubject.next(null);
+    this.refreshTokenSubject.next(null);
   }
 
   /**

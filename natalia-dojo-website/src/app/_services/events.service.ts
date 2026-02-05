@@ -296,6 +296,7 @@ export class EventsService {
     // If there's a file, use FormData; otherwise use JSON
     if (paymentProofFile) {
       const formData = new FormData();
+      // Append all fields as strings (backend expects string values)
       formData.append('userId', request.userId.toString());
       if (request.notes) {
         formData.append('notes', request.notes);
@@ -303,23 +304,35 @@ export class EventsService {
       if (request.paymentMethod) {
         formData.append('paymentMethod', request.paymentMethod);
       }
-      formData.append('paymentProof', paymentProofFile, paymentProofFile.name);
+      // Append file - backend may expect different field name
+      // Common field names: 'file', 'paymentProof', 'paymentProofFile', 'fileUpload'
+      // Check backend API documentation for the correct field name
+      formData.append('file', paymentProofFile, paymentProofFile.name);
       
       // For FormData, we need to let the browser set Content-Type with boundary
       // Create headers without Content-Type so browser can set multipart/form-data with boundary
       const token = this.authService.getToken();
-      let formDataHeaders = new HttpHeaders();
-      if (token) {
-        formDataHeaders = formDataHeaders.set('Authorization', `Bearer ${token}`);
-      }
-      // Don't set Content-Type - let browser set it with boundary
+      // Create headers manually to avoid any Content-Type being set
+      // Angular HttpClient will automatically set Content-Type: multipart/form-data with boundary for FormData
+      const formDataHeaders = new HttpHeaders();
+      const headersWithAuth = token 
+        ? formDataHeaders.set('Authorization', `Bearer ${token}`)
+        : formDataHeaders;
       
       return this.http.post<EventRegistrationResponse>(`${this.apiUrl}/events/${eventId}/registrations`, formData, {
-        headers: formDataHeaders
+        headers: headersWithAuth
+        // Note: Do NOT set Content-Type header - Angular HttpClient will automatically set
+        // Content-Type: multipart/form-data; boundary=... when sending FormData
       }).pipe(
         catchError(error => {
+          if (error.status === 404) {
+            console.error(`Event registration endpoint not found (404): ${this.apiUrl}/events/${eventId}/registrations`);
+            console.error('Check if the backend API endpoint is correctly configured.');
+          } else if (error.status === 415) {
+            console.error('Unsupported Media Type (415): The server may not accept multipart/form-data. Check backend configuration.');
+          }
           // Don't log 503 errors - they're backend database issues, not frontend problems
-          if (error.status !== 503) {
+          if (error.status !== 503 && error.status !== 415 && error.status !== 404) {
             console.error('Event registration error:', error);
           }
           return throwError(() => error);
@@ -331,8 +344,12 @@ export class EventsService {
         headers: this.getAuthHeaders()
       }).pipe(
         catchError(error => {
+          if (error.status === 404) {
+            console.error(`Event registration endpoint not found (404): ${this.apiUrl}/events/${eventId}/registrations`);
+            console.error('Check if the backend API endpoint is correctly configured.');
+          }
           // Don't log 503 errors - they're backend database issues, not frontend problems
-          if (error.status !== 503) {
+          if (error.status !== 503 && error.status !== 404) {
             console.error('Event registration error:', error);
           }
           return throwError(() => error);

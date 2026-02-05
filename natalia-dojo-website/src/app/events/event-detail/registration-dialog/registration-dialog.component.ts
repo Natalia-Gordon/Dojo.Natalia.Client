@@ -113,6 +113,8 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
           this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
         } else if (error.status === 0) {
           this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+        } else if (error.status === 404) {
+          this.errorMessage = 'האירוע לא נמצא או שההרשמה לא זמינה.';
         } else if (error.status === 401) {
           this.errorMessage = 'יש להתחבר או להירשם כדי להירשם לאירוע.';
         } else if (error.status === 409) {

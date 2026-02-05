@@ -61,6 +61,11 @@ export class EventsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Only make API calls in browser, not during SSR/prerendering
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.isAuthenticated = this.authService.isAuthenticated();
     this.userInfo = this.authService.getUserInfo();
     this.isAdminOrInstructor = this.isAllowedToManageEvents(this.userInfo);
@@ -105,41 +110,66 @@ export class EventsComponent implements OnInit, OnDestroy {
   }
 
   loadEvents(): void {
+    // Only make API calls in browser, not during SSR/prerendering
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.eventsService.getEvents({
-      includeUnpublished: this.isAdminOrInstructor, // Only admin/instructor can see unpublished events
-      type: 'Seminar'
-    }).subscribe({
-      next: (events) => {
-        this.events = events || [];
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.isLoading = false;
-        // Handle 503 Service Unavailable with specific message
-        if (error.status === 503) {
-          this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
-        } else {
-          this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
+    try {
+      this.eventsService.getEvents({
+        includeUnpublished: this.isAdminOrInstructor, // Only admin/instructor can see unpublished events
+        type: 'Seminar'
+      }).subscribe({
+        next: (events) => {
+          this.events = events || [];
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.isLoading = false;
+          // Handle 503 Service Unavailable with specific message
+          if (error.status === 503) {
+            this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
+          } else if (error.status === 0) {
+            // Network error - backend not available
+            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+          } else {
+            this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      // Fallback for any unexpected errors during SSR
+      this.isLoading = false;
+      this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
+    }
   }
 
   loadInstructors(): void {
+    // Only make API calls in browser, not during SSR/prerendering
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.isLoadingInstructors = true;
-    this.eventsService.getInstructors(false).subscribe({
-      next: (instructors) => {
-        this.instructors = instructors || [];
-        this.isLoadingInstructors = false;
-      },
-      error: () => {
-        this.isLoadingInstructors = false;
-        this.instructors = [];
-      }
-    });
+    try {
+      this.eventsService.getInstructors(false).subscribe({
+        next: (instructors) => {
+          this.instructors = instructors || [];
+          this.isLoadingInstructors = false;
+        },
+        error: () => {
+          this.isLoadingInstructors = false;
+          this.instructors = [];
+        }
+      });
+    } catch (error) {
+      // Fallback for any unexpected errors during SSR
+      this.isLoadingInstructors = false;
+      this.instructors = [];
+    }
   }
 
   submitCreate(): void {

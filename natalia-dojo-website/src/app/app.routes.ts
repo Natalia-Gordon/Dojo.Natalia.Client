@@ -51,10 +51,10 @@ import { EventDetailComponent } from './events/event-detail/event-detail.compone
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
     {path: "home", component: HomeComponent},
-    {path: "login", component: LoginComponent},
-    {path: "user-details", component: UserDetailsComponent},
-    {path: "events", component: EventsComponent},
-    {path: "events/:id", component: EventDetailComponent},
+    {path: "login", component: LoginComponent, data: { skipPrerender: true }},
+    {path: "user-details", component: UserDetailsComponent, data: { skipPrerender: true }},
+    {path: "events", component: EventsComponent, data: { skipPrerender: true }},
+    {path: "events/:id", component: EventDetailComponent, data: { skipPrerender: true }},
     {path: "profile", redirectTo: "home", pathMatch: "full"}, // TODO: Create ProfileComponent
     {path: "purchases", redirectTo: "home", pathMatch: "full"}, // TODO: Create PurchasesComponent
     {path: "gallery", component: PhotoGalleryComponent},

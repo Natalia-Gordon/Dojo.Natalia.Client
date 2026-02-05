@@ -47,6 +47,7 @@ export class GalleryImageComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     if (!this.showModal && !this.showFullImageModal) return;
 
     switch (event.key) {

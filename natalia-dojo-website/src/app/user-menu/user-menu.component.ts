@@ -15,6 +15,7 @@ import { Subscription } from 'rxjs';
 export class UserMenuComponent implements OnInit, OnDestroy {
   userInfo: UserInfo | null = null;
   isMenuOpen = false;
+  isBrowser = false;
   private userSubscription?: Subscription;
   private readonly mobileMaxWidth = 640;
 
@@ -23,9 +24,16 @@ export class UserMenuComponent implements OnInit, OnDestroy {
     private router: Router,
     private loginModalService: LoginModalService,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit(): void {
+    // Only initialize in browser to avoid SSR issues
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    
     // Get initial user info
     this.userInfo = this.authService.getUserInfo();
     
@@ -142,6 +150,7 @@ export class UserMenuComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     const target = event.target as HTMLElement;
     if (!target.closest('.user-menu-container')) {
       this.closeMenu();
