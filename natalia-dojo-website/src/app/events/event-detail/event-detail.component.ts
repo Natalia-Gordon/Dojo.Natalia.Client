@@ -45,6 +45,12 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    
+    // Only make API calls in browser, not during SSR/prerendering
+    if (!this.isBrowser) {
+      return;
+    }
+
     this.isAuthenticated = this.authService.isAuthenticated();
     this.userInfo = this.authService.getUserInfo();
     this.isAdminOrInstructor = this.isAllowedToManageEvents(this.userInfo);
@@ -82,6 +88,11 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   loadEvent(eventId: number): void {
+    // Only make API calls in browser, not during SSR/prerendering
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -89,7 +100,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     // If user is admin/instructor, send auth headers to potentially see unpublished events
     const requireAuth = this.isAdminOrInstructor;
 
-    this.eventsService.getEventById(eventId, requireAuth).subscribe({
+    try {
+      this.eventsService.getEventById(eventId, requireAuth).subscribe({
       next: (event) => {
         this.event = event;
         // Compute image URL only in browser to avoid SSR issues
@@ -125,6 +137,11 @@ export class EventDetailComponent implements OnInit, OnDestroy {
         }
       }
     });
+    } catch (error) {
+      // Fallback for any unexpected errors during SSR
+      this.isLoading = false;
+      this.errorMessage = 'שגיאה בטעינת האירוע. נסו שוב מאוחר יותר.';
+    }
   }
 
   enroll(): void {

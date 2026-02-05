@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { response } from 'express';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +9,18 @@ import { DOCUMENT } from '@angular/common';
 export class ContactService {
   private watsappUrl = 'https://api.whatsapp.com/send';
 
-  constructor(private http: HttpClient, @Inject(DOCUMENT) private window: Document) { }
+  constructor(
+    private http: HttpClient, 
+    @Inject(DOCUMENT) private document: Document,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   SendMessageToWatsapp(phone: string, text: string){
+    if (!isPlatformBrowser(this.platformId)) {
+      console.warn('SendMessageToWatsapp called during SSR - skipping');
+      return;
+    }
+    
     console.log("Before Send");
     //this.http.get("https://api.whatsapp.com/send?phone=+972547007906&text=רוצה להצטרף לאימון נינג&#39;וטסו");
     //console.log("After Send");

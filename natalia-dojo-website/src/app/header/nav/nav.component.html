@@ -13,7 +13,7 @@
     
     <div class="collapse navbar-collapse" [class.show]="isMobileMenuOpen" id="navbarCollapse">
         <!-- Mobile: User Info Section (only when authenticated) -->
-        <div class="mobile-user-section d-lg-none" *ngIf="isAuthenticated && userInfo">
+        <div class="mobile-user-section d-lg-none" *ngIf="isAuthenticated && userInfo && isBrowser">
             <div class="mobile-user-header">
                 <button
                     type="button"
@@ -47,12 +47,12 @@
             <a routerLink="/contact" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">צור קשר</a>
             
             <!-- Mobile: Profile Settings and Purchases (only when authenticated) -->
-            <a routerLink="/user-details" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">פרופיל משתמש</a>
-            <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated" (click)="closeMobileMenu()">רכישות</a>
-            <a href="#" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated && isAdminOrInstructor()" (click)="openRegisterNewUser(); closeMobileMenu(); $event.preventDefault()">רישום משתמש חדש</a>
+            <a routerLink="/user-details" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated && isBrowser" (click)="closeMobileMenu()">פרופיל משתמש</a>
+            <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated && isBrowser" (click)="closeMobileMenu()">רכישות</a>
+            <a href="#" class="nav-item nav-link d-lg-none" *ngIf="isAuthenticated && isAdminOrInstructor() && isBrowser" (click)="openRegisterNewUser(); closeMobileMenu(); $event.preventDefault()">רישום משתמש חדש</a>
             
             <!-- Login Button (when not authenticated) -->
-            <div class="nav-item nav-link-auth" *ngIf="!isAuthenticated">
+            <div class="nav-item nav-link-auth" *ngIf="!isAuthenticated || !isBrowser">
                 <button 
                     type="button" 
                     class="btn-login"
@@ -67,12 +67,12 @@
             </div>
             
             <!-- Desktop: User Menu (when authenticated) -->
-            <div class="nav-item nav-link-auth d-none d-lg-flex" *ngIf="isAuthenticated">
+            <div class="nav-item nav-link-auth d-none d-lg-flex" *ngIf="isAuthenticated && isBrowser">
                 <app-user-menu></app-user-menu>
             </div>
             
             <!-- Mobile: Logout Button (when authenticated) -->
-            <div class="nav-item nav-link-auth d-lg-none" *ngIf="isAuthenticated">
+            <div class="nav-item nav-link-auth d-lg-none" *ngIf="isAuthenticated && isBrowser">
                 <button 
                     type="button" 
                     class="btn-login btn-logout"

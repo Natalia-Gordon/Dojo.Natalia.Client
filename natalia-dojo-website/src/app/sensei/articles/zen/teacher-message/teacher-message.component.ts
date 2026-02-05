@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, DatePipe, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
@@ -18,7 +18,8 @@ export class TeacherMessageComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private titleService: Title,
-    private metaService: Meta
+    private metaService: Meta,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
@@ -31,13 +32,13 @@ export class TeacherMessageComponent implements OnInit, OnDestroy {
     });
 
     // Smooth scroll behavior
-    if (typeof document !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       document.documentElement.style.scrollBehavior = 'smooth';
     }
   }
 
   ngOnDestroy() {
-    if (typeof document !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       document.documentElement.style.scrollBehavior = 'auto';
     }
   }
