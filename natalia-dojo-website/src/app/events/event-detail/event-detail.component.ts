@@ -26,6 +26,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   userInfo: UserInfo | null = null;
   imageLoadAttempt = 0;
   private imageId: string | null = null;
+  displayImageUrl: string = ''; // Pre-computed image URL for SSR safety
+  isBrowser = false; // Platform check for template
 
   private routeSubscription?: Subscription;
   private authSubscription?: Subscription;
@@ -42,6 +44,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.isBrowser = isPlatformBrowser(this.platformId);
     this.isAuthenticated = this.authService.isAuthenticated();
     this.userInfo = this.authService.getUserInfo();
     this.isAdminOrInstructor = this.isAllowedToManageEvents(this.userInfo);
@@ -89,6 +92,12 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     this.eventsService.getEventById(eventId, requireAuth).subscribe({
       next: (event) => {
         this.event = event;
+        // Compute image URL only in browser to avoid SSR issues
+        if (isPlatformBrowser(this.platformId) && event.imageUrl) {
+          this.displayImageUrl = this.getImageUrl(event.imageUrl);
+        } else {
+          this.displayImageUrl = event.imageUrl || '';
+        }
         this.isLoading = false;
         this.errorMessage = '';
       },

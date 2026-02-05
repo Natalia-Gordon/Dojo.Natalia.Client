@@ -292,18 +292,53 @@ export class EventsService {
     );
   }
 
-  registerForEvent(eventId: number, request: CreateEventRegistrationRequest): Observable<EventRegistrationResponse> {
-    return this.http.post<EventRegistrationResponse>(`${this.apiUrl}/events/${eventId}/registrations`, request, {
-      headers: this.getAuthHeaders()
-    }).pipe(
-      catchError(error => {
-        // Don't log 503 errors - they're backend database issues, not frontend problems
-        if (error.status !== 503) {
-          console.error('Event registration error:', error);
-        }
-        return throwError(() => error);
-      })
-    );
+  registerForEvent(eventId: number, request: CreateEventRegistrationRequest, paymentProofFile?: File | null): Observable<EventRegistrationResponse> {
+    // If there's a file, use FormData; otherwise use JSON
+    if (paymentProofFile) {
+      const formData = new FormData();
+      formData.append('userId', request.userId.toString());
+      if (request.notes) {
+        formData.append('notes', request.notes);
+      }
+      if (request.paymentMethod) {
+        formData.append('paymentMethod', request.paymentMethod);
+      }
+      formData.append('paymentProof', paymentProofFile, paymentProofFile.name);
+      
+      // For FormData, we need to let the browser set Content-Type with boundary
+      // Create headers without Content-Type so browser can set multipart/form-data with boundary
+      const token = this.authService.getToken();
+      let formDataHeaders = new HttpHeaders();
+      if (token) {
+        formDataHeaders = formDataHeaders.set('Authorization', `Bearer ${token}`);
+      }
+      // Don't set Content-Type - let browser set it with boundary
+      
+      return this.http.post<EventRegistrationResponse>(`${this.apiUrl}/events/${eventId}/registrations`, formData, {
+        headers: formDataHeaders
+      }).pipe(
+        catchError(error => {
+          // Don't log 503 errors - they're backend database issues, not frontend problems
+          if (error.status !== 503) {
+            console.error('Event registration error:', error);
+          }
+          return throwError(() => error);
+        })
+      );
+    } else {
+      // No file - use JSON as before
+      return this.http.post<EventRegistrationResponse>(`${this.apiUrl}/events/${eventId}/registrations`, request, {
+        headers: this.getAuthHeaders()
+      }).pipe(
+        catchError(error => {
+          // Don't log 503 errors - they're backend database issues, not frontend problems
+          if (error.status !== 503) {
+            console.error('Event registration error:', error);
+          }
+          return throwError(() => error);
+        })
+      );
+    }
   }
 
   private getAuthHeaders(): HttpHeaders {

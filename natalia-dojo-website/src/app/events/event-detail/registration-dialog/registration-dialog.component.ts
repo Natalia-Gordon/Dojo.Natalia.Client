@@ -95,7 +95,7 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
       userId: this.userInfo.userId,
       notes: this.userNotes.trim() || null,
       paymentMethod: this.event.price > 0 ? this.selectedPaymentMethod : null
-    }).subscribe({
+    }, this.paymentProofFile || null).subscribe({
       next: (response: EventRegistrationResponse) => {
         this.isEnrolling = false;
         this.registrationResult = response;
