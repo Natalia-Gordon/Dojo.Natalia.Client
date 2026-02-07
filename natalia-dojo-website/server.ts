@@ -19,13 +19,27 @@ export function app(): express.Express {
 
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
-  server.get('*.*', express.static(browserDistFolder, {
-    maxAge: '1y'
+  
+  // Serve static files from /browser (assets, JS, CSS, images, etc.)
+  // This must come before the catch-all route
+  server.use(express.static(browserDistFolder, {
+    maxAge: '1y',
+    index: false
   }));
 
   // All regular routes use the Angular engine
   server.get('*', (req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+    
+    // If this is a static file request that wasn't handled by express.static,
+    // return 404 instead of trying to render it as an Angular route
+    if (req.path.match(/\.(js|css|map|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|json)$/)) {
+      return res.status(404).send('File not found');
+    }
+    
     const { protocol, originalUrl, baseUrl, headers } = req;
 
     commonEngine
