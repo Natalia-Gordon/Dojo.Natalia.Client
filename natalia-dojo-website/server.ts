@@ -29,18 +29,29 @@ export function app(): express.Express {
 
   // All regular routes use the Angular engine
   server.get('*', (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith('/api/')) {
-      return next();
+    // Skip API routes - return 404 since API should be handled by backend
+    // Check both with and without leading slash
+    const path = req.path;
+    if (path.startsWith('/api/') || path.startsWith('api/')) {
+      res.status(404).send('API endpoint not found on this server');
+      return;
     }
     
     // If this is a static file request that wasn't handled by express.static,
     // return 404 instead of trying to render it as an Angular route
-    if (req.path.match(/\.(js|css|map|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|json)$/)) {
-      return res.status(404).send('File not found');
+    if (path.match(/\.(js|css|map|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|json)$/)) {
+      res.status(404).send('File not found');
+      return;
     }
     
     const { protocol, originalUrl, baseUrl, headers } = req;
+    
+    // Additional check: ensure the URL doesn't contain API paths
+    // This prevents Angular router from trying to handle API endpoints during SSR
+    if (originalUrl.includes('/api/') || originalUrl.startsWith('api/')) {
+      res.status(404).send('API endpoint not found on this server');
+      return;
+    }
 
     commonEngine
       .render({
