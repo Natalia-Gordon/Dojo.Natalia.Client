@@ -80,23 +80,47 @@
                   <i class="bi bi-bank me-2"></i>
                   פרטי חשבון להעברה בנקאית
                 </h6>
-                <div class="bank-details">
-                  <div class="detail-item">
+                <div *ngIf="isLoadingInstructor" class="text-center py-2">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  טוען פרטי בנק...
+                </div>
+                <div class="bank-details" *ngIf="!isLoadingInstructor && instructor">
+                  <div class="detail-item" *ngIf="instructor.bankName">
                     <strong>שם הבנק:</strong>
-                    <span>בנק הפועלים</span>
+                    <span>{{ instructor.bankName }}</span>
                   </div>
-                  <div class="detail-item">
+                  <div class="detail-item" *ngIf="instructor.branchNumber">
                     <strong>מספר סניף:</strong>
-                    <span>123</span>
+                    <span>{{ instructor.branchNumber }}</span>
                   </div>
-                  <div class="detail-item">
+                  <div class="detail-item" *ngIf="instructor.accountNumber">
                     <strong>מספר חשבון:</strong>
-                    <span>1234567</span>
+                    <span>{{ instructor.accountNumber }}</span>
                   </div>
-                  <div class="detail-item">
+                  <div class="detail-item" *ngIf="instructor.accountHolderName">
                     <strong>שם החשבון:</strong>
-                    <span>דוג'ו נטליה</span>
+                    <span>{{ instructor.accountHolderName }}</span>
                   </div>
+                  <div class="detail-item" *ngIf="instructor.iban">
+                    <strong>IBAN:</strong>
+                    <span>{{ instructor.iban }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="instructor.swiftBic">
+                    <strong>SWIFT/BIC:</strong>
+                    <span>{{ instructor.swiftBic }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="instructor.bankId">
+                    <strong>מספר בנק:</strong>
+                    <span>{{ instructor.bankId }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="instructor.bankAddress">
+                    <strong>כתובת הבנק:</strong>
+                    <span>{{ instructor.bankAddress }}</span>
+                  </div>
+                </div>
+                <div class="alert alert-warning mt-2" *ngIf="!isLoadingInstructor && !instructor">
+                  <i class="bi bi-exclamation-triangle me-2"></i>
+                  פרטי בנק לא זמינים עבור מדריך זה.
                 </div>
                 <hr>
                 <p class="mb-2 small">

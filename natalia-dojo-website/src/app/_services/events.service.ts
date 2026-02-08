@@ -46,9 +46,17 @@ export interface Instructor {
   email: string | null;
   rank: string | null;
   yearsOfExperience: number | null;
-  specialization: string | null;
+  specialization: string[] | null;
   hourlyRate: number | null;
   isAvailable: boolean;
+  bankName: string | null;
+  accountHolderName: string | null;
+  accountNumber: string | null;
+  iban: string | null;
+  swiftBic: string | null;
+  bankAddress: string | null;
+  bankId: string | null;
+  branchNumber: string | null;
 }
 
 export interface CreateEventRequest {
@@ -287,6 +295,27 @@ export class EventsService {
           return of([]);
         }
         
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Get a specific instructor by ID
+   */
+  getInstructorById(instructorId: number): Observable<Instructor> {
+    return this.http.get<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(error => {
+        // Handle 503 Service Unavailable (database connection issues)
+        if (error.status === 503) {
+          return throwError(() => new Error('Service temporarily unavailable'));
+        }
+        // Only log non-network errors to reduce console noise
+        if (error.status !== 0 && error.status !== 503) {
+          console.error('Get instructor by ID error:', error);
+        }
         return throwError(() => error);
       })
     );
