@@ -242,8 +242,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
           fallbackUrl = `https://drive.google.com/uc?export=download&id=${this.imageId}`;
           break;
         case 3:
-          // Last resort: use iframe embed
-          this.showIframeEmbed(imgElement);
+          // Last resort: show error message with link to view on Google Drive
+          this.showErrorMessageWithLink(imgElement);
           return;
       }
       
@@ -254,15 +254,16 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       }
     }
     
-    // All attempts failed - show iframe embed or error message
+    // All attempts failed - show error message with link
     console.error('All image load attempts failed:', currentSrc);
-    this.showIframeEmbed(imgElement);
+    this.showErrorMessageWithLink(imgElement);
   }
 
   /**
-   * Show Google Drive iframe embed as fallback
+   * Show error message with link to view image on Google Drive
+   * (iframe embedding is blocked by Google Drive's CSP)
    */
-  private showIframeEmbed(imgElement: HTMLImageElement): void {
+  private showErrorMessageWithLink(imgElement: HTMLImageElement): void {
     if (!isPlatformBrowser(this.platformId)) return;
     
     if (!this.imageId) {
@@ -276,23 +277,34 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     // Hide the image
     imgElement.style.display = 'none';
 
-    // Check if iframe already exists
-    if (container.querySelector('.drive-iframe-embed')) return;
+    // Check if error message already exists
+    if (container.querySelector('.drive-image-error')) return;
 
-    // Create iframe embed
-    const iframeWrapper = document.createElement('div');
-    iframeWrapper.className = 'drive-iframe-embed';
-    iframeWrapper.style.cssText = 'width: 100%; border-radius: 12px; overflow: hidden;';
+    // Create error message with link
+    const errorWrapper = document.createElement('div');
+    errorWrapper.className = 'drive-image-error';
+    errorWrapper.style.cssText = 'padding: 2rem; text-align: center; color: #6b7280; background: #f8f9fa; border-radius: 8px; margin-top: 1rem;';
     
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://drive.google.com/file/d/${this.imageId}/preview`;
-    iframe.style.cssText = 'width: 100%; min-height: 600px; border: none; border-radius: 12px;';
-    iframe.allow = 'fullscreen';
-    iframe.title = 'Google Drive Image';
-    iframe.loading = 'lazy';
+    const errorIcon = document.createElement('i');
+    errorIcon.className = 'bi bi-exclamation-triangle';
+    errorIcon.style.cssText = 'font-size: 2rem; color: #f59e0b; margin-bottom: 1rem; display: block;';
     
-    iframeWrapper.appendChild(iframe);
-    container.appendChild(iframeWrapper);
+    const errorText = document.createElement('p');
+    errorText.textContent = 'לא ניתן לטעון את התמונה ישירות.';
+    errorText.style.cssText = 'margin-bottom: 1rem;';
+    
+    const driveLink = document.createElement('a');
+    driveLink.href = `https://drive.google.com/file/d/${this.imageId}/view`;
+    driveLink.target = '_blank';
+    driveLink.rel = 'noopener noreferrer';
+    driveLink.textContent = 'לצפייה בתמונה ב-Google Drive';
+    driveLink.className = 'btn btn-primary';
+    driveLink.style.cssText = 'margin-top: 0.5rem;';
+    
+    errorWrapper.appendChild(errorIcon);
+    errorWrapper.appendChild(errorText);
+    errorWrapper.appendChild(driveLink);
+    container.appendChild(errorWrapper);
   }
 
   /**

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { EventsService, Event as EventModel, PaymentMethod, EventRegistrationResponse } from '../../../_services/events.service';
+import { EventsService, Event as EventModel, PaymentMethod, EventRegistrationResponse, Instructor } from '../../../_services/events.service';
 import { AuthService, UserInfo } from '../../../_services/auth.service';
 
 @Component({
@@ -23,6 +23,8 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
   isEnrolling = false;
   errorMessage = '';
   registrationResult: EventRegistrationResponse | null = null;
+  instructor: Instructor | null = null;
+  isLoadingInstructor = false;
   
   paymentMethods: { value: PaymentMethod; label: string }[] = [
     { value: 'cash', label: 'מזומן' },
@@ -53,9 +55,36 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
           this.userNotes = '';
           this.errorMessage = '';
           this.registrationResult = null;
+          this.instructor = null;
+          
+          // Load instructor details if event has instructorId
+          if (state.event?.instructorId) {
+            this.loadInstructor(state.event.instructorId);
+          }
         } else {
           document.body.classList.remove('modal-open');
         }
+      }
+    });
+  }
+  
+  /**
+   * Load instructor details by ID
+   */
+  loadInstructor(instructorId: number): void {
+    this.isLoadingInstructor = true;
+    this.eventsService.getInstructorById(instructorId).subscribe({
+      next: (instructor) => {
+        this.instructor = instructor;
+        this.isLoadingInstructor = false;
+      },
+      error: (error) => {
+        // Only log non-network and non-404 errors
+        if (error.status !== 0 && error.status !== 404) {
+          console.error('Error loading instructor:', error);
+        }
+        this.instructor = null;
+        this.isLoadingInstructor = false;
       }
     });
   }
