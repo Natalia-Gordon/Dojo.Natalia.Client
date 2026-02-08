@@ -212,9 +212,6 @@
                 <span class="ms-2">{{ registrationResult.registeredAt | date:'dd/MM/yyyy HH:mm' }}</span>
               </div>
             </div>
-            <div class="mt-3" *ngIf="registrationResult.message">
-              <p class="mb-0">{{ registrationResult.message }}</p>
-            </div>
             <div class="mt-3" *ngIf="registrationResult.paymentStatus === 'pending'">
               <div class="alert alert-warning">
                 <i class="bi bi-clock-history me-2"></i>
