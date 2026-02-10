@@ -53,6 +53,7 @@
   },
   "overrides": {
     "tar": "^7.0.0",
-    "glob": "^13.0.1"
+    "glob": "^13.0.1",
+    "critters": "npm:beasties@^0.4.1"
   }
 }
