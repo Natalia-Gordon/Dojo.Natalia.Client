@@ -1,12 +1,17 @@
 import { HttpInterceptorFn, HttpErrorResponse, HttpRequest } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID, Optional } from '@angular/core';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 import { catchError, switchMap, take, throwError, EMPTY, of } from 'rxjs';
 import { AuthService } from '../_services/auth.service';
 import { AuthDialogService } from '../_services/auth-dialog.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const platformId = inject(PLATFORM_ID);
+  const isBrowser = isPlatformBrowser(platformId);
+  
+  // Inject services - must be unconditional, but only use in browser
   const router = inject(Router);
   const authDialogService = inject(AuthDialogService);
 
@@ -37,7 +42,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       // If we get a 401 Unauthorized, show dialog to user
       // But skip for public events list requests and refresh token requests
-      if (error.status === 401 && !isPublicEventsListRequest && !isRefreshTokenRequest) {
+      // Only handle dialog in browser (not during SSR)
+      if (error.status === 401 && !isPublicEventsListRequest && !isRefreshTokenRequest && isBrowser && authDialogService) {
         // Check if dialog is already open to avoid multiple dialogs
         if (!authDialogService.isOpen) {
           // For registration requests without token, let the component handle it (show login modal)

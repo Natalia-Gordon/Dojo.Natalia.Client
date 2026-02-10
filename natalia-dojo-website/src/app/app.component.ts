@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HeaderComponent } from "./header/header.component";
 import { FooterComponent } from "./footer/footer.component";
-import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { AuthDialogComponent } from './core/dialogs/auth-dialog/auth-dialog.component';
 
@@ -11,8 +11,15 @@ import { AuthDialogComponent } from './core/dialogs/auth-dialog/auth-dialog.comp
     standalone: true,
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    imports: [RouterOutlet, HeaderComponent, FooterComponent, HomeComponent, LoginComponent, AuthDialogComponent]
+    imports: [RouterOutlet, CommonModule, HeaderComponent, FooterComponent, LoginComponent, AuthDialogComponent]
 })
-export class AppComponent {
-  title = 'Natalia Ninjutsu Dojo';
+export class AppComponent implements OnInit {
+  title = 'Bujinkan Ninjutsu Israel Dojo';
+  isBrowser = false;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  ngOnInit(): void {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 }

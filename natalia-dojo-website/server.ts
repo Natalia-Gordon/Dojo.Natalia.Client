@@ -1,9 +1,59 @@
-import { APP_BASE_HREF } from '@angular/common';
+// CRITICAL: Set up window mock BEFORE any Angular imports
+// This must happen at the very top, before CommonEngine or any Angular code
+(function setupGlobalWindowMock() {
+  if (typeof global === 'undefined') return;
+  
+  if (typeof (global as any).window === 'undefined') {
+    const windowMock: any = {
+      addEventListener: function() { return; },
+      removeEventListener: function() { return; },
+      location: {
+        href: '',
+        pathname: '/',
+        search: '',
+        hash: '',
+        hostname: '',
+        port: '',
+        protocol: 'http:',
+        origin: 'http://localhost',
+        host: 'localhost'
+      },
+      history: {
+        pushState: () => {},
+        replaceState: () => {},
+        go: () => {},
+        back: () => {},
+        forward: () => {},
+        length: 1,
+        state: null,
+        scrollRestoration: 'auto'
+      },
+      navigator: { userAgent: 'SSR' },
+      innerWidth: 1920,
+      innerHeight: 1080,
+      pageYOffset: 0,
+      scrollX: 0,
+      scrollY: 0,
+      scrollTo: () => {},
+      open: () => null,
+      getComputedStyle: () => ({ getPropertyValue: () => '' })
+    };
+    
+    (global as any).window = windowMock;
+  }
+})();
+
+import { APP_BASE_HREF, DOCUMENT } from '@angular/common';
 import { CommonEngine } from '@angular/ssr';
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
 import bootstrap from './src/main.server';
+
+// Note: We don't use domino here because it causes esbuild bundling errors during build.
+// Angular's provideServerRendering() will handle document creation from index.server.html.
+// The minimal document mock in main.server.ts prevents "document is not defined" errors.
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -12,7 +62,32 @@ export function app(): express.Express {
   const browserDistFolder = resolve(serverDistFolder, '../browser');
   const indexHtml = join(serverDistFolder, 'index.server.html');
 
+  // Verify index.server.html exists and contains app-root
+  if (!existsSync(indexHtml)) {
+    console.error(`ERROR: index.server.html not found at ${indexHtml}`);
+    console.error('This file should be generated during build. Check your build configuration.');
+  } else {
+    const htmlContent = readFileSync(indexHtml, 'utf-8');
+    if (!htmlContent.includes('<app-root>') && !htmlContent.includes('app-root')) {
+      console.error(`ERROR: index.server.html does not contain <app-root> selector`);
+      console.error('The file should contain <app-root></app-root> for Angular to bootstrap.');
+    } else {
+      console.log('✓ index.server.html found and contains app-root');
+    }
+  }
+
   const commonEngine = new CommonEngine();
+
+  // Cache the HTML content to avoid reading it on every request
+  let cachedHtmlContent: string | null = null;
+  if (existsSync(indexHtml)) {
+    try {
+      cachedHtmlContent = readFileSync(indexHtml, 'utf-8');
+      console.log('✓ Cached index.server.html content');
+    } catch (e) {
+      console.warn('Failed to cache HTML content:', e);
+    }
+  }
 
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
@@ -53,28 +128,47 @@ export function app(): express.Express {
       return;
     }
 
+    // Let Angular's provideServerRendering() handle document creation from index.server.html
+    // The minimal document mock in main.server.ts prevents "document is not defined" errors
+    // during service initialization, and provideServerRendering() replaces it with the real document
     commonEngine
       .render({
         bootstrap,
         documentFilePath: indexHtml,
         url: `${protocol}://${headers.host}${originalUrl}`,
         publicPath: browserDistFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+        providers: [
+          { provide: APP_BASE_HREF, useValue: baseUrl }
+          // Note: provideServerRendering() in app.config.server.ts will provide DOCUMENT
+          // from index.server.html. The minimal mock in main.server.ts ensures document
+          // is available during service initialization before provideServerRendering() runs.
+        ],
       })
       .then((html) => res.send(html))
-      .catch((err) => next(err));
+      .catch((err) => {
+        // Log detailed error information for debugging
+        console.error('SSR Error:', err);
+        console.error('Error stack:', err.stack);
+        console.error('Error message:', err.message);
+        if (err.message && err.message.includes('document')) {
+          console.error('Document access error detected. Check services/components for browser-only API usage.');
+        }
+        // Return error response instead of crashing
+        res.status(500).send('Server-side rendering error. Please check server logs.');
+      });
   });
 
   return server;
 }
 
 function run(): void {
-  const port = process.env['PORT'] || 4000;
+  const port = Number(process.env['PORT']) || 4000;
+  const host = process.env['HOST'] || '0.0.0.0';
 
   // Start up the Node server
   const server = app();
-  server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  server.listen(port, host, () => {
+    console.log(`Node Express server listening on http://${host}:${port}`);
   });
 }
 
