@@ -74,6 +74,30 @@
                 "entry": "server.ts"
               }
             },
+            "production-no-ssr": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2.5mb",
+                  "maximumError": "3.5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "9kb",
+                  "maximumError": "11kb"
+                }
+              ],
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": false
+              },
+              "outputHashing": "all",
+              "ssr": false
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -98,6 +122,9 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
+              "buildTarget": "natalia-dojo-website:build:production-no-ssr"
+            },
+            "production-ssr": {
               "buildTarget": "natalia-dojo-website:build:production"
             },
             "development": {

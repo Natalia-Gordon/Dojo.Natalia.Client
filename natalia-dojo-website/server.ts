@@ -1,10 +1,14 @@
-import { APP_BASE_HREF } from '@angular/common';
+import { APP_BASE_HREF, DOCUMENT } from '@angular/common';
 import { CommonEngine } from '@angular/ssr';
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import bootstrap from './src/main.server';
+
+// Note: We don't use domino here because it causes esbuild bundling errors during build.
+// Angular's provideServerRendering() will handle document creation from index.server.html.
+// The minimal document mock in main.server.ts prevents "document is not defined" errors.
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -28,6 +32,17 @@ export function app(): express.Express {
   }
 
   const commonEngine = new CommonEngine();
+
+  // Cache the HTML content to avoid reading it on every request
+  let cachedHtmlContent: string | null = null;
+  if (existsSync(indexHtml)) {
+    try {
+      cachedHtmlContent = readFileSync(indexHtml, 'utf-8');
+      console.log('✓ Cached index.server.html content');
+    } catch (e) {
+      console.warn('Failed to cache HTML content:', e);
+    }
+  }
 
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
@@ -68,6 +83,9 @@ export function app(): express.Express {
       return;
     }
 
+    // Let Angular's provideServerRendering() handle document creation from index.server.html
+    // The minimal document mock in main.server.ts prevents "document is not defined" errors
+    // during service initialization, and provideServerRendering() replaces it with the real document
     commonEngine
       .render({
         bootstrap,
@@ -76,9 +94,9 @@ export function app(): express.Express {
         publicPath: browserDistFolder,
         providers: [
           { provide: APP_BASE_HREF, useValue: baseUrl }
-          // Note: provideServerRendering() in app.config.server.ts should handle DOCUMENT
-          // The DOCUMENT is provided by CommonEngine from index.server.html automatically
-          // We don't need to provide it here - Angular's SSR system handles it
+          // Note: provideServerRendering() in app.config.server.ts will provide DOCUMENT
+          // from index.server.html. The minimal mock in main.server.ts ensures document
+          // is available during service initialization before provideServerRendering() runs.
         ],
       })
       .then((html) => res.send(html))
