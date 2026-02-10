@@ -10,8 +10,6 @@ COPY package.json package-lock.json ./
 # Install all the dependencies
 RUN npm install -g npm@latest @angular/cli
 RUN npm install
-# Fix security vulnerabilities where possible (non-breaking)
-RUN npm audit fix --force || true
 
 # Copy other files and folder to working directory
 COPY . .
