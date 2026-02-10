@@ -1,5 +1,5 @@
 # Stage 1: Compile and Build angular codebase
-FROM node:alpine as builder
+FROM node:20-alpine as builder
 
 # Set the working directory
 ENV APP_HOME /usr/src/app
@@ -24,7 +24,7 @@ RUN cat environments/environment.ts
 RUN npm run build -- --configuration production
 
 # Stage 2: Production runtime
-FROM node:alpine
+FROM node:20-alpine
 
 ENV APP_HOME /usr/src/app
 WORKDIR $APP_HOME
