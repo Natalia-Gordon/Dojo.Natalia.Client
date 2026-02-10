@@ -247,6 +247,9 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.setUpdateModeValidators();
           this.registeredUserSnapshot = this.buildRegisterSnapshot(this.registerForm.value);
           this.registerForm.markAsPristine();
+          if (this.isAdminConnected) {
+            this.authService.notifyUsersRefresh();
+          }
           return;
         }
         this.registerSuccess = 'ההרשמה הושלמה. ניתן להתחבר כעת.';

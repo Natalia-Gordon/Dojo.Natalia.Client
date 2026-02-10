@@ -48,6 +48,10 @@
         <span class="menu-icon">⚙️</span>
         <span>פרופיל משתמש</span>
       </a>
+      <a href="#" class="menu-item" *ngIf="isAdmin()" (click)="onManageUsersClick(); $event.preventDefault()">
+        <span class="menu-icon">👥</span>
+        <span>ניהול משתמשים</span>
+      </a>
       <a href="#" class="menu-item" *ngIf="isTeacherOrInstructor()" (click)="onRegisterNewUserClick(); $event.preventDefault()">
         <span class="menu-icon">➕</span>
         <span>רישום משתמש חדש</span>

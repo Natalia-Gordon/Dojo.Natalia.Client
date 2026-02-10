@@ -1,6 +1,6 @@
 import { Injectable, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, Subject, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
@@ -116,6 +116,9 @@ export class AuthService {
 
   private userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
   public userInfo$ = this.userInfoSubject.asObservable();
+
+  private usersRefreshSubject = new Subject<void>();
+  public usersRefresh$ = this.usersRefreshSubject.asObservable();
 
   constructor() {
     // Log environment info for debugging (only in production to help diagnose issues)
@@ -262,6 +265,10 @@ export class AuthService {
    */
   getUserInfo(): UserInfo | null {
     return this.userInfoSubject.value;
+  }
+
+  notifyUsersRefresh(): void {
+    this.usersRefreshSubject.next();
   }
 
   /**
@@ -414,6 +421,21 @@ export class AuthService {
     }).pipe(
       catchError((error: any) => {
         console.error('Get user details error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Get all users (admin only)
+   * @returns Observable with users list
+   */
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/users`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError((error: any) => {
+        console.error('Get users error:', error);
         return throwError(() => error);
       })
     );

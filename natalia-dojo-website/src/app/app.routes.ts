@@ -47,12 +47,14 @@ import { LoginComponent } from './login/login.component';
 import { UserDetailsComponent } from './user/user-details/user-details.component';
 import { EventsComponent } from './events/events.component';
 import { EventDetailComponent } from './events/event-detail/event-detail.component';
+import { UserManagementComponent } from './core/templates/user-management/user-management.component';
 
 export const routes: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
     {path: "home", component: HomeComponent},
     {path: "login", component: LoginComponent, data: { skipPrerender: true }},
     {path: "user-details", component: UserDetailsComponent, data: { skipPrerender: true }},
+    {path: "admin/users", component: UserManagementComponent, data: { skipPrerender: true }},
     {path: "events", component: EventsComponent, data: { skipPrerender: true }},
     {path: "events/:id", component: EventDetailComponent, data: { skipPrerender: true }},
     {path: "profile", redirectTo: "home", pathMatch: "full"}, // TODO: Create ProfileComponent
