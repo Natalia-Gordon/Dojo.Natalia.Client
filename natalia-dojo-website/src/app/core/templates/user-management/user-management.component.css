@@ -1,9 +1,8 @@
+/* Page height grows with table content so all records are visible */
 .user-management {
   padding: 24px 16px 48px;
   width: 98%;
   max-width: 98%;
-  height: 98vh;
-  max-height: 98vh;
   margin: 1vh 1%;
   box-sizing: border-box;
   display: flex;
@@ -21,8 +20,6 @@
 }
 
 .user-management__content {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -45,19 +42,23 @@
 }
 
 .user-management__table-wrapper {
-  height: 99vh;
-  min-height: 99vh;
-  overflow: auto;
   margin-top: 16px;
-  scrollbar-gutter: stable both-edges;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  direction: rtl;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
 .user-management__table {
   width: 100%;
+  min-width: max-content;
   border-collapse: collapse;
   background: #ffffff;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
+  direction: rtl;
 }
 
 .user-management__table th,
@@ -70,6 +71,43 @@
 .user-management__table thead th {
   background: #f3f4f6;
   font-weight: 400;
+}
+
+/* Sticky first column (profile image) – always visible when scrolling (RTL: sticks to right edge) */
+.user-management__table th:first-child,
+.user-management__table td:first-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: #ffffff;
+  min-width: 3rem;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Sticky second column (מזהה) – stays visible when scrolling */
+.user-management__table th:nth-child(2),
+.user-management__table td:nth-child(2) {
+  position: sticky;
+  right: 3.5rem;
+  z-index: 2;
+  background: #ffffff;
+  min-width: 4.5rem;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+.user-management__table thead th:first-child,
+.user-management__table thead th:nth-child(2) {
+  background: #f3f4f6;
+  z-index: 3;
+}
+
+.user-management__table tbody tr:hover td:first-child,
+.user-management__table tbody tr:hover td:nth-child(2) {
+  background: #f9fafb;
+}
+
+.user-management__table tbody tr:hover td:first-child {
+  background: #f9fafb;
 }
 
 .user-management__table tbody tr:hover {

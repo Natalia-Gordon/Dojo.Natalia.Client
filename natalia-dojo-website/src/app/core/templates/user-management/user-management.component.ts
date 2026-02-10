@@ -32,7 +32,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     | 'dateOfBirth'
     | 'username'
     | 'isEmailVerified'
-    | 'id' = 'firstName';
+    | 'id' = 'username';
   sortDirection: 'asc' | 'desc' = 'asc';
 
   /** Popup: full-size profile image URL when open, null when closed */

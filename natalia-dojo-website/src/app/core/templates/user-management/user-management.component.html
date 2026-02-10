@@ -30,10 +30,35 @@
       <table class="user-management__table">
         <thead>
           <tr>
+            <th></th>
             <th>
               <button type="button" class="user-management__sort-btn" (click)="setSort('id')">
                 מזהה
                 <span class="user-management__sort-indicator" *ngIf="sortField === 'id'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('username')">
+                שם משתמש
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'username'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('role')">
+                תפקיד
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'role'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('currentRank')">
+                דרגה
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'currentRank'">
                   {{ sortDirection === 'asc' ? '▲' : '▼' }}
                 </span>
               </button>
@@ -54,28 +79,12 @@
                 </span>
               </button>
             </th>
-            <th>
-              <button type="button" class="user-management__sort-btn" (click)="setSort('username')">
-                שם משתמש
-                <span class="user-management__sort-indicator" *ngIf="sortField === 'username'">
-                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                </span>
-              </button>
-            </th>
             <th>אימייל</th>
             <th>טלפון</th>
             <th>
               <button type="button" class="user-management__sort-btn" (click)="setSort('dateOfBirth')">
                 תאריך לידה
                 <span class="user-management__sort-indicator" *ngIf="sortField === 'dateOfBirth'">
-                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                </span>
-              </button>
-            </th>
-            <th>
-              <button type="button" class="user-management__sort-btn" (click)="setSort('role')">
-                תפקיד
-                <span class="user-management__sort-indicator" *ngIf="sortField === 'role'">
                   {{ sortDirection === 'asc' ? '▲' : '▼' }}
                 </span>
               </button>
@@ -88,15 +97,6 @@
                 </span>
               </button>
             </th>
-            <th>
-              <button type="button" class="user-management__sort-btn" (click)="setSort('currentRank')">
-                דרגה נוכחית
-                <span class="user-management__sort-indicator" *ngIf="sortField === 'currentRank'">
-                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                </span>
-              </button>
-            </th>
-            <th>תמונת פרופיל</th>
             <th>תיאור</th>
             <th>
               <button type="button" class="user-management__sort-btn" (click)="setSort('joinDate')">
@@ -134,16 +134,6 @@
         </thead>
         <tbody>
           <tr *ngFor="let user of users; trackBy: trackByUserId">
-            <td>{{ user.id }}</td>
-            <td>{{ user.firstName || '—' }}</td>
-            <td>{{ user.lastName || '—' }}</td>
-            <td>{{ user.username || '—' }}</td>
-            <td>{{ user.email || '—' }}</td>
-            <td>{{ user.phone || '—' }}</td>
-            <td>{{ user.dateOfBirth || '—' }}</td>
-            <td>{{ user.role || '—' }}</td>
-            <td>{{ user.level || '—' }}</td>
-            <td>{{ getRankName(user.currentRankId) }}</td>
             <td>
               <button
                 *ngIf="getProfileImageSrc(user.profileImageUrl)"
@@ -161,6 +151,16 @@
               </button>
               <span *ngIf="!getProfileImageSrc(user.profileImageUrl)">—</span>
             </td>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username || '—' }}</td>
+            <td>{{ user.role || '—' }}</td>
+            <td>{{ getRankName(user.currentRankId) }}</td>
+            <td>{{ user.firstName || '—' }}</td>
+            <td>{{ user.lastName || '—' }}</td>
+            <td>{{ user.email || '—' }}</td>
+            <td>{{ user.phone || '—' }}</td>
+            <td>{{ user.dateOfBirth || '—' }}</td>
+            <td>{{ user.level || '—' }}</td>
             <td>{{ user.bio || '—' }}</td>
             <td>{{ user.joinDate || '—' }}</td>
             <td>{{ user.isActive === true ? 'כן' : (user.isActive === false ? 'לא' : '—') }}</td>
