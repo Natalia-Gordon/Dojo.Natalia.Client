@@ -1,4 +1,4 @@
-import { Injectable, inject, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, Inject, PLATFORM_ID, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
@@ -104,7 +104,6 @@ export interface UpdateUserRequest {
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private router = inject(Router);
   private apiUrl = environment.apiUrl;
   private platformId = inject(PLATFORM_ID);
   
@@ -117,7 +116,7 @@ export class AuthService {
   private userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
   public userInfo$ = this.userInfoSubject.asObservable();
 
-  constructor() {
+  constructor(@Optional() private router: Router | null = null) {
     // Log environment info for debugging (only in production to help diagnose issues)
     if (environment.production) {
       console.log('Production mode detected');
@@ -227,7 +226,9 @@ export class AuthService {
     if (!refreshToken) {
       this.clearToken();
       this.clearUserInfo();
-      this.router.navigate(['/home']);
+      if (isPlatformBrowser(this.platformId) && this.router) {
+        this.router.navigate(['/home']);
+      }
       return of(void 0);
     }
 
@@ -243,14 +244,18 @@ export class AuthService {
         // Clear tokens and user info regardless of API response
         this.clearToken();
         this.clearUserInfo();
-        this.router.navigate(['/home']);
+        if (isPlatformBrowser(this.platformId) && this.router) {
+          this.router.navigate(['/home']);
+        }
       }),
       catchError(error => {
         // Even if API call fails, clear local data
         console.error('Logout error:', error);
         this.clearToken();
         this.clearUserInfo();
-        this.router.navigate(['/home']);
+        if (isPlatformBrowser(this.platformId) && this.router) {
+          this.router.navigate(['/home']);
+        }
         // Return void instead of throwing error to prevent error propagation
         return of(void 0);
       })

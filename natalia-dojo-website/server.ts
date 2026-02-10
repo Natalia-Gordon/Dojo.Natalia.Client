@@ -62,7 +62,17 @@ export function app(): express.Express {
         providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
       })
       .then((html) => res.send(html))
-      .catch((err) => next(err));
+      .catch((err) => {
+        // Log detailed error information for debugging
+        console.error('SSR Error:', err);
+        console.error('Error stack:', err.stack);
+        console.error('Error message:', err.message);
+        if (err.message && err.message.includes('document')) {
+          console.error('Document access error detected. Check services/components for browser-only API usage.');
+        }
+        // Return error response instead of crashing
+        res.status(500).send('Server-side rendering error. Please check server logs.');
+      });
   });
 
   return server;
