@@ -3,6 +3,7 @@ import { CommonEngine } from '@angular/ssr';
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
 import bootstrap from './src/main.server';
 
 // The Express app is exported so that it can be used by serverless Functions.
@@ -11,6 +12,20 @@ export function app(): express.Express {
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
   const indexHtml = join(serverDistFolder, 'index.server.html');
+
+  // Verify index.server.html exists and contains app-root
+  if (!existsSync(indexHtml)) {
+    console.error(`ERROR: index.server.html not found at ${indexHtml}`);
+    console.error('This file should be generated during build. Check your build configuration.');
+  } else {
+    const htmlContent = readFileSync(indexHtml, 'utf-8');
+    if (!htmlContent.includes('<app-root>') && !htmlContent.includes('app-root')) {
+      console.error(`ERROR: index.server.html does not contain <app-root> selector`);
+      console.error('The file should contain <app-root></app-root> for Angular to bootstrap.');
+    } else {
+      console.log('✓ index.server.html found and contains app-root');
+    }
+  }
 
   const commonEngine = new CommonEngine();
 
@@ -59,7 +74,12 @@ export function app(): express.Express {
         documentFilePath: indexHtml,
         url: `${protocol}://${headers.host}${originalUrl}`,
         publicPath: browserDistFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+        providers: [
+          { provide: APP_BASE_HREF, useValue: baseUrl }
+          // Note: provideServerRendering() in app.config.server.ts should handle DOCUMENT
+          // The DOCUMENT is provided by CommonEngine from index.server.html automatically
+          // We don't need to provide it here - Angular's SSR system handles it
+        ],
       })
       .then((html) => res.send(html))
       .catch((err) => {

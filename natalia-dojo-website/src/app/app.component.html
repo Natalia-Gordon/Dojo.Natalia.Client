@@ -1,5 +1,6 @@
 <app-header />
 <router-outlet />
 <app-footer />
-<app-login />
-<app-auth-dialog />
+<!-- Login and AuthDialog are conditionally rendered to avoid SSR issues -->
+<app-login *ngIf="isBrowser" />
+<app-auth-dialog *ngIf="isBrowser" />
