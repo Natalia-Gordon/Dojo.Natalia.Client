@@ -1,3 +1,48 @@
+// CRITICAL: Set up window mock BEFORE any Angular imports
+// This must happen at the very top, before CommonEngine or any Angular code
+(function setupGlobalWindowMock() {
+  if (typeof global === 'undefined') return;
+  
+  if (typeof (global as any).window === 'undefined') {
+    const windowMock: any = {
+      addEventListener: function() { return; },
+      removeEventListener: function() { return; },
+      location: {
+        href: '',
+        pathname: '/',
+        search: '',
+        hash: '',
+        hostname: '',
+        port: '',
+        protocol: 'http:',
+        origin: 'http://localhost',
+        host: 'localhost'
+      },
+      history: {
+        pushState: () => {},
+        replaceState: () => {},
+        go: () => {},
+        back: () => {},
+        forward: () => {},
+        length: 1,
+        state: null,
+        scrollRestoration: 'auto'
+      },
+      navigator: { userAgent: 'SSR' },
+      innerWidth: 1920,
+      innerHeight: 1080,
+      pageYOffset: 0,
+      scrollX: 0,
+      scrollY: 0,
+      scrollTo: () => {},
+      open: () => null,
+      getComputedStyle: () => ({ getPropertyValue: () => '' })
+    };
+    
+    (global as any).window = windowMock;
+  }
+})();
+
 import { APP_BASE_HREF, DOCUMENT } from '@angular/common';
 import { CommonEngine } from '@angular/ssr';
 import express from 'express';
