@@ -1,9 +1,8 @@
-import { ApplicationConfig, PLATFORM_ID } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
 import { provideServerRendering } from '@angular/platform-server';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { DOCUMENT, Location, isPlatformServer } from '@angular/common';
 import { routes } from './app.routes';
 
 // Server-specific config that excludes browser-only providers
