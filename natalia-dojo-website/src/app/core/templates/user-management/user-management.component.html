@@ -1,0 +1,191 @@
+<section class="user-management" dir="rtl">
+  <div class="user-management__header">
+    <h1 class="user-management__title">ניהול משתמשים</h1>
+    <div
+      class="user-management__success"
+      *ngIf="isAdmin && !isLoading && !errorMessage"
+    >
+      נטענו בהצלחה {{ users.length }} משתמשים.
+    </div>
+    <div
+      class="user-management__error"
+      *ngIf="isAdmin && !isLoading && errorMessage"
+    >
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <div class="user-management__restricted" *ngIf="!isAdmin">
+    אין לך הרשאה לצפות בעמוד זה.
+  </div>
+
+  <div class="user-management__content" *ngIf="isAdmin">
+    <div class="user-management__status" *ngIf="isLoading">טוען משתמשים...</div>
+
+    <div class="user-management__empty" *ngIf="!isLoading && !errorMessage && users.length === 0">
+      אין משתמשים להצגה.
+    </div>
+
+    <div class="user-management__table-wrapper" *ngIf="!isLoading && !errorMessage && users.length > 0">
+      <table class="user-management__table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('id')">
+                מזהה
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'id'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('username')">
+                שם משתמש
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'username'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('role')">
+                תפקיד
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'role'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('currentRank')">
+                דרגה
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'currentRank'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('firstName')">
+                שם פרטי
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'firstName'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('lastName')">
+                שם משפחה
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'lastName'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>אימייל</th>
+            <th>טלפון</th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('dateOfBirth')">
+                תאריך לידה
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'dateOfBirth'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('level')">
+                רמה
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'level'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>תיאור</th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('joinDate')">
+                תאריך הצטרפות
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'joinDate'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('isActive')">
+                פעיל
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'isActive'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('isEmailVerified')">
+                אימות אימייל
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'isEmailVerified'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+            <th>
+              <button type="button" class="user-management__sort-btn" (click)="setSort('lastLoginAt')">
+                התחברות אחרונה
+                <span class="user-management__sort-indicator" *ngIf="sortField === 'lastLoginAt'">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users; trackBy: trackByUserId">
+            <td>
+              <button
+                *ngIf="getProfileImageSrc(user.profileImageUrl)"
+                type="button"
+                class="user-management__avatar-btn"
+                (click)="openImagePopup(getProfileImageSrcLarge(user.profileImageUrl) || getProfileImageSrc(user.profileImageUrl)!)"
+                [attr.aria-label]="'תמונת פרופיל של ' + (user.displayName || user.username || '')"
+              >
+                <img
+                  [src]="getProfileImageSrc(user.profileImageUrl)"
+                  [alt]="user.displayName || user.username || 'תמונת פרופיל'"
+                  class="user-management__avatar"
+                  loading="lazy"
+                />
+              </button>
+              <span *ngIf="!getProfileImageSrc(user.profileImageUrl)">—</span>
+            </td>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username || '—' }}</td>
+            <td>{{ user.role || '—' }}</td>
+            <td>{{ getRankName(user.currentRankId) }}</td>
+            <td>{{ user.firstName || '—' }}</td>
+            <td>{{ user.lastName || '—' }}</td>
+            <td>{{ user.email || '—' }}</td>
+            <td>{{ user.phone || '—' }}</td>
+            <td>{{ user.dateOfBirth || '—' }}</td>
+            <td>{{ user.level || '—' }}</td>
+            <td>{{ user.bio || '—' }}</td>
+            <td>{{ user.joinDate || '—' }}</td>
+            <td>{{ user.isActive === true ? 'כן' : (user.isActive === false ? 'לא' : '—') }}</td>
+            <td>{{ user.isEmailVerified === true ? 'כן' : (user.isEmailVerified === false ? 'לא' : '—') }}</td>
+            <td>{{ formatLastLogin(user.lastLoginAt) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Profile image popup -->
+  <div
+    *ngIf="popupImageSrc"
+    class="user-management__popup-overlay"
+    (click)="closeImagePopup()"
+    role="button"
+    tabindex="0"
+    aria-label="סגור תמונת פרופיל"
+  >
+    <img
+      class="user-management__popup-image"
+      [src]="popupImageSrc"
+      alt="תמונת פרופיל מוגדלת"
+      (click)="$event.stopPropagation()"
+    />
+  </div>
+</section>

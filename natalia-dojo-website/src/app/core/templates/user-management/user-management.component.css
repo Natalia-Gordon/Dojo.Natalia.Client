@@ -1,0 +1,158 @@
+/* Page height grows with table content so all records are visible */
+.user-management {
+  padding: 24px 16px 48px;
+  width: 98%;
+  max-width: 98%;
+  margin: 1vh 1%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-management__header {
+  margin-bottom: 16px;
+}
+
+.user-management__title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.user-management__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-management__restricted,
+.user-management__status,
+.user-management__success,
+.user-management__error,
+.user-management__empty {
+  margin-top: 12px;
+  font-size: 16px;
+}
+
+.user-management__success {
+  color: #15803d;
+}
+
+.user-management__error {
+  color: #b91c1c;
+}
+
+.user-management__table-wrapper {
+  margin-top: 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  direction: rtl;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.user-management__table {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: visible;
+  direction: rtl;
+}
+
+.user-management__table th,
+.user-management__table td {
+  padding: 12px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.user-management__table thead th {
+  background: #f3f4f6;
+  font-weight: 400;
+}
+
+/* Sticky first column (profile image) – always visible when scrolling (RTL: sticks to right edge) */
+.user-management__table th:first-child,
+.user-management__table td:first-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: #ffffff;
+  min-width: 3rem;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Sticky second column (מזהה) – stays visible when scrolling */
+.user-management__table th:nth-child(2),
+.user-management__table td:nth-child(2) {
+  position: sticky;
+  right: 3.5rem;
+  z-index: 2;
+  background: #ffffff;
+  min-width: 4.5rem;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+.user-management__table thead th:first-child,
+.user-management__table thead th:nth-child(2) {
+  background: #f3f4f6;
+  z-index: 3;
+}
+
+.user-management__table tbody tr:hover td:first-child,
+.user-management__table tbody tr:hover td:nth-child(2) {
+  background: #f9fafb;
+}
+
+.user-management__table tbody tr:hover td:first-child {
+  background: #f9fafb;
+}
+
+.user-management__table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.user-management__avatar-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-management__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+  background: #e5e7eb;
+}
+
+.user-management__popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: pointer;
+}
+
+.user-management__popup-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
