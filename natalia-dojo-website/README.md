@@ -1,27 +1,73 @@
-# NataliaDojoWebsite
+# Natalia Dojo Website
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.1.1.
+Angular 18 site for Bujinkan Ninjutsu Israel Dojo: landing page, blog, events, team, and Hebrew/RTL support with optional SSR.
 
-## Development server
+## Prerequisites
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Node.js 18.x, 20.x, or 22.x (LTS recommended)
+- npm (comes with Node)
 
-## Code scaffolding
+## Setup
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm install
+```
+
+Patches for Karma (tests on Windows/CI) are applied automatically via `postinstall`. See [KARMA_WINDOWS_PATCHES.md](KARMA_WINDOWS_PATCHES.md) for details.
+
+## Development
+
+```bash
+npm start
+# or
+npm run dev
+```
+
+Open [http://localhost:4200](http://localhost:4200).
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+| Command | Output | SSR |
+|--------|--------|-----|
+| `npm run build` | `dist/natalia-dojo-website/` | Yes (production) |
+| `ng build --configuration development` | Dev build | No |
+| `ng build --configuration production-no-ssr` | Production build | No |
 
-## Running unit tests
+## Tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+npm test
+```
 
-## Running end-to-end tests
+Runs unit tests with Karma and ChromeHeadless. For CI / single run:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```bash
+npm test -- --watch=false --browsers=ChromeHeadless
+```
 
-## Further help
+Run from the `natalia-dojo-website` folder so the correct `node_modules` (and Karma builder) are used.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Project structure
+
+- `src/app/` – Application code (components, services, routes)
+- `src/assets/` – Images, fonts, audio, and third-party libs (e.g. Owl Carousel)
+- `src/environments/` – Environment config (API URL, production flag)
+- `server.ts` – Express SSR server entry (production)
+- `angular.json` – Build and serve configurations
+
+## Docs in this folder
+
+- [KARMA_WINDOWS_PATCHES.md](KARMA_WINDOWS_PATCHES.md) – Karma patches for Windows and CI
+- [TRANSLATION_BEST_PRACTICES.md](TRANSLATION_BEST_PRACTICES.md) – Translation and RTL practices
+- [SSR_FIXES_SUMMARY.md](SSR_FIXES_SUMMARY.md) – SSR and browser-API safety notes
+
+## Angular CLI
+
+Generate components, services, etc.:
+
+```bash
+npx ng generate component my-component
+npx ng help
+```
+
+[Angular CLI Overview](https://angular.dev/tools/cli)
