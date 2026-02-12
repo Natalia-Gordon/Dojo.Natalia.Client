@@ -1,74 +1,81 @@
-<div class="user-menu-container" *ngIf="userInfo && isBrowser">
-  <!-- User Avatar Button -->
-  <button 
-    type="button" 
-    class="user-avatar-btn"
-    (click)="onAvatarClick()"
-    [class.active]="isMenuOpen">
-    <div class="user-avatar">
-      <span class="avatar-initial">{{ getInitials() }}</span>
-    </div>
-  </button>
-
-  <!-- Dropdown Menu -->
-  <div class="user-menu-dropdown" *ngIf="isMenuOpen">
-    <!-- User Header Section -->
-    <div class="user-menu-header">
-      <button 
-        type="button"
-        class="user-avatar-large-btn"
-        (click)="onMenuAvatarClick()"
-        title="פרטי משתמש">
-        <div class="user-avatar-large">
-          <span class="avatar-initial-large">{{ getInitials() }}</span>
-        </div>
-      </button>
-      <div class="user-info">
-        <div class="user-name">{{ userInfo.displayName || userInfo.username }}</div>
-        <div class="user-last-login" *ngIf="userInfo.lastLoginAt">
-          התחברות אחרונה: {{ formatLastLogin(userInfo.lastLoginAt) }}
-        </div>
-        <div class="user-badges">
-          <span class="badge" [ngClass]="getLevelColor(userInfo.level)">
-            {{ userInfo.level || 'User' }}
-          </span>
-          <span class="badge badge-role" *ngIf="userInfo.role">
-            {{ userInfo.role }}
-          </span>
-        </div>
+@if (userInfo && isBrowser) {
+  <div class="user-menu-container">
+    <!-- User Avatar Button -->
+    <button
+      type="button"
+      class="user-avatar-btn"
+      (click)="onAvatarClick()"
+      [class.active]="isMenuOpen">
+      <div class="user-avatar">
+        <span class="avatar-initial">{{ getInitials() }}</span>
       </div>
-    </div>
-
-    <!-- Separator -->
-    <div class="menu-separator"></div>
-
-    <!-- Menu Items -->
-    <div class="menu-items">
-      <a href="#" class="menu-item" (click)="onUserDetailsClick(); $event.preventDefault()">
-        <span class="menu-icon">⚙️</span>
-        <span>פרופיל משתמש</span>
-      </a>
-      <a href="#" class="menu-item" *ngIf="isAdmin()" (click)="onManageUsersClick(); $event.preventDefault()">
-        <span class="menu-icon">👥</span>
-        <span>ניהול משתמשים</span>
-      </a>
-      <a href="#" class="menu-item" *ngIf="isTeacherOrInstructor()" (click)="onRegisterNewUserClick(); $event.preventDefault()">
-        <span class="menu-icon">➕</span>
-        <span>רישום משתמש חדש</span>
-      </a>
-      <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
-        <span class="menu-icon">🛒</span>
-        <span>הרכישות שלי</span>
-      </a>
-    </div>
-
-    <!-- Separator -->
-    <div class="menu-separator"></div>
-
-    <!-- Logout Button -->
-    <button type="button" class="menu-item menu-item-logout" (click)="onLogout()">
-      <span class="menu-icon">🚪</span>
-      <span>התנתקות</span>
     </button>
+    <!-- Dropdown Menu -->
+    @if (isMenuOpen) {
+      <div class="user-menu-dropdown">
+        <!-- User Header Section -->
+        <div class="user-menu-header">
+          <button
+            type="button"
+            class="user-avatar-large-btn"
+            (click)="onMenuAvatarClick()"
+            title="פרטי משתמש">
+            <div class="user-avatar-large">
+              <span class="avatar-initial-large">{{ getInitials() }}</span>
+            </div>
+          </button>
+          <div class="user-info">
+            <div class="user-name">{{ userInfo.displayName || userInfo.username }}</div>
+            @if (userInfo.lastLoginAt) {
+              <div class="user-last-login">
+                התחברות אחרונה: {{ formatLastLogin(userInfo.lastLoginAt) }}
+              </div>
+            }
+            <div class="user-badges">
+              <span class="badge" [ngClass]="getLevelColor(userInfo.level)">
+                {{ userInfo.level || 'User' }}
+              </span>
+              @if (userInfo.role) {
+                <span class="badge badge-role">
+                  {{ userInfo.role }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+        <!-- Separator -->
+        <div class="menu-separator"></div>
+        <!-- Menu Items -->
+        <div class="menu-items">
+          <a href="#" class="menu-item" (click)="onUserDetailsClick(); $event.preventDefault()">
+            <span class="menu-icon">⚙️</span>
+            <span>פרופיל משתמש</span>
+          </a>
+          @if (isAdmin()) {
+            <a href="#" class="menu-item" (click)="onManageUsersClick(); $event.preventDefault()">
+              <span class="menu-icon">👥</span>
+              <span>ניהול משתמשים</span>
+            </a>
+          }
+          @if (isTeacherOrInstructor()) {
+            <a href="#" class="menu-item" (click)="onRegisterNewUserClick(); $event.preventDefault()">
+              <span class="menu-icon">➕</span>
+              <span>רישום משתמש חדש</span>
+            </a>
+          }
+          <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
+            <span class="menu-icon">🛒</span>
+            <span>הרכישות שלי</span>
+          </a>
+        </div>
+        <!-- Separator -->
+        <div class="menu-separator"></div>
+        <!-- Logout Button -->
+        <button type="button" class="menu-item menu-item-logout" (click)="onLogout()">
+          <span class="menu-icon">🚪</span>
+          <span>התנתקות</span>
+        </button>
+      </div>
+    }
   </div>
-</div>
+}

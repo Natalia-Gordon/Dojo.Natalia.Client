@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, Inject, PLATFORM_ID, HostListener } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface GalleryImage {
   src: string;
@@ -12,7 +12,7 @@ export interface GalleryImage {
 @Component({
   selector: 'app-gallery-image',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './gallery-image.component.html',
   styleUrls: ['./gallery-image.component.css']
 })

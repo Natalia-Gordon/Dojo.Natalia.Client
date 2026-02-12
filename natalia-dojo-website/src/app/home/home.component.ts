@@ -3,7 +3,6 @@ import { Title, Meta } from '@angular/platform-browser';
 import * as jQuery from "jquery";
 import { AboutComponent } from "../about/about.component";
 import { WorkoutsComponent } from "../workouts/workouts.component";
-import { TeamComponent } from "../team/team.component";
 import { RecentArticlesComponent } from "./recent-articles/recent-articles.component";
 
 @Component({
@@ -11,7 +10,7 @@ import { RecentArticlesComponent } from "./recent-articles/recent-articles.compo
     standalone: true,
     templateUrl: './home.component.html',
     styleUrl: './home.component.css',
-    imports: [AboutComponent, WorkoutsComponent, TeamComponent, RecentArticlesComponent]
+    imports: [AboutComponent, WorkoutsComponent, RecentArticlesComponent]
 })
 export class HomeComponent implements OnInit, AfterViewInit {
     constructor(private title: Title, private meta: Meta) {}

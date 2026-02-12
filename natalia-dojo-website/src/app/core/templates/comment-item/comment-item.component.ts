@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AddcommentComponent } from '../addcomment/addcomment.component';
 
 @Component({
   selector: 'app-comment-item',
   standalone: true,
-  imports: [CommonModule, FormsModule, AddcommentComponent],
+  imports: [FormsModule, AddcommentComponent],
   templateUrl: './comment-item.component.html',
   styleUrl: './comment-item.component.css'
 })

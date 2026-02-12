@@ -3,13 +3,12 @@ import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
 import { ZenSidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule, DatePipe } from '@angular/common';
 import { CommentsListComponent, Comment } from '../../../../core/templates/comments-list/comments-list.component';
-import { AddcommentComponent } from '../../../../core/templates/addcomment/addcomment.component';
 import { AudioPlayerComponent } from '../../../../core/templates/audio-player/audio-player.component';
 
 @Component({
   selector: 'app-zen-today',
   standalone: true,
-  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent, AudioPlayerComponent, DatePipe],
+  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AudioPlayerComponent, DatePipe],
   templateUrl: './zen-today.component.html',
   styleUrl: './zen-today.component.css'
 })

@@ -1,35 +1,37 @@
 <!-- Hero Start -->
 <div class="container-fluid bg-primary p-5 bg-hero mb-5">
-    <div class="row py-5">
-        <div class="col-12 text-center">
-            <h1 class="display-3 text-light mb-0">רגעים מהאימונים</h1>
-            <p class="text-light mt-4">כאן תוכלו לראות תמונות מאימונים, סדנאות ואירועים מיוחדים של הדוג'ו. הצטרפו אלינו למסע של למידה, התפתחות וגילוי עצמי.</p>
-            <a href="home" class="btn btn-primary py-md-3 px-md-5 me-3">דף הבית</a>&nbsp;
-            <a href="gallery" class="btn btn-light py-md-3 px-md-5">גלריה</a>
-        </div>
+  <div class="row py-5">
+    <div class="col-12 text-center">
+      <h1 class="display-3 text-light mb-0">רגעים מהאימונים</h1>
+      <p class="text-light mt-4">כאן תוכלו לראות תמונות מאימונים, סדנאות ואירועים מיוחדים של הדוג'ו. הצטרפו אלינו למסע של למידה, התפתחות וגילוי עצמי.</p>
+      <a href="home" class="btn btn-primary py-md-3 px-md-5 me-3">דף הבית</a>&nbsp;
+      <a href="gallery" class="btn btn-light py-md-3 px-md-5">גלריה</a>
     </div>
+  </div>
 </div>
 <!-- Hero End -->
 
 <!-- Gallery Start -->
 <div class="container-fluid p-0" style="margin: 90px 0;">
-    <div class="row g-0">
-        <div class="col-lg-12">
-            <div class="gallery-container shadow-lg p-3 bg-white rounded">
-                <div class="row g-3">
-                    <div class="col-md-3 col-sm-6" *ngFor="let image of galleryImages; let i = index">
-                        <app-gallery-image 
-                            [image]="image" 
-                            [index]="i"
-                            [allImages]="galleryImages"
-                            (imageClick)="onImageClick($event)"
-                            (imageLoad)="onImageLoad($event)"
-                            (imageError)="onImageError($event)">
-                        </app-gallery-image>
-                    </div>
-                </div>
+  <div class="row g-0">
+    <div class="col-lg-12">
+      <div class="gallery-container shadow-lg p-3 bg-white rounded">
+        <div class="row g-3">
+          @for (image of galleryImages; track image; let i = $index) {
+            <div class="col-md-3 col-sm-6">
+              <app-gallery-image
+                [image]="image"
+                [index]="i"
+                [allImages]="galleryImages"
+                (imageClick)="onImageClick($event)"
+                (imageLoad)="onImageLoad($event)"
+                (imageError)="onImageError($event)">
+              </app-gallery-image>
             </div>
+          }
         </div>
+      </div>
     </div>
+  </div>
 </div>
 <!-- Gallery End -->

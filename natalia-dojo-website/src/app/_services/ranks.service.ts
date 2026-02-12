@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -25,9 +25,12 @@ export interface Rank {
   providedIn: 'root'
 })
 export class RanksService {
-  private http = inject(HttpClient);
-  private authService = inject(AuthService);
   private apiUrl = environment.apiUrl;
+
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   getRanks(rankType?: string): Observable<Rank[]> {
     const query = rankType ? `?rankType=${encodeURIComponent(rankType)}` : '';

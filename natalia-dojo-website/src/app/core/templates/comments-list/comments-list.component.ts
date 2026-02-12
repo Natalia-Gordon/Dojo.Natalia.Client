@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { CommentItemComponent } from '../comment-item/comment-item.component';
 import { AddcommentComponent } from '../addcomment/addcomment.component';
 
@@ -18,7 +18,7 @@ export interface Comment {
 @Component({
   selector: 'app-comments-list',
   standalone: true,
-  imports: [CommonModule, CommentItemComponent, AddcommentComponent],
+  imports: [CommentItemComponent, AddcommentComponent],
   templateUrl: './comments-list.component.html',
   styleUrl: './comments-list.component.css'
 })

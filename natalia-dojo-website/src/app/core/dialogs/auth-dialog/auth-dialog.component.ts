@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AuthDialogService } from '../../../_services/auth-dialog.service';
 
 @Component({
   selector: 'app-auth-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './auth-dialog.component.html',
   styleUrl: './auth-dialog.component.css'
 })

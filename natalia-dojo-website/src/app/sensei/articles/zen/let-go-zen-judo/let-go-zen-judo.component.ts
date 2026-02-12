@@ -3,12 +3,10 @@ import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
 import { ZenSidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule, DatePipe } from '@angular/common';
 import { CommentsListComponent, Comment } from '../../../../core/templates/comments-list/comments-list.component';
-import { AddcommentComponent } from '../../../../core/templates/addcomment/addcomment.component';
-
 @Component({
   selector: 'app-let-go-zen-judo',
   standalone: true,
-  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent, DatePipe],
+  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, DatePipe],
   templateUrl: './let-go-zen-judo.component.html',
   styleUrl: './let-go-zen-judo.component.css'
 })

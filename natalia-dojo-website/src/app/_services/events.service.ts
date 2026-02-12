@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError, of, BehaviorSubject } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -146,9 +146,12 @@ export interface EventRegistrationResponse {
   providedIn: 'root'
 })
 export class EventsService {
-  private http = inject(HttpClient);
-  private authService = inject(AuthService);
   private apiUrl = environment.apiUrl;
+
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   // Registration Dialog State Management
   private registrationDialogStateSubject = new BehaviorSubject<RegistrationDialogState>({

@@ -1,11 +1,13 @@
 <!-- Comment List Start -->
 <div class="mb-5">
-    <h3 class="text-uppercase mb-4">{{ comments.length }} תגובות</h3>
-    <!-- Main Comments -->
-    <app-comment-item *ngFor="let comment of comments" [comment]="comment" (replyAdded)="onCommentAdded($event)"></app-comment-item>
-    <!-- End Main Comments -->
+  <h3 class="text-uppercase mb-4">{{ comments.length }} תגובות</h3>
+  <!-- Main Comments -->
+  @for (comment of comments; track comment) {
+    <app-comment-item [comment]="comment" (replyAdded)="onCommentAdded($event)"></app-comment-item>
+  }
+  <!-- End Main Comments -->
 </div>
 <!-- Comment List End -->
 
 <!-- Add Comment Form for new comments -->
-<app-addcomment (newCommentAdded)="onCommentAdded($event)"></app-addcomment> 
+<app-addcomment (newCommentAdded)="onCommentAdded($event)"></app-addcomment>

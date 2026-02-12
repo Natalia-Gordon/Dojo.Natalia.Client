@@ -1,7 +1,7 @@
-import { Injectable, inject, Inject, PLATFORM_ID, Optional } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, Subject, of, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
@@ -103,13 +103,11 @@ export interface UpdateUserRequest {
   providedIn: 'root'
 })
 export class AuthService {
-  private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
-  private platformId = inject(PLATFORM_ID);
-  
+
   private tokenSubject = new BehaviorSubject<string | null>(null);
   public token$ = this.tokenSubject.asObservable();
-  
+
   private refreshTokenSubject = new BehaviorSubject<string | null>(null);
   public refreshToken$ = this.refreshTokenSubject.asObservable();
 
@@ -119,7 +117,11 @@ export class AuthService {
   private usersRefreshSubject = new Subject<void>();
   public usersRefresh$ = this.usersRefreshSubject.asObservable();
 
-  constructor(@Optional() private router: Router | null = null) {
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    @Optional() private router: Router | null = null
+  ) {
     // Log environment info for debugging (only in production to help diagnose issues)
     if (environment.production) {
       console.log('Production mode detected');

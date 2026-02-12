@@ -5,7 +5,7 @@ import { Title, Meta } from '@angular/platform-browser';
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [ContactComponent, SharedContactComponent],
+  imports: [SharedContactComponent],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.css'
 })
