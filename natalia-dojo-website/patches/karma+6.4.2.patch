@@ -1,0 +1,68 @@
+diff --git a/node_modules/karma/lib/file-list.js b/node_modules/karma/lib/file-list.js
+index b4ec01d..14794e0 100644
+--- a/node_modules/karma/lib/file-list.js
++++ b/node_modules/karma/lib/file-list.js
+@@ -68,9 +68,33 @@ class FileList {
+           return
+         }
+ 
+-        const mg = new Glob(pathLib.normalize(pattern), { cwd: '/', follow: true, nodir: true, sync: true })
++        // On Windows, absolute paths (e.g. C:\path\to\file.js) and mixed-separator paths
++        // do not match when passed to Glob with cwd: '/'. Resolve as a single file when applicable.
++        const normalizedPattern = pathLib.normalize(pattern).replace(/\\/g, '/')
++        const absolutePath = pathLib.normalize(pattern)
++        if (pathLib.isAbsolute(absolutePath)) {
++          try {
++            const stat = await statAsync(absolutePath)
++            if (stat.isFile()) {
++              const urlPath = absolutePath.replace(/\\/g, '/')
++              const file = new File(urlPath, stat.mtime, nocache, type, isBinary)
++              file.contentPath = absolutePath
++              const files = [file]
++              if (!nocache) {
++                await Promise.all(files.map((f) => this._preprocess(f)))
++              }
++              this.buckets.set(pattern, files)
++            }
++          } catch (_e) {
++            log.warn(`Pattern "${pattern}" does not match any file.`)
++          }
++          return
++        }
++
++        const mg = new Glob(normalizedPattern, { cwd: '/', follow: true, nodir: true, sync: true })
+ 
+-        const files = mg.found
++        const found = mg.found || []
++        const files = found
+           .filter((path) => {
+             if (this._findExcluded(path)) {
+               log.debug(`Excluded file "${path}"`)
+diff --git a/node_modules/karma/lib/middleware/karma.js b/node_modules/karma/lib/middleware/karma.js
+index 355a9b6..5712485 100644
+--- a/node_modules/karma/lib/middleware/karma.js
++++ b/node_modules/karma/lib/middleware/karma.js
+@@ -34,7 +34,9 @@ function filePathToUrlPath (filePath, basePath, urlRoot, proxyPath) {
+   if (filePath.startsWith(basePath)) {
+     return proxyPath + urlRoot.slice(1) + 'base' + filePath.slice(basePath.length)
+   }
+-  return proxyPath + urlRoot.slice(1) + 'absolute' + filePath
++  // Use forward slashes and a slash after 'absolute' so Windows paths (e.g. A:\path) form valid URLs
++  const normalizedPath = filePath.replace(/\\/g, '/')
++  return proxyPath + urlRoot.slice(1) + 'absolute/' + normalizedPath
+ }
+ 
+ function getQuery (urlStr) {
+diff --git a/node_modules/karma/lib/middleware/source_files.js b/node_modules/karma/lib/middleware/source_files.js
+index e44ae02..5d10ba8 100644
+--- a/node_modules/karma/lib/middleware/source_files.js
++++ b/node_modules/karma/lib/middleware/source_files.js
+@@ -13,7 +13,7 @@ function composeUrl (url, basePath, urlRoot) {
+   return url
+     .replace(urlRoot, '/')
+     .replace(/\?.*$/, '')
+-    .replace(/^\/absolute/, '')
++    .replace(/^\/absolute\/?/, '')
+     .replace(/^\/base/, basePath)
+ }
+ 

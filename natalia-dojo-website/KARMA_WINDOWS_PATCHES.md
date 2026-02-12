@@ -1,14 +1,11 @@
-# Karma patches for Windows
+# Karma patches (Windows and CI)
 
-These patches fix Karma test runs on Windows (file-list `mg.found` undefined, absolute path URLs, and `describe is not defined` because Jasmine files were not loaded).
+Patches in `patches/karma+6.4.2.patch` fix Karma test runs on Windows and on CI (e.g. GitHub Actions):
 
-**If you run `npm install` or `npm ci`, these changes in `node_modules/karma` will be lost.** To re-apply them you can:
+- **file-list `mg.found` undefined** – Guard with `mg.found || []` and handle absolute paths (Windows and Linux) by resolving single files instead of Glob.
+- **Invalid absolute URLs** – Build URLs as `absolute/` + normalized path and strip `/absolute/` correctly when resolving.
+- **`describe is not defined`** – Ensures Jasmine framework files are found and served so globals are available.
 
-1. **Use patch-package** (recommended): Install `patch-package`, add a `postinstall` script, then run `npx patch-package karma` to generate `patches/karma+6.4.2.patch`. Commit the patch file so it applies after every install.
+These are applied automatically after every `npm install` / `npm ci` via the `postinstall` script (`patch-package`). Commit the `patches/` directory so CI gets the same fixes.
 
-2. **Re-apply manually** by editing:
-   - `node_modules/karma/lib/file-list.js` – guard `mg.found` with `|| []`, and handle absolute paths (resolve as single file, set `file.contentPath`, use forward-slash path for URL).
-   - `node_modules/karma/lib/middleware/karma.js` – in `filePathToUrlPath`, use `'absolute/' + normalizedPath` and normalize backslashes.
-   - `node_modules/karma/lib/middleware/source_files.js` – in `composeUrl`, use `.replace(/^\/absolute\/?/, '')` so `/absolute/` is stripped.
-
-Your project also uses a custom test entry (`src/test.ts`) and `sourceMap: false` for tests in `angular.json`, and the app component spec was updated to match the current app title.
+The project also uses a custom test entry (`src/test.ts`) and `sourceMap: false` for tests in `angular.json`.
