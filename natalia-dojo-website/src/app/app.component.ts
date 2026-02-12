@@ -14,7 +14,7 @@ import { AuthDialogComponent } from './core/dialogs/auth-dialog/auth-dialog.comp
     imports: [RouterOutlet, CommonModule, HeaderComponent, FooterComponent, LoginComponent, AuthDialogComponent]
 })
 export class AppComponent implements OnInit {
-  title = 'Bujinkan Ninjutsu Israel Dojo';
+  title = 'Bujinkan Ninjutsu Natalia Dojo';
   isBrowser = false;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}

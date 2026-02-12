@@ -21,10 +21,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'natalia-dojo-website' title`, () => {
+  it(`should have the expected title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('Natalia Ninjutsu Dojo');
+    expect(app.title).toEqual('Bujinkan Ninjutsu Natalia Dojo');
   });
 
   it('should render header and footer', () => {
