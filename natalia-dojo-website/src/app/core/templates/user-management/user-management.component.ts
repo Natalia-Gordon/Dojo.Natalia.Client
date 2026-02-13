@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, Inject, PLATFORM_ID, HostListener } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AuthService, User, UserInfo } from '../../../_services/auth.service';
 import { Rank, RanksService } from '../../../_services/ranks.service';
@@ -7,7 +7,7 @@ import { Rank, RanksService } from '../../../_services/ranks.service';
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.css'
 })

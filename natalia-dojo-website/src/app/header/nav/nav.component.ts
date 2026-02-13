@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { UserMenuComponent } from '../../user-menu/user-menu.component';
@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, UserMenuComponent]
+  imports: [RouterModule, UserMenuComponent]
 })
 export class NavComponent implements OnInit, OnDestroy {
   isAuthenticated = false;

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { HeroComponent } from "../hero/hero.component";
 import { SidebarComponent } from "../sidebar/sidebar.component";
 import { AddcommentComponent } from "../../core/templates/addcomment/addcomment.component";
-import { CommonModule } from '@angular/common';
+
 import { CommentsListComponent, Comment } from '../../core/templates/comments-list/comments-list.component';
 
 @Component({
@@ -10,7 +10,7 @@ import { CommentsListComponent, Comment } from '../../core/templates/comments-li
     standalone: true,
     templateUrl: './articles.component.html',
     styleUrl: './articles.component.css',
-    imports: [HeroComponent, SidebarComponent, AddcommentComponent, CommonModule, CommentsListComponent]
+    imports: [HeroComponent, SidebarComponent, AddcommentComponent, CommentsListComponent]
 })
 export class ArticlesComponent {
   comments: Comment[] = [

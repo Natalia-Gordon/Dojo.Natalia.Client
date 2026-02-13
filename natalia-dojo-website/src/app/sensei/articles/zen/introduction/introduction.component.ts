@@ -3,14 +3,13 @@ import { SidebarComponent } from "../../../../blog/sidebar/sidebar.component";
 import { ZenheroComponent } from "../../../../blog/articles/zen/hero/hero.component";
 import { SharedHeroComponent } from "../../../../shared/components/hero/hero.component";
 import { ZenSidebarComponent } from "../sidebar/sidebar.component";
-import { CommonModule } from '@angular/common';
+
 import { CommentsListComponent } from '../../../../core/templates/comments-list/comments-list.component';
-import { AddcommentComponent } from "../../../../core/templates/addcomment/addcomment.component";
 
 @Component({
   selector: 'app-introduction',
   standalone: true,
-  imports: [AddcommentComponent, SharedHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent],
+  imports: [SharedHeroComponent, ZenSidebarComponent, CommentsListComponent],
   templateUrl: './introduction.component.html',
   styleUrl: './introduction.component.css'
 })

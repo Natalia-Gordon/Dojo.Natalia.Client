@@ -1,7 +1,7 @@
 // Import polyfills FIRST to set up window before Angular code runs
 import './polyfills.server';
 
-import { bootstrapApplication } from '@angular/platform-browser';
+import { BootstrapContext, bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { config } from './app/app.config.server';
 
@@ -122,6 +122,7 @@ if (typeof global !== 'undefined' && typeof global.document === 'undefined') {
   (global as any).document = minimalDoc;
 }
 
-const bootstrap = () => bootstrapApplication(AppComponent, config);
+// CommonEngine calls bootstrap(context) when doing SSR; context must be passed to bootstrapApplication (NG0401 fix)
+const bootstrap = (context: BootstrapContext) => bootstrapApplication(AppComponent, config, context);
 
 export default bootstrap;

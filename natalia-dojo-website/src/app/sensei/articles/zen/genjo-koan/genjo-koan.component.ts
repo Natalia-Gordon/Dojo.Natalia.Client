@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { SharedHeroComponent } from "../../../../shared/components/hero/hero.component";
 import { ZenSidebarComponent } from "../sidebar/sidebar.component";
 import { AddcommentComponent } from "../../../../core/templates/addcomment/addcomment.component";
-import { CommonModule } from '@angular/common';
-import { CommentsListComponent, Comment } from '../../../../core/templates/comments-list/comments-list.component';
+
+import { Comment } from '../../../../core/templates/comments-list/comments-list.component';
 
 @Component({
   selector: 'app-genjo-koan',
   standalone: true,
-  imports: [AddcommentComponent, ZenSidebarComponent, SharedHeroComponent, CommonModule, CommentsListComponent],
+  imports: [AddcommentComponent, ZenSidebarComponent, SharedHeroComponent],
   templateUrl: './genjo-koan.component.html',
   styleUrl: './genjo-koan.component.css'
 })

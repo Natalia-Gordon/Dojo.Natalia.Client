@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { ZenSidebarComponent } from "../sidebar/sidebar.component";
 import { SharedHeroComponent } from "../../../../shared/components/hero/hero.component";
-import { AddcommentComponent } from "../../../../core/templates/addcomment/addcomment.component";
-import { CommonModule } from '@angular/common';
+
 import { ZenTermsAnAtamanComponent } from "./an-ataman/an-ataman.component";
 import { ZenTermsIgyoComponent } from "./igyo/igyo.component";
 import { ZenTermsEisaiComponent } from "./eisai/eisai.component";
@@ -43,7 +42,7 @@ import { ZenTermsJijiyuzamaiComponent } from "./jijiyuzamai/jijiyuzamai.componen
 @Component({
   selector: 'app-terms',
   standalone: true,
-  imports: [ZenSidebarComponent, AddcommentComponent, SharedHeroComponent, CommonModule, ZenTermsAnAtamanComponent, ZenTermsIgyoComponent, ZenTermsEisaiComponent, ZenTermsEngakujiComponent, ZenTermsAsangaComponent, ZenTermsBuddhaComponent, ZenTermsBodhidahrmaComponent, ZenTermsBodhisatavaComponent, ZenTermsButsudenComponent, ZenTermsGazenIchimiComponent, ZenTermsGyochaShikiComponent, ZenTermsGenkanComponent, ZenTermsDojoComponent, ZenTermsHabokuComponent, ZenTermsHattoComponent, ZenTermsHojoComponent, ZenTermsHaikuComponent, ZenTermsZazenComponent, ZenTermsZendoComponent, ZenTermsZenkiComponent, ZenTermsObakuComponent, ZenTermsYokyokuComponent, ZenTermsMokushozenComponent, ZenTermsMushiDokugoComponent, ZenTermsMenguComponent, ZenTermsSotoSenComponent, ZenTermsSunyataComponent, ZenTermsSatoriComponent, ZenTermsKannaZenComponent, ZenTermsKojoNoShikanComponent, ZenTermsKinhinComponent, ZenTermsRengaComponent, ZenTermsRandoriComponent, ZenTermsShuryoComponent, ZenTermsShikentazaComponent, ZenTermsJijiyuzamaiComponent],
+  imports: [ZenSidebarComponent, SharedHeroComponent, ZenTermsAnAtamanComponent, ZenTermsIgyoComponent, ZenTermsEisaiComponent, ZenTermsEngakujiComponent, ZenTermsAsangaComponent, ZenTermsBuddhaComponent, ZenTermsBodhidahrmaComponent, ZenTermsBodhisatavaComponent, ZenTermsButsudenComponent, ZenTermsGazenIchimiComponent, ZenTermsGyochaShikiComponent, ZenTermsGenkanComponent, ZenTermsDojoComponent, ZenTermsHabokuComponent, ZenTermsHattoComponent, ZenTermsHojoComponent, ZenTermsHaikuComponent, ZenTermsZazenComponent, ZenTermsZendoComponent, ZenTermsZenkiComponent, ZenTermsObakuComponent, ZenTermsYokyokuComponent, ZenTermsMokushozenComponent, ZenTermsMushiDokugoComponent, ZenTermsMenguComponent, ZenTermsSotoSenComponent, ZenTermsSunyataComponent, ZenTermsSatoriComponent, ZenTermsKannaZenComponent, ZenTermsKojoNoShikanComponent, ZenTermsKinhinComponent, ZenTermsRengaComponent, ZenTermsRandoriComponent, ZenTermsShuryoComponent, ZenTermsShikentazaComponent, ZenTermsJijiyuzamaiComponent],
   templateUrl: './terms.component.html',
   styleUrl: './terms.component.css'
 })

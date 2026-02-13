@@ -3,12 +3,11 @@ import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
 import { ZenSidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule, DatePipe } from '@angular/common';
 import { CommentsListComponent, Comment } from '../../../../core/templates/comments-list/comments-list.component';
-import { AddcommentComponent } from '../../../../core/templates/addcomment/addcomment.component';
 
 @Component({
   selector: 'app-human-life-importance',
   standalone: true,
-  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent, DatePipe],
+  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, DatePipe],
   templateUrl: './human-life-importance.component.html',
   styleUrl: './human-life-importance.component.css'
 })

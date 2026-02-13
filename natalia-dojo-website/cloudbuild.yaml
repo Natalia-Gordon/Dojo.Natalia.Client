@@ -1,33 +1,66 @@
+# =============================================================================
+# Dojo Natalia – Client (Angular SSR) – Cloud Build
+# =============================================================================
+# Builds the natalia-dojo-website Docker image (Angular 19 + SSR) and deploys
+# it to Cloud Run.
+#
+# Image tag format: client-<branch>-<commit-sha>
+#   - branch: Use _BRANCH_NAME from trigger (set in Cloud Build trigger Substitution variables), else BRANCH_NAME, else git.
+#   - commit-sha: full SHA (Cloud Build COMMIT_SHA).
+# Example: client-update-to-9-fb3d72e76c5a8da40e277f5017eb49c37df2ac0e
+#
+# =============================================================================
+
 steps:
-# Build the container image
+# Build the container image (tag: client-<branch>-<sha>)
 - name: "gcr.io/cloud-builders/docker"
-  dir: "natalia-dojo-website"
-  args: ['build', '-t', 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia:client-$COMMIT_SHA', '.']
-#Push the container image to Cloud Registry
-- name: "gcr.io/cloud-builders/docker"
-  args: ['push', 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia:client-$COMMIT_SHA']
-# Deploy container image to Cloud Run
-- name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-  entrypoint: gcloud
+  entrypoint: bash
   args:
-    - 'beta'
-    - 'run'
-    - 'deploy'
-    - 'natalia'
-    - '--image'
-    - 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia:client-$COMMIT_SHA'
-    - '--region'
-    - 'us-central1'
-    - '--port'
-    - '4200'
-    - '--platform'
-    - 'managed'
-    - '--min-instances'
-    - '1'
-    - '--max-instances'
-    - '1'
-    - '--allow-unauthenticated'
-# This fix this error Failed to trigger build: generic::invalid_argument: if 'build.service_account' is specified, the build must either (a) specify 'build.logs_bucket', (b) use the REGIONAL_USER_OWNED_BUCKET build.options.default_logs_bucket_behavior option, or (c) use either CLOUD_LOGGING_ONLY / NONE logging options
+    - -c
+    - |
+      set -e
+      # Branch: 1) trigger _BRANCH_NAME (set in Cloud Build trigger), 2) BRANCH_NAME, 3) git
+      BRANCH="${_BRANCH_NAME}"
+      if [ -z "$$BRANCH" ]; then
+        BRANCH="${BRANCH_NAME}"
+      fi
+      if [ -z "$$BRANCH" ]; then
+        BRANCH=$$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+        if [ "$$BRANCH" = "HEAD" ] || [ -z "$$BRANCH" ]; then
+          BRANCH=$$(git name-rev --name-only HEAD 2>/dev/null | sed 's|remotes/origin/||;s/\^0$$//;s/~[0-9]*$$//' | head -1)
+        fi
+      fi
+      SAFE_BRANCH=$$(echo "$${BRANCH:-main}" | tr '/' '-')
+      # Message: last commit from GitHub (full for label; subject-only for log)
+      COMMIT_MSG_FULL=$$(git log -1 --pretty=%B 2>/dev/null || echo 'n/a')
+      COMMIT_MSG_SUBJECT=$$(git log -1 --pretty=%s 2>/dev/null || echo 'n/a')
+      echo "=== Commit being built ==="
+      echo "SHA:    ${COMMIT_SHA}"
+      echo "Branch: $${SAFE_BRANCH}"
+      echo "Message: $${COMMIT_MSG_SUBJECT}"
+      echo "========================="
+      cd natalia-dojo-website
+      IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
+      echo "$$IMAGE" > /workspace/.cloudbuild_image_tag
+      # Optional: add commit info as image labels (visible in docker inspect / some registries)
+      COMMIT_DESC=$$(echo "$$COMMIT_MSG_FULL" | tr '\n' ' ' | sed 's/"/'"'"'/g' | head -c 500)
+      docker build -t "$$IMAGE" \
+        --label "org.opencontainers.image.revision=${COMMIT_SHA}" \
+        --label "org.opencontainers.image.description=$${COMMIT_DESC}" \
+        .
+      docker push "$$IMAGE"
+# Deploy container image to Cloud Run (revision tag = commit SHA only; tag+service name must be ≤46 chars)
+- name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      IMAGE=$$(cat /workspace/.cloudbuild_image_tag)
+      # Tag: "r" + first 7 chars of SHA = 39 chars (tag+service must be ≤46; "natalia"=7)
+      SHA="${COMMIT_SHA}"
+      REVISION_TAG="${_BRANCH_NAME}-$${SHA:0:7}"
+      gcloud run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=0 --max-instances=1 --allow-unauthenticated --tag="$$REVISION_TAG"
+# Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
   logging: CLOUD_LOGGING_ONLY
 images:

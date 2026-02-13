@@ -1,0 +1,7 @@
+<app-header></app-header>
+<router-outlet></router-outlet>
+<app-footer></app-footer>
+<ng-container *ngIf="isBrowser">
+  <app-login></app-login>
+  <app-auth-dialog></app-auth-dialog>
+</ng-container>

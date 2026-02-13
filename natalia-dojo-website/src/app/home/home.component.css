@@ -1,0 +1,26 @@
+/* Single carousel image (NgOptimizedImage) + caption-only slides: keep image full-size to avoid NG02960 */
+#header-carousel .carousel-inner {
+  position: relative;
+  min-height: 56.25vw; /* 16:9 aspect ratio */
+}
+
+#header-carousel .carousel-image-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+#header-carousel .carousel-image-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+#header-carousel .carousel-item {
+  min-height: 56.25vw;
+  position: relative;
+  z-index: 1;
+}

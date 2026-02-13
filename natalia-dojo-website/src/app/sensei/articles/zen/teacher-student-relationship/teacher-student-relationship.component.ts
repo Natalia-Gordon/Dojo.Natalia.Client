@@ -3,12 +3,10 @@ import { SenseiZenHeroComponent } from '../hero/sensei-zen-hero.component';
 import { ZenSidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule, DatePipe } from '@angular/common';
 import { CommentsListComponent, Comment } from '../../../../core/templates/comments-list/comments-list.component';
-import { AddcommentComponent } from '../../../../core/templates/addcomment/addcomment.component';
-
 @Component({
   selector: 'app-teacher-student-relationship',
   standalone: true,
-  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, AddcommentComponent, DatePipe],
+  imports: [SenseiZenHeroComponent, ZenSidebarComponent, CommonModule, CommentsListComponent, DatePipe],
   templateUrl: './teacher-student-relationship.component.html',
   styleUrl: './teacher-student-relationship.component.css'
 })

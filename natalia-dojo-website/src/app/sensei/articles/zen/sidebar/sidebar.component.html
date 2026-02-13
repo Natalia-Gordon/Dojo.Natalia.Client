@@ -1,123 +1,133 @@
 
 <!-- Search Form Start -->
 <div class="mb-5 position-relative" style="z-index:20;">
-    <div class="input-group" dir="ltr">
-        <button class="btn btn-primary px-4"><i class="bi bi-search"></i></button>
-        <input type="text" class="form-control p-3" placeholder="מילת מפתח" style="text-align: right; border-bottom-left-radius:0;border-bottom-right-radius:0;" 
-              [(ngModel)]="searchTerm" 
-              (ngModelChange)="onSearchTermChange($event)">
+  <div class="input-group" dir="ltr">
+    <button class="btn btn-primary px-4"><i class="bi bi-search"></i></button>
+    <input type="text" class="form-control p-3" placeholder="מילת מפתח" style="text-align: right; border-bottom-left-radius:0;border-bottom-right-radius:0;"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchTermChange($event)">
     </div>
     <!-- Results: Only show if searchTerm is not empty -->
-    <div *ngIf="searchTerm" 
-         style="position:absolute; right:0; left:0; top:100%; background: rgba(250,250,250,0.96); border:1px solid #eee; border-top:none; border-bottom-left-radius:1rem; border-bottom-right-radius:1rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
-        <div *ngIf="filteredArticles.length > 0">
+    @if (searchTerm) {
+      <div
+        style="position:absolute; right:0; left:0; top:100%; background: rgba(250,250,250,0.96); border:1px solid #eee; border-top:none; border-bottom-left-radius:1rem; border-bottom-right-radius:1rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+        @if (filteredArticles.length > 0) {
+          <div>
             <div class="search-group-label" style="padding:0.75rem 1rem 0.25rem 1rem; font-weight: 700; color:#5a5a9a; border-bottom:1px solid #e0e0ef;">
-                📰 מאמרים
+              📰 מאמרים
             </div>
             <div class="list-group bg-transparent mb-0" style="border-radius:0; box-shadow:none;">
-                <button class="list-group-item list-group-item-action" 
-                        style="text-align:right; border:none; background:transparent; padding:0.7rem 1.5rem; font-weight:500; font-size:1rem; color:#212136; border-radius:0; transition: background 0.2s;"
-                        *ngFor="let item of filteredArticles" 
-                        (click)="navigateTo(item.path)"
-                        [ngStyle]="{'background': 'transparent'}"
-                        onmouseover="this.style.background='#EDEFFA'" onmouseout="this.style.background='transparent'">
+              @for (item of filteredArticles; track item) {
+                <button class="list-group-item list-group-item-action"
+                  style="text-align:right; border:none; background:transparent; padding:0.7rem 1.5rem; font-weight:500; font-size:1rem; color:#212136; border-radius:0; transition: background 0.2s;"
+                  (click)="navigateTo(item.path)"
+                  [ngStyle]="{'background': 'transparent'}"
+                  onmouseover="this.style.background='#EDEFFA'" onmouseout="this.style.background='transparent'">
                   {{item.label}}
                 </button>
+              }
             </div>
-        </div>
-        <div *ngIf="filteredTerms.length > 0">
-           <div class="search-group-label" style="padding:0.75rem 1rem 0.25rem 1rem; font-weight: 700; color:#4e8573; border-bottom:1px solid #dcebe5;">
-                📖 מונחים
-           </div>
-           <div class="list-group bg-transparent mb-0" style="border-radius:0; box-shadow:none;">
-               <button class="list-group-item list-group-item-action" 
-                       style="text-align:right; border:none; background:transparent; padding:0.7rem 1.5rem; font-weight:500; font-size:1rem; color:#234636; border-radius:0; transition: background 0.2s;"
-                       *ngFor="let item of filteredTerms" 
-                       (click)="navigateTo(item.path)"
-                       [ngStyle]="{'background': 'transparent'}"
-                       onmouseover="this.style.background='#E4F5EA'" onmouseout="this.style.background='transparent'">
-                 {{item.label}}
-               </button>
-           </div>
-        </div>
-        <div *ngIf="filteredArticles.length === 0 && filteredTerms.length === 0" class="text-secondary text-center py-3" style="font-size:0.95rem;">
-          לא נמצאו תוצאות.
-        </div>
-    </div>
-</div>
-<!-- Search Form End -->
+          </div>
+        }
+        @if (filteredTerms.length > 0) {
+          <div>
+            <div class="search-group-label" style="padding:0.75rem 1rem 0.25rem 1rem; font-weight: 700; color:#4e8573; border-bottom:1px solid #dcebe5;">
+              📖 מונחים
+            </div>
+            <div class="list-group bg-transparent mb-0" style="border-radius:0; box-shadow:none;">
+              @for (item of filteredTerms; track item) {
+                <button class="list-group-item list-group-item-action"
+                  style="text-align:right; border:none; background:transparent; padding:0.7rem 1.5rem; font-weight:500; font-size:1rem; color:#234636; border-radius:0; transition: background 0.2s;"
+                  (click)="navigateTo(item.path)"
+                  [ngStyle]="{'background': 'transparent'}"
+                  onmouseover="this.style.background='#E4F5EA'" onmouseout="this.style.background='transparent'">
+                  {{item.label}}
+                </button>
+              }
+            </div>
+          </div>
+        }
+        @if (filteredArticles.length === 0 && filteredTerms.length === 0) {
+          <div class="text-secondary text-center py-3" style="font-size:0.95rem;">
+            לא נמצאו תוצאות.
+          </div>
+        }
+      </div>
+    }
+  </div>
+  <!-- Search Form End -->
 
-<!-- Category Start -->
-<div class="mb-5">
+  <!-- Category Start -->
+  <div class="mb-5">
     <h3 class="text-uppercase mb-4">זן בודיזם</h3>
     <div class="d-flex flex-column justify-content-start bg-dark rounded p-4">
-        <a class="fs-5 fw-bold text-light text-uppercase mb-2" href="sensei/articles/zen/introduction"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>מה הוא זן?</a>
-        <a class="fs-5 fw-bold text-light text-uppercase mb-2" href="sensei/articles/zen/terms"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>מילון מונחים</a>
-        <a class="fs-5 fw-bold text-light text-uppercase mb-2" href="sensei/articles/zen/fukan-zazengi"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>הנחיות לישיבה בזה-זן</a>
-        <a class="fs-5 fw-bold text-light text-uppercase mb-2" href="sensei/articles/zen/genjo-koan"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>הקואן בחיי היום יום (גֶנְג'וֹקוֹאָן)</a>
-        <a class="fs-5 fw-bold text-light text-uppercase" href="sensei/articles/zen/zenki"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>פילוסופיה של תפקוד מלא (זנקי)</a>
+      <a class="fs-5 fw-bold text-light text-uppercase mb-2" href="sensei/articles/zen/introduction"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>מה הוא זן?</a>
+      <a class="fs-5 fw-bold text-light text-uppercase mb-2" href="sensei/articles/zen/terms"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>מילון מונחים</a>
+      <a class="fs-5 fw-bold text-light text-uppercase mb-2" href="sensei/articles/zen/fukan-zazengi"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>הנחיות לישיבה בזה-זן</a>
+      <a class="fs-5 fw-bold text-light text-uppercase mb-2" href="sensei/articles/zen/genjo-koan"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>הקואן בחיי היום יום (גֶנְג'וֹקוֹאָן)</a>
+      <a class="fs-5 fw-bold text-light text-uppercase" href="sensei/articles/zen/zenki"><i class="bi bi-arrow-left text-primary me-2">&nbsp;</i>פילוסופיה של תפקוד מלא (זנקי)</a>
     </div>
-</div>
-<!-- Category End -->
+  </div>
+  <!-- Category End -->
 
-<!-- Recent Post Start -->
-<div class="mb-5">
+  <!-- Recent Post Start -->
+  <div class="mb-5">
     <h3 class="text-uppercase mb-4">מאמרים מפורסמים</h3>
     <div class="bg-dark rounded p-4">
-        <div class="d-flex overflow-hidden mb-3">            
-            <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-1.jpg" style="width: 75px;" alt="מאמר: מה הוא זן?">
-            <a href="sensei/articles/zen/introduction" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">מה הוא זן?</a>            
-        </div>
-        <div class="d-flex overflow-hidden mb-3">
-            <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-1.jpg" style="width: 75px;" alt="מאמר: הנחיות לישיבה בזה-זן">
-            <a href="sensei/articles/zen/fukan-zazengi" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">הנחיות לישיבה בזה-זן (פוקאן-זה-זן-גי)</a>
-        </div>
-        <div class="d-flex overflow-hidden mb-3">
-            <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-1.jpg" style="width: 75px;" alt="מאמר: הקואן בחיי היום יום">
-            <a href="sensei/articles/zen/genjo-koan" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">הקואן בחיי היום יום (גֶנְג'וֹקוֹאָן)</a>
-        </div>
-        <div class="d-flex overflow-hidden mb-3">
-            <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-1.jpg" style="width: 75px;" alt="מאמר: פילוסופיה של תפקוד מלא">
-            <a href="sensei/articles/zen/zenki" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">פילוסופיה של תפקוד מלא (זנקי)        </a>
-        </div>
-        <div class="d-flex overflow-hidden">
-            <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-2.jpg" style="width: 75px;" alt="מאמר: זן וג'ודו">
-            <a href="sensei/articles/zen/zenandjodo" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">זן וג'ודו</a>
-        </div>
+      <div class="d-flex overflow-hidden mb-3">
+        <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-1.jpg" style="width: 75px;" alt="מאמר: מה הוא זן?">
+        <a href="sensei/articles/zen/introduction" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">מה הוא זן?</a>
+      </div>
+      <div class="d-flex overflow-hidden mb-3">
+        <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-1.jpg" style="width: 75px;" alt="מאמר: הנחיות לישיבה בזה-זן">
+        <a href="sensei/articles/zen/fukan-zazengi" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">הנחיות לישיבה בזה-זן (פוקאן-זה-זן-גי)</a>
+      </div>
+      <div class="d-flex overflow-hidden mb-3">
+        <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-1.jpg" style="width: 75px;" alt="מאמר: הקואן בחיי היום יום">
+        <a href="sensei/articles/zen/genjo-koan" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">הקואן בחיי היום יום (גֶנְג'וֹקוֹאָן)</a>
+      </div>
+      <div class="d-flex overflow-hidden mb-3">
+        <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-1.jpg" style="width: 75px;" alt="מאמר: פילוסופיה של תפקוד מלא">
+        <a href="sensei/articles/zen/zenki" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">פילוסופיה של תפקוד מלא (זנקי)        </a>
+      </div>
+      <div class="d-flex overflow-hidden">
+        <img class="img-fluid flex-shrink-0 rounded-end" src="/assets/img/blog-2.jpg" style="width: 75px;" alt="מאמר: זן וג'ודו">
+        <a href="sensei/articles/zen/zenandjodo" class="d-flex align-items-center bg-light rounded-start h5 text-uppercase p-3 mb-0">זן וג'ודו</a>
+      </div>
     </div>
-</div>
-<!-- Recent Post End -->
+  </div>
+  <!-- Recent Post End -->
 
-<!-- Tags Start -->
-<div class="mb-5">
+  <!-- Tags Start -->
+  <div class="mb-5">
     <h3 class="text-uppercase mb-4">מונחים חשובים</h3>
     <div class="d-flex flex-wrap m-n1">
-        <a href="sensei/articles/zen/terms/an-ataman" class="btn btn-dark m-1">אן-אטאמן</a>
-        <a href="sensei/articles/zen/terms/buddha" class="btn btn-dark m-1">בודהה</a>
-        <a href="sensei/articles/zen/terms/bodhidahrma" class="btn btn-dark m-1">בודהידרמה</a>
-        <a href="sensei/articles/zen/terms/bodhisatava" class="btn btn-dark m-1">בודהיסטווה</a>
-        <a href="sensei/articles/zen/terms/dojo" class="btn btn-dark m-1">דוג'ו</a>
-        <a href="sensei/articles/zen/terms/zazen" class="btn btn-dark m-1">זה-זן</a>
-        <a href="sensei/articles/zen/terms/zenki" class="btn btn-dark m-1">זנקי</a>
-        <a href="sensei/articles/zen/terms/mengu" class="btn btn-dark m-1">מנג'ו</a>
-        <a href="sensei/articles/zen/terms/soto-zen" class="btn btn-dark m-1">סוטו-זן</a>
-        <a href="sensei/articles/zen/terms/sunyata" class="btn btn-dark m-1">סוניאטה</a>
-        <a href="ensei/articles/zen/terms/satori" class="btn btn-dark m-1">סטורי</a>
-        <a href="sensei/articles/zen/terms/kinhin" class="btn btn-dark m-1">קינהין</a>
-        <a href="sensei/articles/zen/terms/randori" class="btn btn-dark m-1">רנדורי</a>
-        <a href="sensei/articles/zen/terms/jijiyuzamai" class="btn btn-dark m-1">גי'גי'ו-זהמאיי</a>
+      <a href="sensei/articles/zen/terms/an-ataman" class="btn btn-dark m-1">אן-אטאמן</a>
+      <a href="sensei/articles/zen/terms/buddha" class="btn btn-dark m-1">בודהה</a>
+      <a href="sensei/articles/zen/terms/bodhidahrma" class="btn btn-dark m-1">בודהידרמה</a>
+      <a href="sensei/articles/zen/terms/bodhisatava" class="btn btn-dark m-1">בודהיסטווה</a>
+      <a href="sensei/articles/zen/terms/dojo" class="btn btn-dark m-1">דוג'ו</a>
+      <a href="sensei/articles/zen/terms/zazen" class="btn btn-dark m-1">זה-זן</a>
+      <a href="sensei/articles/zen/terms/zenki" class="btn btn-dark m-1">זנקי</a>
+      <a href="sensei/articles/zen/terms/mengu" class="btn btn-dark m-1">מנג'ו</a>
+      <a href="sensei/articles/zen/terms/soto-zen" class="btn btn-dark m-1">סוטו-זן</a>
+      <a href="sensei/articles/zen/terms/sunyata" class="btn btn-dark m-1">סוניאטה</a>
+      <a href="ensei/articles/zen/terms/satori" class="btn btn-dark m-1">סטורי</a>
+      <a href="sensei/articles/zen/terms/kinhin" class="btn btn-dark m-1">קינהין</a>
+      <a href="sensei/articles/zen/terms/randori" class="btn btn-dark m-1">רנדורי</a>
+      <a href="sensei/articles/zen/terms/jijiyuzamai" class="btn btn-dark m-1">גי'גי'ו-זהמאיי</a>
     </div>
-</div>
-<!-- Tags End -->
+  </div>
+  <!-- Tags End -->
 
-<!-- Plain Text Start -->
-<div>
+  <!-- Plain Text Start -->
+  <div>
     <h3 class="text-uppercase mb-4">דברי המורה</h3>
     <div class="bg-dark rounded text-center text-light" style="padding: 30px;">
-        <p>
-            הנושאים והתכנים המובאים כאן נובעים ברובם מהדברים שנאמרו בשיחות זן עם התלמידים לאורך השנים המתבססים על המאמרים של המורה זן, דוגן ועל המאמרים של פופ' מאסונאגה רייהו. המאמרים נכתבו למען האנשים בארץ, כדי שיגלו בו דרך להבנת עצמם באמצעות הזה-זן (הישיבה השלווה). אני בטוח שאם האנשים בישראל יבינו את עצמם, ישתפר המצב במדינה ובכללותו בחיים האישיים, לרבות הכלכלה, יחסי אנוש והפוליטיקה, והחיים באזור יהיו קלים יותר.   
-        </p>
-        <a href="sensei/articles/zen/teacher-message" class="btn btn-primary py-2 px-4">קרא עוד</a>
+      <p>
+        הנושאים והתכנים המובאים כאן נובעים ברובם מהדברים שנאמרו בשיחות זן עם התלמידים לאורך השנים המתבססים על המאמרים של המורה זן, דוגן ועל המאמרים של פופ' מאסונאגה רייהו. המאמרים נכתבו למען האנשים בארץ, כדי שיגלו בו דרך להבנת עצמם באמצעות הזה-זן (הישיבה השלווה). אני בטוח שאם האנשים בישראל יבינו את עצמם, ישתפר המצב במדינה ובכללותו בחיים האישיים, לרבות הכלכלה, יחסי אנוש והפוליטיקה, והחיים באזור יהיו קלים יותר.
+      </p>
+      <a href="sensei/articles/zen/teacher-message" class="btn btn-primary py-2 px-4">קרא עוד</a>
     </div>
-</div>
-<!-- Plain Text End -->
+  </div>
+  <!-- Plain Text End -->

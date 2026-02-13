@@ -1,20 +1,30 @@
 <div class="d-flex mb-4" style="gap: 15px;">
-    <img *ngIf="!comment.avatarError" [src]="comment.avatar" (error)="comment.avatarError = true" class="img-fluid rounded" style="width: 45px; height: 45px;">
-    <i *ngIf="comment.avatarError" class="fa fa-user fs-5 text-muted" style="font-size: 45px;"></i>
-    <div>
-        <h6><a href="#"><strong>{{ comment.author }}</strong></a> &nbsp;|&nbsp; <small><i><strong>{{ comment.date }}</strong></i></small></h6>
-        <p *ngIf="comment.subject" class="text-secondary mb-2"><strong>נושא:</strong> {{ comment.subject }}</p>
-        <p style="font-size: 19px; font-weight: 440; line-height: 28px; letter-spacing: normal;">{{ comment.text }}</p>
-        <button class="btn btn-sm btn-secondary" (click)="toggleReplyForm()">התגובה שלי</button>
+  @if (!comment.avatarError) {
+    <img [src]="comment.avatar" (error)="comment.avatarError = true" class="img-fluid rounded" style="width: 45px; height: 45px;">
+  }
+  @if (comment.avatarError) {
+    <i class="fa fa-user fs-5 text-muted" style="font-size: 45px;"></i>
+  }
+  <div>
+    <h6><a href="#"><strong>{{ comment.author }}</strong></a> &nbsp;|&nbsp; <small><i><strong>{{ comment.date }}</strong></i></small></h6>
+    @if (comment.subject) {
+      <p class="text-secondary mb-2"><strong>נושא:</strong> {{ comment.subject }}</p>
+    }
+    <p style="font-size: 19px; font-weight: 440; line-height: 28px; letter-spacing: normal;">{{ comment.text }}</p>
+    <button class="btn btn-sm btn-secondary" (click)="toggleReplyForm()">התגובה שלי</button>
 
-        <div *ngIf="showReplyForm" class="mt-3">
-            <app-addcomment (newCommentAdded)="onReplyAdded($event)"></app-addcomment>
-        </div>
+    @if (showReplyForm) {
+      <div class="mt-3">
+        <app-addcomment (newCommentAdded)="onReplyAdded($event)"></app-addcomment>
+      </div>
+    }
 
-        <!-- Replies -->
-        <div *ngFor="let reply of comment.replies" class="d-flex ms-5 mt-3" style="gap: 15px;">
-            <app-comment-item [comment]="reply" (replyAdded)="replyAdded.emit($event)"></app-comment-item>
-        </div>
-        <!-- End Replies -->
-    </div>
+    <!-- Replies -->
+    @for (reply of comment.replies; track reply) {
+      <div class="d-flex ms-5 mt-3" style="gap: 15px;">
+        <app-comment-item [comment]="reply" (replyAdded)="replyAdded.emit($event)"></app-comment-item>
+      </div>
+    }
+    <!-- End Replies -->
+  </div>
 </div>

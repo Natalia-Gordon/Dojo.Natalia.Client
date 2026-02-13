@@ -1,10 +1,10 @@
 import { Component, Input, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-audio-player',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './audio-player.component.html',
   styleUrl: './audio-player.component.css'
 })

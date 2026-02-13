@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GalleryImageComponent, GalleryImage } from '../core/templates/gallery-image/gallery-image.component';
 
 @Component({
   selector: 'app-photo-gallery',
   standalone: true,
-  imports: [CommonModule, GalleryImageComponent],
+  imports: [GalleryImageComponent],
   templateUrl: './photo-gallery.component.html',
   styleUrls: ['./photo-gallery.component.css']
 })
