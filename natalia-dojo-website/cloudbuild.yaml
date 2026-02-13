@@ -9,8 +9,6 @@
 #   - commit-sha: full SHA (Cloud Build COMMIT_SHA).
 # Example: client-update-to-9-fb3d72e76c5a8da40e277f5017eb49c37df2ac0e
 #
-# Description: GitHub commit message is stored in image labels "description" and
-# "org.opencontainers.image.description" so Artifact Registry may show it in the Description column / Labels.
 # =============================================================================
 
 steps:
@@ -44,12 +42,11 @@ steps:
       cd natalia-dojo-website
       IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
       echo "$$IMAGE" > /workspace/.cloudbuild_image_tag
-      # Image label + OCI annotation: full GitHub commit message (sanitized, max 500 chars) for Description in Artifact Registry
+      # Optional: add commit info as image labels (visible in docker inspect / some registries)
       COMMIT_DESC=$$(echo "$$COMMIT_MSG_FULL" | tr '\n' ' ' | sed 's/"/'"'"'/g' | head -c 500)
       docker build -t "$$IMAGE" \
         --label "org.opencontainers.image.revision=${COMMIT_SHA}" \
         --label "org.opencontainers.image.description=$${COMMIT_DESC}" \
-        --label "description=$${COMMIT_DESC}" \
         .
       docker push "$$IMAGE"
 # Deploy container image to Cloud Run (same tag as build)
