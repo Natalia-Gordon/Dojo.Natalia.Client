@@ -8,8 +8,8 @@ steps:
     - -c
     - |
       cd natalia-dojo-website
-      SAFE_BRANCH=$$(echo "$${BRANCH_NAME:-main}" | tr '/' '-')
-      IMAGE="me-west1-docker.pkg.dev/$${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-$${COMMIT_SHA}"
+      SAFE_BRANCH=$$(echo "${BRANCH_NAME:-main}" | tr '/' '-')
+      IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
       docker build -t "$$IMAGE" .
       docker push "$$IMAGE"
 # Deploy container image to Cloud Run (same tag)
@@ -18,8 +18,8 @@ steps:
   args:
     - -c
     - |
-      SAFE_BRANCH=$$(echo "$${BRANCH_NAME:-main}" | tr '/' '-')
-      IMAGE="me-west1-docker.pkg.dev/$${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-$${COMMIT_SHA}"
+      SAFE_BRANCH=$$(echo "${BRANCH_NAME:-main}" | tr '/' '-')
+      IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
       gcloud beta run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=1 --max-instances=1 --allow-unauthenticated
 # Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
