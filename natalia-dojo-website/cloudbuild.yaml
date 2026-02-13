@@ -42,7 +42,6 @@ steps:
       cd natalia-dojo-website
       IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
       echo "$$IMAGE" > /workspace/.cloudbuild_image_tag
-      echo "$${SAFE_BRANCH}-${COMMIT_SHA}" > /workspace/.cloudbuild_revision_tag
       # Optional: add commit info as image labels (visible in docker inspect / some registries)
       COMMIT_DESC=$$(echo "$$COMMIT_MSG_FULL" | tr '\n' ' ' | sed 's/"/'"'"'/g' | head -c 500)
       docker build -t "$$IMAGE" \
@@ -50,14 +49,16 @@ steps:
         --label "org.opencontainers.image.description=$${COMMIT_DESC}" \
         .
       docker push "$$IMAGE"
-# Deploy container image to Cloud Run (revision tag = <branch>-<commit-sha> from build step)
+# Deploy container image to Cloud Run (revision tag = commit SHA only; tag+service name must be ≤46 chars)
 - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
   entrypoint: bash
   args:
     - -c
     - |
       IMAGE=$$(cat /workspace/.cloudbuild_image_tag)
-      REVISION_TAG=$$(cat /workspace/.cloudbuild_revision_tag)
+      # Tag + service name must be ≤46 chars; COMMIT_SHA is 40, "natalia" is 7 → use first 39 of SHA
+      SHA="${COMMIT_SHA}"
+      REVISION_TAG="$${SHA:0:39}"
       gcloud run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=0 --max-instances=1 --allow-unauthenticated --tag="$$REVISION_TAG"
 # Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
