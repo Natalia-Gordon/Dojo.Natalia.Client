@@ -1,33 +1,27 @@
+# Image tag includes branch name (sanitized: / → -) and commit SHA for traceability.
+# BRANCH_NAME and COMMIT_SHA are provided by Cloud Build when triggered from a branch.
 steps:
-# Build the container image
+# Build the container image (tag: client-<branch>-<sha>)
 - name: "gcr.io/cloud-builders/docker"
-  dir: "natalia-dojo-website"
-  args: ['build', '-t', 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia:client-$COMMIT_SHA', '.']
-#Push the container image to Cloud Registry
-- name: "gcr.io/cloud-builders/docker"
-  args: ['push', 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia:client-$COMMIT_SHA']
-# Deploy container image to Cloud Run
-- name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-  entrypoint: gcloud
+  entrypoint: bash
   args:
-    - 'beta'
-    - 'run'
-    - 'deploy'
-    - 'natalia'
-    - '--image'
-    - 'me-west1-docker.pkg.dev/$PROJECT_ID/dojo-website/natalia:client-$COMMIT_SHA'
-    - '--region'
-    - 'us-central1'
-    - '--port'
-    - '4200'
-    - '--platform'
-    - 'managed'
-    - '--min-instances'
-    - '1'
-    - '--max-instances'
-    - '1'
-    - '--allow-unauthenticated'
-# This fix this error Failed to trigger build: generic::invalid_argument: if 'build.service_account' is specified, the build must either (a) specify 'build.logs_bucket', (b) use the REGIONAL_USER_OWNED_BUCKET build.options.default_logs_bucket_behavior option, or (c) use either CLOUD_LOGGING_ONLY / NONE logging options
+    - -c
+    - |
+      cd natalia-dojo-website
+      SAFE_BRANCH=$(echo "${BRANCH_NAME:-main}" | tr '/' '-')
+      IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-${SAFE_BRANCH}-${COMMIT_SHA}"
+      docker build -t "$IMAGE" .
+      docker push "$IMAGE"
+# Deploy container image to Cloud Run (same tag)
+- name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      SAFE_BRANCH=$(echo "${BRANCH_NAME:-main}" | tr '/' '-')
+      IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-${SAFE_BRANCH}-${COMMIT_SHA}"
+      gcloud beta run deploy natalia --image="$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=1 --max-instances=1 --allow-unauthenticated
+# Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
   logging: CLOUD_LOGGING_ONLY
 images:
