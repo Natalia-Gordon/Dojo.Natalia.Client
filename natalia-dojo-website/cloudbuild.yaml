@@ -5,12 +5,12 @@
 # it to Cloud Run.
 #
 # Image tag format: client-<branch>-<commit-sha>
-#   - branch: Cloud Build BRANCH_NAME when set; else from git (abbrev-ref or
-#     name-rev when detached HEAD). Slashes replaced with hyphens.
+#   - branch: Use _BRANCH_NAME from trigger (set in Cloud Build trigger Substitution variables), else BRANCH_NAME, else git.
 #   - commit-sha: full SHA (Cloud Build COMMIT_SHA).
 # Example: client-update-to-9-fb3d72e76c5a8da40e277f5017eb49c37df2ac0e
 #
-# Commit message: last GitHub commit (git log -1); subject in log, full in label.
+# Description: GitHub commit message is stored in image labels "description" and
+# "org.opencontainers.image.description" so Artifact Registry may show it in the Description column / Labels.
 # =============================================================================
 
 steps:
@@ -21,8 +21,11 @@ steps:
     - -c
     - |
       set -e
-      # Branch: prefer Cloud Build BRANCH_NAME; when detached HEAD use git name-rev to get branch containing this commit
-      BRANCH="$${BRANCH_NAME}"
+      # Branch: 1) trigger _BRANCH_NAME (set in Cloud Build trigger), 2) BRANCH_NAME, 3) git
+      BRANCH="${_BRANCH_NAME}"
+      if [ -z "$$BRANCH" ]; then
+        BRANCH="${BRANCH_NAME}"
+      fi
       if [ -z "$$BRANCH" ]; then
         BRANCH=$$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
         if [ "$$BRANCH" = "HEAD" ] || [ -z "$$BRANCH" ]; then
@@ -41,11 +44,12 @@ steps:
       cd natalia-dojo-website
       IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
       echo "$$IMAGE" > /workspace/.cloudbuild_image_tag
-      # Image label: full GitHub commit message (sanitized: single line, no double quotes, max 20 chars)
-      COMMIT_DESC=$$(echo "$$COMMIT_MSG_FULL" | tr '\n' ' ' | sed 's/"/'"'"'/g' | head -c 20)
+      # Image label + OCI annotation: full GitHub commit message (sanitized, max 500 chars) for Description in Artifact Registry
+      COMMIT_DESC=$$(echo "$$COMMIT_MSG_FULL" | tr '\n' ' ' | sed 's/"/'"'"'/g' | head -c 500)
       docker build -t "$$IMAGE" \
         --label "org.opencontainers.image.revision=${COMMIT_SHA}" \
         --label "org.opencontainers.image.description=$${COMMIT_DESC}" \
+        --label "description=$${COMMIT_DESC}" \
         .
       docker push "$$IMAGE"
 # Deploy container image to Cloud Run (same tag as build)
