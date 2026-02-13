@@ -5,13 +5,12 @@
 # it to Cloud Run.
 #
 # Image tag format: client-<branch>-<commit-sha>
-#   - branch: from git (checked-out branch); slashes replaced with hyphens.
-#   - commit-sha: full SHA of the commit being built (Cloud Build substitution).
+#   - branch: Cloud Build BRANCH_NAME when set; else from git (abbrev-ref or
+#     name-rev when detached HEAD). Slashes replaced with hyphens.
+#   - commit-sha: full SHA (Cloud Build COMMIT_SHA).
 # Example: client-update-to-9-fb3d72e76c5a8da40e277f5017eb49c37df2ac0e
 #
-# Commit explanation: the GitHub commit message is (1) printed in the build log
-# and (2) stored as the image label org.opencontainers.image.description so
-# Artifact Registry / Cloud Run show it as the image description.
+# Commit message: last GitHub commit (git log -1); subject in log, full in label.
 # =============================================================================
 
 steps:
@@ -22,17 +21,28 @@ steps:
     - -c
     - |
       set -e
+      # Branch: prefer Cloud Build BRANCH_NAME; when detached HEAD use git name-rev to get branch containing this commit
+      BRANCH="$${BRANCH_NAME}"
+      if [ -z "$$BRANCH" ]; then
+        BRANCH=$$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+        if [ "$$BRANCH" = "HEAD" ] || [ -z "$$BRANCH" ]; then
+          BRANCH=$$(git name-rev --name-only HEAD 2>/dev/null | sed 's|remotes/origin/||;s/\^0$$//;s/~[0-9]*$$//' | head -1)
+        fi
+      fi
+      SAFE_BRANCH=$$(echo "$${BRANCH:-main}" | tr '/' '-')
+      # Message: last commit from GitHub (full for label; subject-only for log)
+      COMMIT_MSG_FULL=$$(git log -1 --pretty=%B 2>/dev/null || echo 'n/a')
+      COMMIT_MSG_SUBJECT=$$(git log -1 --pretty=%s 2>/dev/null || echo 'n/a')
       echo "=== Commit being built ==="
       echo "SHA:    ${COMMIT_SHA}"
-      echo "Branch: $$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'main')"
-      echo "Message: $$(git log -1 --pretty=%B 2>/dev/null || echo 'n/a')"
+      echo "Branch: $${SAFE_BRANCH}"
+      echo "Message: $${COMMIT_MSG_SUBJECT}"
       echo "========================="
-      SAFE_BRANCH=$$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo "main")
       cd natalia-dojo-website
       IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
       echo "$$IMAGE" > /workspace/.cloudbuild_image_tag
-      # GitHub commit message as image description (sanitized for OCI label: single line, no double quotes, max 500 chars)
-      COMMIT_DESC=$$(git log -1 --pretty=%B 2>/dev/null | tr '\n' ' ' | sed 's/"/'"'"'/g' | head -c 500)
+      # Image label: full GitHub commit message (sanitized: single line, no double quotes, max 20 chars)
+      COMMIT_DESC=$$(echo "$$COMMIT_MSG_FULL" | tr '\n' ' ' | sed 's/"/'"'"'/g' | head -c 20)
       docker build -t "$$IMAGE" \
         --label "org.opencontainers.image.revision=${COMMIT_SHA}" \
         --label "org.opencontainers.image.description=$${COMMIT_DESC}" \
