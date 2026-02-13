@@ -56,7 +56,7 @@ steps:
     - -c
     - |
       IMAGE=$$(cat /workspace/.cloudbuild_image_tag)
-      gcloud beta run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=1 --max-instances=1 --allow-unauthenticated
+      gcloud beta run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=0 --max-instances=1 --allow-unauthenticated
 # Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
   logging: CLOUD_LOGGING_ONLY
