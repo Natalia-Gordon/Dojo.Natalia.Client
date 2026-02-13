@@ -1,5 +1,19 @@
-# Image tag includes branch name (sanitized: / → -) and commit SHA for traceability.
-# BRANCH_NAME and COMMIT_SHA are provided by Cloud Build when triggered from a branch.
+# =============================================================================
+# Dojo Natalia – Client (Angular SSR) – Cloud Build
+# =============================================================================
+# Builds the natalia-dojo-website Docker image (Angular 19 + SSR) and deploys
+# it to Cloud Run.
+#
+# Image tag format: client-<branch>-<commit-sha>
+#   - branch: from git (checked-out branch); slashes replaced with hyphens.
+#   - commit-sha: full SHA of the commit being built (Cloud Build substitution).
+# Example: client-update-to-9-fb3d72e76c5a8da40e277f5017eb49c37df2ac0e
+#
+# Commit explanation: the GitHub commit message is (1) printed in the build log
+# and (2) stored as the image label org.opencontainers.image.description so
+# Artifact Registry / Cloud Run show it as the image description.
+# =============================================================================
+
 steps:
 # Build the container image (tag: client-<branch>-<sha>)
 - name: "gcr.io/cloud-builders/docker"
@@ -7,19 +21,30 @@ steps:
   args:
     - -c
     - |
+      set -e
+      echo "=== Commit being built ==="
+      echo "SHA:    ${COMMIT_SHA}"
+      echo "Branch: $$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'main')"
+      echo "Message: $$(git log -1 --pretty=%B 2>/dev/null || echo 'n/a')"
+      echo "========================="
+      SAFE_BRANCH=$$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo "main")
       cd natalia-dojo-website
-      SAFE_BRANCH=$$(echo "${BRANCH_NAME:-main}" | tr '/' '-')
       IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
-      docker build -t "$$IMAGE" .
+      echo "$$IMAGE" > /workspace/.cloudbuild_image_tag
+      # GitHub commit message as image description (sanitized for OCI label: single line, no double quotes, max 500 chars)
+      COMMIT_DESC=$$(git log -1 --pretty=%B 2>/dev/null | tr '\n' ' ' | sed 's/"/'"'"'/g' | head -c 500)
+      docker build -t "$$IMAGE" \
+        --label "org.opencontainers.image.revision=${COMMIT_SHA}" \
+        --label "org.opencontainers.image.description=$${COMMIT_DESC}" \
+        .
       docker push "$$IMAGE"
-# Deploy container image to Cloud Run (same tag)
+# Deploy container image to Cloud Run (same tag as build)
 - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
   entrypoint: bash
   args:
     - -c
     - |
-      SAFE_BRANCH=$$(echo "${BRANCH_NAME:-main}" | tr '/' '-')
-      IMAGE="me-west1-docker.pkg.dev/${PROJECT_ID}/dojo-website/natalia:client-$${SAFE_BRANCH}-${COMMIT_SHA}"
+      IMAGE=$$(cat /workspace/.cloudbuild_image_tag)
       gcloud beta run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=1 --max-instances=1 --allow-unauthenticated
 # Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
