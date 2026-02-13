@@ -49,14 +49,16 @@ steps:
         --label "org.opencontainers.image.description=$${COMMIT_DESC}" \
         .
       docker push "$$IMAGE"
-# Deploy container image to Cloud Run (revision tag = branch + short SHA, ≤39 chars)
+# Deploy container image to Cloud Run (revision tag = commit SHA only; tag+service name must be ≤46 chars)
 - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
   entrypoint: bash
   args:
     - -c
     - |
       IMAGE=$$(cat /workspace/.cloudbuild_image_tag)
-      REVISION_TAG="${_BRANCH_NAME}-${COMMIT_SHA:0:7}"
+      # Tag: "r" + first 7 chars of SHA = 39 chars (tag+service must be ≤46; "natalia"=7)
+      SHA="${COMMIT_SHA}"
+      REVISION_TAG="${_BRANCH_NAME}-$${SHA:0:7}"
       gcloud run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=0 --max-instances=1 --allow-unauthenticated --tag="$$REVISION_TAG"
 # Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
