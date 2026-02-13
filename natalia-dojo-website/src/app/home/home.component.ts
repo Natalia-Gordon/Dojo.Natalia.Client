@@ -31,6 +31,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
             name: 'description',
             content: 'דוג׳ו נטליה - בית ספר לנינג׳וטסו ואומנויות לחימה באופקים. אימוני הגנה עצמית, שיטות עבודה יפניות מסורתיות, פילוסופיה וקהילה מקצועית. הירשם לאימון ניסיון.'
         });
+        // Preload carousel images so next/prev switch is instant
+        this.carouselImages.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
     }
 
     ngAfterViewInit(): void {
@@ -38,10 +43,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
         setTimeout(() => {
             this.title.setTitle('דוג׳ו נטליה - נינג׳וטסו ואומנויות לחימה');
         }, 0);
-        // Sync single carousel image with Bootstrap slide (avoids NG02960 on hidden slides)
+        // Sync single carousel image with Bootstrap slide (update on slide start so image changes with caption, no delay)
         const el = this.headerCarouselRef?.nativeElement;
         if (el) {
-            el.addEventListener('slid.bs.carousel', (e: Event) => {
+            el.addEventListener('slide.bs.carousel', (e: Event) => {
                 const to = (e as { to?: number }).to;
                 if (typeof to === 'number') this.activeSlideIndex = to;
             });
