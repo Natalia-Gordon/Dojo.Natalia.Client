@@ -56,13 +56,7 @@ steps:
     - -c
     - |
       IMAGE=$$(cat /workspace/.cloudbuild_image_tag)
-      BRANCH="${_BRANCH_NAME}"
-      [ -z "$$BRANCH" ] && BRANCH="${BRANCH_NAME}"
-      [ -z "$$BRANCH" ] && BRANCH=main
-      SAFE_BRANCH=$$(echo "$$BRANCH" | tr '[:upper:]' '[:lower:]' | tr '/' '-' | sed 's/[^a-z0-9-]//g' | sed 's/-*$$//' | head -c 31)
-      [ -z "$$SAFE_BRANCH" ] && SAFE_BRANCH=main
-      case "$${SAFE_BRANCH:0:1}" in [0-9]) SAFE_BRANCH="r$$SAFE_BRANCH";; esac
-      REVISION_TAG="$${SAFE_BRANCH}-${COMMIT_SHA:0:7}"
+      REVISION_TAG="${_BRANCH_NAME}-${COMMIT_SHA:0:7}"
       gcloud run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=0 --max-instances=1 --allow-unauthenticated --tag="$$REVISION_TAG"
 # Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
