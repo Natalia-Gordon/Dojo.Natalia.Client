@@ -49,3 +49,16 @@
 - **Router testing**: Use `provideRouter()` in tests instead of `RouterTestingModule` if you adopt the new testing APIs.
 
 These are optional; the app runs on Angular 19 without them.
+
+## Carousel images (NG0913 / performance)
+
+The home carousel uses **NgOptimizedImage** (`ngSrc`, `width`, `height`; `priority` on the first slide for LCP). To avoid NG0913 warnings and keep good performance:
+
+1. **Resize the source files**  
+   Resize `src/assets/img/carousel-1.jpg` through `carousel-4.jpg` to the **display size** (e.g. **1920×1080**). Oversized originals cause the warning and extra bandwidth.
+
+2. **Keep dimensions in sync**  
+   The template uses `width="1920"` and `height="1080"` to match the intrinsic image size. If you change the image dimensions, update both the image files and these attributes so the aspect ratio matches (avoids NG02952).
+
+3. **Do not disable the warning**  
+   Keeping NG0913 enabled helps catch oversized images; fixing the assets is the intended approach.
