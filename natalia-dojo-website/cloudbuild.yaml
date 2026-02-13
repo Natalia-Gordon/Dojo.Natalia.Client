@@ -49,16 +49,20 @@ steps:
         --label "org.opencontainers.image.description=$${COMMIT_DESC}" \
         .
       docker push "$$IMAGE"
-# Deploy container image to Cloud Run (revision tag = commit SHA only; tag+service name must be ≤46 chars)
+# Deploy container image to Cloud Run (revision tag = branch + short SHA, ≤39 chars)
 - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
   entrypoint: bash
   args:
     - -c
     - |
       IMAGE=$$(cat /workspace/.cloudbuild_image_tag)
-      # Tag: full commit SHA (must start with a letter; if deploy fails, SHA may have started with 0-9)
-      SHA="${COMMIT_SHA}"
-      REVISION_TAG="r$${SHA:0:40}"
+      BRANCH="${_BRANCH_NAME}"
+      [ -z "$$BRANCH" ] && BRANCH="${BRANCH_NAME}"
+      [ -z "$$BRANCH" ] && BRANCH=main
+      SAFE_BRANCH=$$(echo "$$BRANCH" | tr '[:upper:]' '[:lower:]' | tr '/' '-' | sed 's/[^a-z0-9-]//g' | sed 's/-*$$//' | head -c 31)
+      [ -z "$$SAFE_BRANCH" ] && SAFE_BRANCH=main
+      case "$${SAFE_BRANCH:0:1}" in [0-9]) SAFE_BRANCH="r$$SAFE_BRANCH";; esac
+      REVISION_TAG="$${SAFE_BRANCH}-${SHORT_SHA}"
       gcloud run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=0 --max-instances=1 --allow-unauthenticated --tag="$$REVISION_TAG"
 # Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
