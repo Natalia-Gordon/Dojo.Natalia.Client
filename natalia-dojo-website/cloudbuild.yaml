@@ -56,9 +56,9 @@ steps:
     - -c
     - |
       IMAGE=$$(cat /workspace/.cloudbuild_image_tag)
-      # Tag: must start with a letter, only [a-z0-9-], ≤39 chars (tag+service ≤46)
+      # Tag: full commit SHA (must start with a letter; if deploy fails, SHA may have started with 0-9)
       SHA="${COMMIT_SHA}"
-      REVISION_TAG="$${SHA:0:40}"
+      REVISION_TAG="r$${SHA:0:40}"
       gcloud run deploy natalia --image="$$IMAGE" --region=us-central1 --port=8080 --platform=managed --min-instances=0 --max-instances=1 --allow-unauthenticated --tag="$$REVISION_TAG"
 # Fix: build must use CLOUD_LOGGING_ONLY when service_account / logs_bucket not set
 options:
