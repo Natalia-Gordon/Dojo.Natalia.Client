@@ -168,22 +168,23 @@
               @for (user of users; track trackByUserId($index, user)) {
                 <tr>
                   <td>
-                    @if (getProfileImageSrc(user.profileImageUrl)) {
+                    @if (hasDisplayableAvatar(user)) {
                       <button
                         type="button"
                         class="user-management__avatar-btn"
-                        (click)="openImagePopup(getProfileImageSrcLarge(user.profileImageUrl) || getProfileImageSrc(user.profileImageUrl)!)"
+                        (click)="openImagePopup(getDisplayAvatarSrcLarge(user) || getDisplayAvatarSrc(user)!)"
                         [attr.aria-label]="'תמונת פרופיל של ' + (user.displayName || user.username || '')"
                         >
                         <img
-                          [src]="getProfileImageSrc(user.profileImageUrl)"
+                          [src]="getDisplayAvatarSrc(user)"
                           [alt]="user.displayName || user.username || 'תמונת פרופיל'"
                           class="user-management__avatar"
                           loading="lazy"
+                          (error)="onAvatarError(user, $event)"
                           />
                         </button>
                       }
-                      @if (!getProfileImageSrc(user.profileImageUrl)) {
+                      @if (!hasDisplayableAvatar(user)) {
                         <span>—</span>
                       }
                     </td>

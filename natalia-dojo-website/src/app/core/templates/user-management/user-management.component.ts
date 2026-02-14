@@ -38,6 +38,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   /** Popup: full-size profile image URL when open, null when closed */
   popupImageSrc: string | null = null;
 
+  /** Per-user avatar URL overrides when primary Google Drive format fails (fallback attempts) */
+  avatarSrcOverride: Record<number, string> = {};
+  /** Per-user attempt index: 0=thumbnail, 1=uc view, 2=uc download */
+  avatarAttemptByUserId: Record<number, number> = {};
+  /** User IDs for which all avatar load attempts failed */
+  avatarFailedIds = new Set<number>();
+
   private authSubscription?: Subscription;
   private userSubscription?: Subscription;
   private usersRefreshSubscription?: Subscription;
@@ -112,6 +119,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         next: (users) => {
           const normalizedUsers = users || [];
           this.users = this.sortUsers(normalizedUsers);
+          this.avatarSrcOverride = {};
+          this.avatarAttemptByUserId = {};
+          this.avatarFailedIds = new Set();
           this.isLoading = false;
         },
         error: (error) => {
@@ -326,40 +336,102 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     return rankName ? rankName : '—';
   }
 
-  getProfileImageSrc(url?: string | null): string | null {
+  /** Extract Google Drive file ID from various URL formats. */
+  private getDriveFileId(url?: string | null): string | null {
     if (!url) return null;
     const trimmed = url.trim();
     if (!trimmed) return null;
-
-    // Prefer Google Drive thumbnail endpoint for better compatibility.
     const match = trimmed.match(/drive\.google\.com\/file\/d\/([^/]+)/i);
-    if (match?.[1]) {
-      return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w256`;
-    }
+    if (match?.[1]) return match[1];
     const idParam = trimmed.match(/drive\.google\.com\/(?:open|uc)\?[^#]*id=([^&]+)/i);
-    if (idParam?.[1]) {
-      return `https://drive.google.com/thumbnail?id=${idParam[1]}&sz=w256`;
+    if (idParam?.[1]) return idParam[1];
+    const idInUrl = trimmed.match(/[?&]id=([^&]+)/i);
+    if (idInUrl?.[1]) return idInUrl[1];
+    return null;
+  }
+
+  /**
+   * Get Google Drive image URL for a given attempt.
+   * Attempt 0: thumbnail API; 1: uc export=view; 2: uc export=download.
+   */
+  private getProfileImageUrlForAttempt(
+    url: string | null | undefined,
+    attempt: number,
+    size: 'w256' | 'w800' = 'w256'
+  ): string | null {
+    const fileId = this.getDriveFileId(url);
+    if (!fileId) return url?.trim() || null;
+    if (attempt === 0) {
+      return `https://drive.google.com/thumbnail?id=${fileId}&sz=${size}`;
+    }
+    if (attempt === 1) {
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+    if (attempt === 2) {
+      return `https://drive.google.com/uc?export=download&id=${fileId}`;
+    }
+    return null;
+  }
+
+  /** Display URL for avatar in table. Uses override if retrying after error. */
+  getDisplayAvatarSrc(user: User): string | null {
+    if (this.avatarFailedIds.has(user.id)) return null;
+    const override = this.avatarSrcOverride[user.id];
+    if (override) return override;
+    return this.getProfileImageUrlForAttempt(user.profileImageUrl, 0, 'w256');
+  }
+
+  /** Large URL for popup. Matches the format used for display when possible. */
+  getDisplayAvatarSrcLarge(user: User): string | null {
+    if (this.avatarFailedIds.has(user.id)) return null;
+    const override = this.avatarSrcOverride[user.id];
+    if (override) return override;
+    return this.getProfileImageUrlForAttempt(user.profileImageUrl, 0, 'w800');
+  }
+
+  /** Whether the user has a displayable avatar (has URL and hasn't failed). */
+  hasDisplayableAvatar(user: User): boolean {
+    return !!this.getDisplayAvatarSrc(user);
+  }
+
+  /** Handle avatar load error: try alternative Google Drive URL formats. */
+  onAvatarError(user: User, event: Event): void {
+    const imgElement = (event.target as HTMLImageElement) ?? (event as unknown as { target?: HTMLImageElement })?.target;
+    if (!imgElement?.src) return;
+
+    const fileId = this.getDriveFileId(user.profileImageUrl);
+    if (!fileId) {
+      this.avatarFailedIds.add(user.id);
+      this.avatarFailedIds = new Set(this.avatarFailedIds);
+      return;
     }
 
-    return trimmed;
+    const currentAttempt = this.avatarAttemptByUserId[user.id] ?? 0;
+    const nextAttempt = currentAttempt + 1;
+    const nextUrl = this.getProfileImageUrlForAttempt(user.profileImageUrl, nextAttempt, 'w256');
+
+    if (!nextUrl) {
+      this.avatarFailedIds.add(user.id);
+      this.avatarFailedIds = new Set(this.avatarFailedIds);
+      delete this.avatarSrcOverride[user.id];
+      delete this.avatarAttemptByUserId[user.id];
+      this.avatarSrcOverride = { ...this.avatarSrcOverride };
+      return;
+    }
+
+    this.avatarAttemptByUserId[user.id] = nextAttempt;
+    this.avatarSrcOverride = { ...this.avatarSrcOverride, [user.id]: nextUrl };
+    imgElement.src = nextUrl;
+  }
+
+  /** Legacy: return first-format URL (thumbnail). Used for compatibility. */
+  getProfileImageSrc(url?: string | null): string | null {
+    return this.getProfileImageUrlForAttempt(url, 0, 'w256');
   }
 
   /** Same as getProfileImageSrc but with larger size for popup (e.g. w800). */
   getProfileImageSrcLarge(url?: string | null): string | null {
-    if (!url) return null;
-    const trimmed = url.trim();
-    if (!trimmed) return null;
-
-    const match = trimmed.match(/drive\.google\.com\/file\/d\/([^/]+)/i);
-    if (match?.[1]) {
-      return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`;
-    }
-    const idParam = trimmed.match(/drive\.google\.com\/(?:open|uc)\?[^#]*id=([^&]+)/i);
-    if (idParam?.[1]) {
-      return `https://drive.google.com/thumbnail?id=${idParam[1]}&sz=w800`;
-    }
-
-    return trimmed;
+    return this.getProfileImageUrlForAttempt(url, 0, 'w800');
   }
 
   openImagePopup(src: string): void {
