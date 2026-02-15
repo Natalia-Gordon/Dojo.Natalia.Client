@@ -294,6 +294,23 @@ export class AuthService {
   }
 
   /**
+   * Check if the access token is expired (or missing).
+   * Uses JWT exp claim with 60s buffer to avoid edge cases.
+   */
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload?.exp;
+      if (!exp || typeof exp !== 'number') return true;
+      return Date.now() / 1000 >= exp - 60;
+    } catch {
+      return true;
+    }
+  }
+
+  /**
    * Get current authentication token
    */
   getToken(): string | null {

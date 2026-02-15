@@ -2,7 +2,7 @@
   <div class="user-management__header">
     <div class="user-management__header-row">
       <h1 class="user-management__title">ניהול משתמשים</h1>
-      @if (isAdmin) {
+      @if (isAdmin && !isUnauthorized) {
         <div class="user-management__search-wrap">
           <span class="user-management__search-icon" aria-hidden="true">
             <i class="bi bi-search"></i>
@@ -50,7 +50,7 @@
         }
       }
     </div>
-    @if (isAdmin && !isLoading && !errorMessage) {
+    @if (isAdmin && !isUnauthorized && !isLoading && !errorMessage) {
       <div
         class="user-management__success"
         >
@@ -60,22 +60,28 @@
         }
       </div>
     }
-    @if (isAdmin && !isLoading && errorMessage) {
-      <div
-        class="user-management__error"
-        >
+    @if ((isAdmin || isUnauthorized) && errorMessage) {
+      <div class="user-management__error user-management__error--auth" role="alert">
         {{ errorMessage }}
+        @if (isUnauthorized) {
+          <div class="user-management__error-actions">
+            <button type="button" class="user-management__btn-login" (click)="openLoginModal()">
+              <i class="bi bi-box-arrow-in-right"></i>
+              התחברות
+            </button>
+          </div>
+        }
       </div>
     }
   </div>
 
-  @if (!isAdmin) {
+  @if (!isAdmin && !isUnauthorized) {
     <div class="user-management__restricted">
       אין לך הרשאה לצפות בעמוד זה.
     </div>
   }
 
-  @if (isAdmin) {
+  @if (isAdmin && !isUnauthorized) {
     <div class="user-management__content">
       @if (isLoading) {
         <div class="user-management__status">טוען משתמשים...</div>

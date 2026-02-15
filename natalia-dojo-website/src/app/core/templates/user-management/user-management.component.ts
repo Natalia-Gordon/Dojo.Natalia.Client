@@ -47,6 +47,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   /** Username search filter (client-side) */
   usernameSearchQuery = '';
 
+  /** True when 401/403 - show re-login option */
+  isUnauthorized = false;
+
   /** User pending delete confirmation, null when dialog closed */
   deleteConfirmUser: User | null = null;
 
@@ -80,6 +83,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   private authSubscription?: Subscription;
   private userSubscription?: Subscription;
   private usersRefreshSubscription?: Subscription;
+  private reconnectSubscription?: Subscription;
   private readonly nameCollator = new Intl.Collator(['he', 'en'], {
     sensitivity: 'base',
     numeric: true
@@ -103,32 +107,53 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.isAdmin = this.isAdminUser(this.userInfo);
 
     if (this.isAdmin) {
-      this.loadRanks();
-      this.loadUsers();
+      if (this.authService.isTokenExpired()) {
+        this.isUnauthorized = true;
+        this.errorMessage = 'שגיאה: הגישה נדחתה. יש להתחבר מחדש';
+      } else {
+        this.loadRanks();
+        this.loadUsers();
+      }
     }
 
     this.authSubscription = this.authService.token$.subscribe(token => {
       if (!token) {
         this.users = [];
+        if (this.isAdmin) {
+          this.isUnauthorized = true;
+          this.errorMessage = 'שגיאה: הגישה נדחתה. יש להתחבר מחדש';
+        }
         this.isAdmin = false;
+        this.isLoading = false;
       }
     });
 
     this.userSubscription = this.authService.userInfo$.subscribe(userInfo => {
       this.userInfo = userInfo;
       this.isAdmin = this.isAdminUser(userInfo);
-      if (this.isAdmin) {
+      if (this.isAdmin && !this.authService.isTokenExpired() && !this.isUnauthorized) {
         if (!this.ranks.length && !this.isRanksLoading) {
           this.loadRanks();
         }
         this.loadUsers();
-      } else {
+      } else if (!this.isAdmin) {
         this.users = [];
       }
     });
 
     this.usersRefreshSubscription = this.authService.usersRefresh$.subscribe(() => {
-      if (this.isAdmin) {
+      if (this.isAdmin && !this.authService.isTokenExpired() && !this.isUnauthorized) {
+        this.loadUsers();
+      }
+    });
+
+    this.reconnectSubscription = this.loginModalService.reconnectSuccess$.subscribe(() => {
+      const info = this.authService.getUserInfo();
+      if (info && this.isAdminUser(info)) {
+        this.isAdmin = true;
+        this.isUnauthorized = false;
+        this.errorMessage = '';
+        this.loadRanks();
         this.loadUsers();
       }
     });
@@ -138,10 +163,17 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.authSubscription?.unsubscribe();
     this.userSubscription?.unsubscribe();
     this.usersRefreshSubscription?.unsubscribe();
+    this.reconnectSubscription?.unsubscribe();
   }
 
   loadUsers(): void {
     if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    if (this.authService.isTokenExpired()) {
+      this.isUnauthorized = true;
+      this.errorMessage = 'שגיאה: הגישה נדחתה. יש להתחבר מחדש';
+      this.users = [];
       return;
     }
 
@@ -157,15 +189,20 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           this.avatarAttemptByUserId = {};
           this.avatarFailedIds = new Set();
           this.isLoading = false;
+          this.isUnauthorized = false;
+          this.errorMessage = '';
         },
         error: (error) => {
           this.isLoading = false;
           if (error.status === 403 || error.status === 401) {
-            this.errorMessage = 'אין הרשאה לצפות ברשימת המשתמשים.';
+            this.isUnauthorized = true;
+            this.errorMessage = 'שגיאה: הגישה נדחתה. יש להתחבר מחדש';
             this.users = [];
           } else if (error.status === 0) {
+            this.isUnauthorized = false;
             this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסה שוב.';
           } else {
+            this.isUnauthorized = false;
             this.errorMessage = 'שגיאה בטעינת המשתמשים. נסו שוב מאוחר יותר.';
           }
         }
@@ -177,7 +214,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   loadRanks(): void {
-    if (!isPlatformBrowser(this.platformId)) {
+    if (!isPlatformBrowser(this.platformId) || this.authService.isTokenExpired()) {
       return;
     }
 
@@ -594,6 +631,11 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   openRegisterForm(): void {
     this.loginModalService.open('register');
+  }
+
+  /** Open login modal for re-authentication (401/403 recovery) */
+  openLoginModal(): void {
+    this.loginModalService.openForReconnect(this.authService.getUserInfo()?.username ?? null);
   }
 
   getSelectedUser(): User | null {
