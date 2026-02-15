@@ -38,6 +38,15 @@
           >
             מחיקת משתמש
           </button>
+          @if (isSelectedUserInstructor) {
+            <button
+              type="button"
+              class="user-management__btn-bank"
+              (click)="openBankDetailsForm()"
+            >
+              עידכון פרטי חשבון בנק
+            </button>
+          }
         }
       }
     </div>
@@ -246,6 +255,120 @@
               מחיקה
             </button>
           </div>
+        </div>
+      </div>
+    }
+
+    <!-- Bank details popup -->
+    @if (bankDetailsUser) {
+      <div
+        class="user-management__confirm-overlay"
+        (click)="closeBankDetailsForm()"
+        role="button"
+        tabindex="0"
+        aria-label="סגור עידכון פרטי בנק"
+        dir="rtl">
+        <div class="user-management__bank-dialog" (click)="$event.stopPropagation()">
+          <div class="user-management__confirm-header">
+            <h3 class="user-management__confirm-title">עידכון פרטי חשבון בנק</h3>
+            <button type="button" class="user-management__confirm-close" (click)="closeBankDetailsForm()" aria-label="סגור">&times;</button>
+          </div>
+          <form class="user-management__bank-form" (ngSubmit)="saveBankDetails()">
+            <div class="user-management__bank-body">
+              <div class="form-group">
+                <label for="bank-account-holder" class="form-label">שם בעל החשבון</label>
+                <div class="input-wrapper">
+                  <input
+                    id="bank-account-holder"
+                    type="text"
+                    [(ngModel)]="bankForm.accountHolderName"
+                    name="accountHolderName"
+                    class="form-input"
+                    placeholder="הזן שם בעל החשבון">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="bank-name" class="form-label">שם הבנק</label>
+                <div class="input-wrapper">
+                  <input
+                    id="bank-name"
+                    type="text"
+                    [(ngModel)]="bankForm.bankName"
+                    name="bankName"
+                    class="form-input"
+                    placeholder="הזן שם הבנק">
+                </div>
+              </div>
+              <div class="register-grid">
+                <div class="form-group">
+                  <label for="bank-number" class="form-label">מספר הבנק</label>
+                  <div class="input-wrapper">
+                    <input
+                      id="bank-number"
+                      type="text"
+                      [(ngModel)]="bankForm.bankId"
+                      name="bankId"
+                      class="form-input"
+                      placeholder="מס' בנק">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="bank-branch" class="form-label">מספר הסניף</label>
+                  <div class="input-wrapper">
+                    <input
+                      id="bank-branch"
+                      type="text"
+                      [(ngModel)]="bankForm.branchNumber"
+                      name="branchNumber"
+                      class="form-input"
+                      placeholder="מס' סניף">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="bank-account" class="form-label">מספר החשבון</label>
+                <div class="input-wrapper">
+                  <input
+                    id="bank-account"
+                    type="text"
+                    [(ngModel)]="bankForm.accountNumber"
+                    name="accountNumber"
+                    class="form-input"
+                    placeholder="הזן מספר חשבון">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="bank-address" class="form-label">כתובת הבנק</label>
+                <div class="input-wrapper">
+                  <input
+                    id="bank-address"
+                    type="text"
+                    [(ngModel)]="bankForm.bankAddress"
+                    name="bankAddress"
+                    class="form-input"
+                    placeholder="הזן כתובת הבנק">
+                </div>
+              </div>
+              @if (bankFormError) {
+                <div class="alert-error">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <span>{{ bankFormError }}</span>
+                </div>
+              }
+            </div>
+            <div class="user-management__confirm-actions">
+              <button type="button" class="user-management__confirm-btn user-management__confirm-btn--cancel" (click)="closeBankDetailsForm()">
+                ביטול
+              </button>
+              <button type="submit" class="user-management__confirm-btn user-management__confirm-btn--save" [disabled]="isBankFormLoading">
+                {{ isBankFormLoading ? 'שומר...' : 'שמירה' }}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     }

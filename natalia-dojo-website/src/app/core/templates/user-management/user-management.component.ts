@@ -1,14 +1,16 @@
 import { Component, OnDestroy, OnInit, Inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AuthService, User, UserInfo } from '../../../_services/auth.service';
 import { LoginModalService } from '../../../_services/login-modal.service';
 import { Rank, RanksService } from '../../../_services/ranks.service';
+import { EventsService, Instructor } from '../../../_services/events.service';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.css'
 })
@@ -48,6 +50,26 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   /** User pending delete confirmation, null when dialog closed */
   deleteConfirmUser: User | null = null;
 
+  /** User for bank details form; null when dialog closed */
+  bankDetailsUser: User | null = null;
+  bankForm: {
+    accountHolderName: string;
+    bankName: string;
+    bankId: string;
+    branchNumber: string;
+    accountNumber: string;
+    bankAddress: string;
+  } = {
+    accountHolderName: '',
+    bankName: '',
+    bankId: '',
+    branchNumber: '',
+    accountNumber: '',
+    bankAddress: ''
+  };
+  isBankFormLoading = false;
+  bankFormError = '';
+
   /** Per-user avatar URL overrides when primary Google Drive format fails (fallback attempts) */
   avatarSrcOverride: Record<number, string> = {};
   /** Per-user attempt index: 0=thumbnail, 1=uc view, 2=uc download */
@@ -68,6 +90,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private loginModalService: LoginModalService,
     private ranksService: RanksService,
+    private eventsService: EventsService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -468,6 +491,99 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     return this.selectedUserId === user.id;
   }
 
+  /** Whether the selected user has instructor (or teacher) role */
+  get isSelectedUserInstructor(): boolean {
+    const user = this.getSelectedUser();
+    if (!user) return false;
+    const role = (user.role || '').trim().toLowerCase();
+    return role === 'instructor' || role === 'teacher';
+  }
+
+  openBankDetailsForm(): void {
+    const user = this.getSelectedUser();
+    if (!user || !isPlatformBrowser(this.platformId)) return;
+    this.bankDetailsUser = user;
+    this.bankFormError = '';
+    this.eventsService.getInstructors(true).subscribe({
+      next: (instructors) => {
+        const inst = (instructors || []).find(i => i.userId === user.id);
+        if (inst) {
+          this.bankForm = {
+            accountHolderName: inst.accountHolderName || '',
+            bankName: inst.bankName || '',
+            bankId: inst.bankId || '',
+            branchNumber: inst.branchNumber || '',
+            accountNumber: inst.accountNumber || '',
+            bankAddress: inst.bankAddress || ''
+          };
+        } else {
+          this.bankForm = {
+            accountHolderName: '',
+            bankName: '',
+            bankId: '',
+            branchNumber: '',
+            accountNumber: '',
+            bankAddress: ''
+          };
+        }
+      },
+      error: () => {
+        this.bankForm = {
+          accountHolderName: '',
+          bankName: '',
+          bankId: '',
+          branchNumber: '',
+          accountNumber: '',
+          bankAddress: ''
+        };
+      }
+    });
+  }
+
+  closeBankDetailsForm(): void {
+    this.bankDetailsUser = null;
+    this.bankFormError = '';
+  }
+
+  saveBankDetails(): void {
+    const user = this.bankDetailsUser;
+    if (!user) return;
+    this.isBankFormLoading = true;
+    this.bankFormError = '';
+
+    this.eventsService.getInstructors(true).subscribe({
+      next: (instructors) => {
+        const inst = (instructors || []).find((i: Instructor) => i.userId === user.id);
+        if (!inst) {
+          this.isBankFormLoading = false;
+          this.bankFormError = 'לא נמצא רשומת מדריך עבור משתמש זה.';
+          return;
+        }
+        this.eventsService.updateInstructorBankDetails(inst.instructorId, {
+          accountHolderName: this.bankForm.accountHolderName.trim() || null,
+          bankName: this.bankForm.bankName.trim() || null,
+          bankId: this.bankForm.bankId.trim() || null,
+          branchNumber: this.bankForm.branchNumber.trim() || null,
+          accountNumber: this.bankForm.accountNumber.trim() || null,
+          bankAddress: this.bankForm.bankAddress.trim() || null
+        }).subscribe({
+          next: () => {
+            this.isBankFormLoading = false;
+            this.closeBankDetailsForm();
+          },
+          error: (err) => {
+            this.isBankFormLoading = false;
+            this.bankFormError = err.error?.message ?? 'שגיאה בשמירת פרטי הבנק. נסה שוב.';
+          }
+        });
+      },
+      error: () => {
+        this.isBankFormLoading = false;
+        this.bankFormError = 'לא ניתן לטעון רשימת מדריכים. נסה שוב.';
+      }
+    });
+  }
+
   openImagePopup(src: string): void {
     this.popupImageSrc = src;
   }
@@ -540,6 +656,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   onEscape(): void {
     if (this.deleteConfirmUser) {
       this.cancelDeleteUser();
+    } else if (this.bankDetailsUser) {
+      this.closeBankDetailsForm();
     } else if (this.popupImageSrc) {
       this.closeImagePopup();
     }
