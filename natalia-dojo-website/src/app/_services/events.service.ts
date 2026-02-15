@@ -324,6 +324,30 @@ export class EventsService {
     );
   }
 
+  /**
+   * Update instructor bank details (admin only)
+   */
+  updateInstructorBankDetails(
+    instructorId: number,
+    bankDetails: {
+      accountHolderName?: string | null;
+      bankName?: string | null;
+      bankId?: string | null;
+      branchNumber?: string | null;
+      accountNumber?: string | null;
+      bankAddress?: string | null;
+    }
+  ): Observable<Instructor> {
+    return this.http.patch<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, bankDetails, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(error => {
+        console.error('Update instructor bank details error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   registerForEvent(eventId: number, request: CreateEventRegistrationRequest, paymentProofFile?: File | null): Observable<EventRegistrationResponse> {
     // If there's a file, use FormData; otherwise use JSON
     if (paymentProofFile) {

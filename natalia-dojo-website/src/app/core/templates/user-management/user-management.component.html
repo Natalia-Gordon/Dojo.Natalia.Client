@@ -1,29 +1,87 @@
 <section class="user-management" dir="rtl">
   <div class="user-management__header">
-    <h1 class="user-management__title">ניהול משתמשים</h1>
-    @if (isAdmin && !isLoading && !errorMessage) {
+    <div class="user-management__header-row">
+      <h1 class="user-management__title">ניהול משתמשים</h1>
+      @if (isAdmin && !isUnauthorized) {
+        <div class="user-management__search-wrap">
+          <span class="user-management__search-icon" aria-hidden="true">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="user-management__search-input"
+            [value]="usernameSearchQuery"
+            (input)="onUsernameSearchInput($event)"
+            placeholder="חיפוש לפי שם משתמש..."
+            aria-label="חיפוש לפי שם משתמש"
+          />
+        </div>
+        <button
+          type="button"
+          class="user-management__btn-register"
+          (click)="openRegisterForm()"
+        >
+          רישום משתמש חדש
+        </button>
+        @if (selectedUserId) {
+          <button
+            type="button"
+            class="user-management__btn-update"
+            (click)="openUpdateUserForm()"
+          >
+            עידכון משתמש
+          </button>
+          <button
+            type="button"
+            class="user-management__btn-delete"
+            (click)="deleteSelectedUser()"
+          >
+            מחיקת משתמש
+          </button>
+          @if (isSelectedUserInstructor) {
+            <button
+              type="button"
+              class="user-management__btn-bank"
+              (click)="openBankDetailsForm()"
+            >
+              עידכון פרטי חשבון בנק
+            </button>
+          }
+        }
+      }
+    </div>
+    @if (isAdmin && !isUnauthorized && !isLoading && !errorMessage) {
       <div
         class="user-management__success"
         >
         נטענו בהצלחה {{ users.length }} משתמשים.
+        @if (usernameSearchQuery.trim() && filteredUsers.length !== users.length) {
+          <span class="user-management__search-result">({{ filteredUsers.length }} תואמים לחיפוש)</span>
+        }
       </div>
     }
-    @if (isAdmin && !isLoading && errorMessage) {
-      <div
-        class="user-management__error"
-        >
+    @if ((isAdmin || isUnauthorized) && errorMessage) {
+      <div class="user-management__error user-management__error--auth" role="alert">
         {{ errorMessage }}
+        @if (isUnauthorized) {
+          <div class="user-management__error-actions">
+            <button type="button" class="user-management__btn-login" (click)="openLoginModal()">
+              <i class="bi bi-box-arrow-in-right"></i>
+              התחברות
+            </button>
+          </div>
+        }
       </div>
     }
   </div>
 
-  @if (!isAdmin) {
+  @if (!isAdmin && !isUnauthorized) {
     <div class="user-management__restricted">
       אין לך הרשאה לצפות בעמוד זה.
     </div>
   }
 
-  @if (isAdmin) {
+  @if (isAdmin && !isUnauthorized) {
     <div class="user-management__content">
       @if (isLoading) {
         <div class="user-management__status">טוען משתמשים...</div>
@@ -34,6 +92,12 @@
         </div>
       }
       @if (!isLoading && !errorMessage && users.length > 0) {
+        @if (usernameSearchQuery.trim() && filteredUsers.length === 0) {
+          <div class="user-management__empty user-management__empty--search">
+            אין תוצאות התואמות לחיפוש "{{ usernameSearchQuery.trim() }}".
+          </div>
+        }
+        @if (!(usernameSearchQuery.trim() && filteredUsers.length === 0)) {
         <div class="user-management__table-wrapper">
           <table class="user-management__table">
             <thead>
@@ -43,6 +107,16 @@
                   <button type="button" class="user-management__sort-btn" (click)="setSort('id')">
                     מזהה
                     @if (sortField === 'id') {
+                      <span class="user-management__sort-indicator">
+                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                      </span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="user-management__sort-btn" (click)="setSort('isActive')">
+                    פעיל
+                    @if (sortField === 'isActive') {
                       <span class="user-management__sort-indicator">
                         {{ sortDirection === 'asc' ? '▲' : '▼' }}
                       </span>
@@ -63,6 +137,16 @@
                   <button type="button" class="user-management__sort-btn" (click)="setSort('role')">
                     תפקיד
                     @if (sortField === 'role') {
+                      <span class="user-management__sort-indicator">
+                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                      </span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="user-management__sort-btn" (click)="setSort('level')">
+                    רמה
+                    @if (sortField === 'level') {
                       <span class="user-management__sort-indicator">
                         {{ sortDirection === 'asc' ? '▲' : '▼' }}
                       </span>
@@ -99,115 +183,199 @@
                     }
                   </button>
                 </th>
-                <th>אימייל</th>
                 <th>טלפון</th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('dateOfBirth')">
-                    תאריך לידה
-                    @if (sortField === 'dateOfBirth') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('level')">
-                    רמה
-                    @if (sortField === 'level') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>תיאור</th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('joinDate')">
-                    תאריך הצטרפות
-                    @if (sortField === 'joinDate') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('isActive')">
-                    פעיל
-                    @if (sortField === 'isActive') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('isEmailVerified')">
-                    אימות אימייל
-                    @if (sortField === 'isEmailVerified') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('lastLoginAt')">
-                    התחברות אחרונה
-                    @if (sortField === 'lastLoginAt') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
+                <th>דואר אלקטרוני</th>
               </tr>
             </thead>
             <tbody>
-              @for (user of users; track trackByUserId($index, user)) {
-                <tr>
-                  <td>
-                    @if (getProfileImageSrc(user.profileImageUrl)) {
+              @for (user of filteredUsers; track trackByUserId($index, user)) {
+                <tr
+                  [class.user-management__row--selected]="isUserSelected(user)"
+                  (click)="selectUser(user)">
+                  <td (click)="$event.stopPropagation()">
+                    @if (hasDisplayableAvatar(user)) {
                       <button
                         type="button"
                         class="user-management__avatar-btn"
-                        (click)="openImagePopup(getProfileImageSrcLarge(user.profileImageUrl) || getProfileImageSrc(user.profileImageUrl)!)"
+                        (click)="openImagePopup(getDisplayAvatarSrcLarge(user) || getDisplayAvatarSrc(user)!)"
                         [attr.aria-label]="'תמונת פרופיל של ' + (user.displayName || user.username || '')"
                         >
                         <img
-                          [src]="getProfileImageSrc(user.profileImageUrl)"
+                          [src]="getDisplayAvatarSrc(user)"
                           [alt]="user.displayName || user.username || 'תמונת פרופיל'"
                           class="user-management__avatar"
                           loading="lazy"
+                          (error)="onAvatarError(user, $event)"
                           />
                         </button>
                       }
-                      @if (!getProfileImageSrc(user.profileImageUrl)) {
+                      @if (!hasDisplayableAvatar(user)) {
                         <span>—</span>
                       }
                     </td>
                     <td>{{ user.id }}</td>
+                    <td>{{ user.isActive === true ? 'כן' : (user.isActive === false ? 'לא' : '—') }}</td>
                     <td>{{ user.username || '—' }}</td>
                     <td>{{ user.role || '—' }}</td>
+                    <td>{{ user.level || '—' }}</td>
                     <td>{{ getRankName(user.currentRankId) }}</td>
                     <td>{{ user.firstName || '—' }}</td>
                     <td>{{ user.lastName || '—' }}</td>
-                    <td>{{ user.email || '—' }}</td>
                     <td>{{ user.phone || '—' }}</td>
-                    <td>{{ user.dateOfBirth || '—' }}</td>
-                    <td>{{ user.level || '—' }}</td>
-                    <td>{{ user.bio || '—' }}</td>
-                    <td>{{ user.joinDate || '—' }}</td>
-                    <td>{{ user.isActive === true ? 'כן' : (user.isActive === false ? 'לא' : '—') }}</td>
-                    <td>{{ user.isEmailVerified === true ? 'כן' : (user.isEmailVerified === false ? 'לא' : '—') }}</td>
-                    <td>{{ formatLastLogin(user.lastLoginAt) }}</td>
+                    <td>{{ user.email || '—' }}</td>
                   </tr>
                 }
               </tbody>
             </table>
           </div>
         }
+        }
+      </div>
+    }
+
+    <!-- Delete confirmation popup -->
+    @if (deleteConfirmUser) {
+      <div
+        class="user-management__confirm-overlay"
+        (click)="cancelDeleteUser()"
+        role="button"
+        tabindex="0"
+        aria-label="סגור אישור מחיקה"
+        dir="rtl">
+        <div class="user-management__confirm-dialog" (click)="$event.stopPropagation()">
+          <div class="user-management__confirm-header">
+            <h3 class="user-management__confirm-title">אישור מחיקה</h3>
+            <button type="button" class="user-management__confirm-close" (click)="cancelDeleteUser()" aria-label="סגור">&times;</button>
+          </div>
+          <div class="user-management__confirm-body">
+            <p class="user-management__confirm-message">
+              האם למחוק את המשתמש "{{ getDeleteConfirmUserName() }}"?
+            </p>
+            <p class="user-management__confirm-warning">פעולה זו אינה ניתנת לשחזור.</p>
+          </div>
+          <div class="user-management__confirm-actions">
+            <button type="button" class="user-management__confirm-btn user-management__confirm-btn--cancel" (click)="cancelDeleteUser()">
+              ביטול
+            </button>
+            <button type="button" class="user-management__confirm-btn user-management__confirm-btn--delete" (click)="confirmDeleteUser()">
+              מחיקה
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Bank details popup -->
+    @if (bankDetailsUser) {
+      <div
+        class="user-management__confirm-overlay"
+        (click)="closeBankDetailsForm()"
+        role="button"
+        tabindex="0"
+        aria-label="סגור עידכון פרטי בנק"
+        dir="rtl">
+        <div class="user-management__bank-dialog" (click)="$event.stopPropagation()">
+          <div class="user-management__confirm-header">
+            <h3 class="user-management__confirm-title">עידכון פרטי חשבון בנק</h3>
+            <button type="button" class="user-management__confirm-close" (click)="closeBankDetailsForm()" aria-label="סגור">&times;</button>
+          </div>
+          <form class="user-management__bank-form" (ngSubmit)="saveBankDetails()">
+            <div class="user-management__bank-body">
+              <div class="form-group">
+                <label for="bank-account-holder" class="form-label">שם בעל החשבון</label>
+                <div class="input-wrapper">
+                  <input
+                    id="bank-account-holder"
+                    type="text"
+                    [(ngModel)]="bankForm.accountHolderName"
+                    name="accountHolderName"
+                    class="form-input"
+                    placeholder="הזן שם בעל החשבון">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="bank-name" class="form-label">שם הבנק</label>
+                <div class="input-wrapper">
+                  <input
+                    id="bank-name"
+                    type="text"
+                    [(ngModel)]="bankForm.bankName"
+                    name="bankName"
+                    class="form-input"
+                    placeholder="הזן שם הבנק">
+                </div>
+              </div>
+              <div class="register-grid">
+                <div class="form-group">
+                  <label for="bank-number" class="form-label">מספר הבנק</label>
+                  <div class="input-wrapper">
+                    <input
+                      id="bank-number"
+                      type="text"
+                      [(ngModel)]="bankForm.bankId"
+                      name="bankId"
+                      class="form-input"
+                      placeholder="מס' בנק">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="bank-branch" class="form-label">מספר הסניף</label>
+                  <div class="input-wrapper">
+                    <input
+                      id="bank-branch"
+                      type="text"
+                      [(ngModel)]="bankForm.branchNumber"
+                      name="branchNumber"
+                      class="form-input"
+                      placeholder="מס' סניף">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="bank-account" class="form-label">מספר החשבון</label>
+                <div class="input-wrapper">
+                  <input
+                    id="bank-account"
+                    type="text"
+                    [(ngModel)]="bankForm.accountNumber"
+                    name="accountNumber"
+                    class="form-input"
+                    placeholder="הזן מספר חשבון">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="bank-address" class="form-label">כתובת הבנק</label>
+                <div class="input-wrapper">
+                  <input
+                    id="bank-address"
+                    type="text"
+                    [(ngModel)]="bankForm.bankAddress"
+                    name="bankAddress"
+                    class="form-input"
+                    placeholder="הזן כתובת הבנק">
+                </div>
+              </div>
+              @if (bankFormError) {
+                <div class="alert-error">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <span>{{ bankFormError }}</span>
+                </div>
+              }
+            </div>
+            <div class="user-management__confirm-actions">
+              <button type="button" class="user-management__confirm-btn user-management__confirm-btn--cancel" (click)="closeBankDetailsForm()">
+                ביטול
+              </button>
+              <button type="submit" class="user-management__confirm-btn user-management__confirm-btn--save" [disabled]="isBankFormLoading">
+                {{ isBankFormLoading ? 'שומר...' : 'שמירה' }}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     }
 
