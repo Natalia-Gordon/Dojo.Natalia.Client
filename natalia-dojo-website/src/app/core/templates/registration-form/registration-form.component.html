@@ -220,6 +220,19 @@
         </div>
       </div>
 
+      @if (isAdminConnected || isInstructorConnected) {
+        <div class="form-group form-group--checkbox">
+          <label class="checkbox-label">
+            <input
+              id="register-is-active"
+              type="checkbox"
+              formControlName="isActive"
+              class="checkbox-input">
+            פעיל
+          </label>
+        </div>
+      }
+
       @if (registerError) {
         <div class="alert-error">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -249,7 +262,7 @@
         </div>
       }
 
-      @if (!showConnectedRegistrationSuccess) {
+      @if (!showConnectedRegistrationSuccess && !showEditUserUpdateButton) {
         <button
           type="submit"
           class="submit-button"
@@ -263,7 +276,7 @@
         </button>
       }
 
-      @if (showConnectedRegistrationUpdateButton) {
+      @if (showConnectedRegistrationUpdateButton || showEditUserUpdateButton) {
         <button
           type="button"
           class="submit-button"

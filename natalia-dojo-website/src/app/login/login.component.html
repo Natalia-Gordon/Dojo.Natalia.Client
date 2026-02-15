@@ -7,16 +7,22 @@
       <div class="modal-header login-modal-header">
         <button type="button" class="btn-close btn-close-white login-close-btn" (click)="closeModal()" aria-label="Close"></button>
         <h5 class="modal-title login-title">
-          {{ showLoginTab ? "התחברות לדוג'ו" : "הרשמה לדוג'ו" }}
+          @if (showLoginTab || isReconnectMode) {
+            התחברות לדוג'ו
+          } @else if (userToEditForForm) {
+            עידכון משתמש
+          } @else {
+            הרשמה לדוג'ו
+          }
         </h5>
       </div>
       <div class="modal-body login-modal-body">
-        @if (showLoginTab) {
+        @if (showLoginTab || isReconnectMode) {
           <p class="login-subtitle">היכנסו לחשבון שלכם כדי לגשת לאימונים ומשאבי הנינג'וטסו</p>
         }
 
-        <!-- Tabs -->
-        @if (showLoginTab) {
+        <!-- Tabs (hidden in reconnect mode - login only) -->
+        @if (showLoginTab && !isReconnectMode) {
           <div class="login-tabs">
             <button
               type="button"
@@ -35,8 +41,8 @@
           </div>
         }
 
-        <!-- Login Form -->
-        @if (showLoginTab && activeTab === 'login') {
+        <!-- Login Form (always shown in reconnect mode) -->
+        @if (isReconnectMode || (showLoginTab && activeTab === 'login')) {
           <div class="login-content">
             <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
               <!-- Username/Email Field -->
@@ -113,10 +119,11 @@
               </div>
             }
 
-            <!-- Register Form -->
-            @if (activeTab === 'register') {
+            <!-- Register Form (hidden in reconnect mode) -->
+            @if (activeTab === 'register' && !isReconnectMode) {
               <app-registration-form
                 [showLoginTab]="showLoginTab"
+                [userToEdit]="userToEditForForm"
                 (switchToLoginTab)="onSwitchToLoginTab($event)">
               </app-registration-form>
             }

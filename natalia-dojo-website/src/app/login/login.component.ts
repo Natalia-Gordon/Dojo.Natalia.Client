@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -15,11 +15,16 @@ import { Subscription } from 'rxjs';
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit, OnDestroy {
+  @ViewChild(RegistrationFormComponent) registrationForm?: RegistrationFormComponent;
   loginForm!: FormGroup;
   isLoginLoading = false;
   errorMessage = '';
   activeTab: 'login' | 'register' = 'login';
   showModal = false;
+  /** When true, show login form even if user appears authenticated (reconnect after 401/403) */
+  isReconnectMode = false;
+  /** User to edit when opening register tab from user management */
+  userToEditForForm: { id: number; username?: string | null; email?: string | null; firstName?: string | null; lastName?: string | null; displayName?: string | null; phone?: string | null; dateOfBirth?: string | null; role?: string | null; currentRankId?: number | null; profileImageUrl?: string | null; bio?: string | null; isActive?: boolean } | null = null;
   private modalSubscription?: Subscription;
   private tabSubscription?: Subscription;
 
@@ -41,8 +46,32 @@ export class LoginComponent implements OnInit, OnDestroy {
       if (isPlatformBrowser(this.platformId)) {
         if (isOpen) {
           document.body.classList.add('modal-open');
+          const username = this.loginModalService.prefillUsername;
+          if (username) {
+            this.isReconnectMode = true;
+            this.activeTab = 'login';
+            this.loginForm.patchValue({ username, password: '' });
+            this.loginModalService.clearPrefillUsername();
+          } else {
+            this.isReconnectMode = false;
+            this.userToEditForForm = this.loginModalService.userToEdit;
+            if (this.userToEditForForm) {
+              this.activeTab = 'register';
+            }
+            // Reset or populate registration form when modal opens on register tab
+            if (this.activeTab === 'register' || this.userToEditForForm) {
+              if (this.userToEditForForm) {
+                setTimeout(() => this.registrationForm?.setUserToEdit(this.userToEditForForm), 0);
+              } else {
+                setTimeout(() => this.registrationForm?.resetFormState(), 0);
+              }
+            }
+          }
         } else {
           document.body.classList.remove('modal-open');
+          this.isReconnectMode = false;
+          this.userToEditForForm = null;
+          this.loginModalService.clearUserToEdit();
         }
       }
     });
@@ -108,6 +137,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authService.login(username, password).subscribe({
       next: (response) => {
         this.isLoginLoading = false;
+        if (this.isReconnectMode) {
+          this.loginModalService.notifyReconnectSuccess();
+        }
         this.closeModal();
         // Redirect only if we came from a route, otherwise stay on current page
         if (this.route.snapshot.url.length > 0) {

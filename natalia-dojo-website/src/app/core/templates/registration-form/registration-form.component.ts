@@ -17,21 +17,25 @@ import {
   ValidationErrors
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../../_services/auth.service';
 import { Rank, RanksService } from '../../../_services/ranks.service';
-import { LoginModalService } from '../../../_services/login-modal.service';
+import { LoginModalService, UserToEdit } from '../../../_services/login-modal.service';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-registration-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule],
   templateUrl: './registration-form.component.html',
   styleUrl: './registration-form.component.css'
 })
 export class RegistrationFormComponent implements OnInit, OnDestroy {
   @Input() showLoginTab = false;
+
+  /** When set, form opens in edit mode for this user (e.g. from user management). */
+  @Input() userToEdit: UserToEdit | null = null;
 
   /** Emitted when registration succeeds and user is not authenticated (username to pre-fill login). */
   @Output() switchToLoginTab = new EventEmitter<string>();
@@ -61,6 +65,12 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
+    }
+
+    if (this.userToEdit) {
+      this.setUserToEdit(this.userToEdit);
+    } else {
+      this.resetFormState();
     }
 
     this.userInfoSubscription = this.authService.userInfo$.subscribe(() => {
@@ -105,9 +115,51 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     this.registerSuccess = '';
     this.registeredUserId = null;
     this.registeredUserSnapshot = null;
-    this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null });
+    this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null, isActive: true });
     this.setRegisterModeValidators();
     this.updateRegisterControlStates();
+  }
+
+  /** Populate form for editing an existing user (called from user management). */
+  setUserToEdit(user: UserToEdit | null): void {
+    if (!user) {
+      this.resetFormState();
+      return;
+    }
+    this.registerError = '';
+    this.registerSuccess = '';
+    this.registeredUserId = user.id;
+    const userType = this.mapRoleToUserType(user.role);
+    this.registerForm.patchValue({
+      username: user.username ?? '',
+      email: user.email ?? '',
+      password: '',
+      confirmPassword: '',
+      userType: userType || this.getDefaultRegisterUserType(),
+      rankId: user.currentRankId ?? null,
+      firstName: user.firstName ?? '',
+      lastName: user.lastName ?? '',
+      displayName: user.displayName ?? '',
+      phone: user.phone ?? '',
+      dateOfBirth: user.dateOfBirth ? user.dateOfBirth.split('T')[0] : '',
+      profileImageUrl: user.profileImageUrl ?? '',
+      bio: user.bio ?? '',
+      isActive: user.isActive !== false
+    });
+    this.setUpdateModeValidators();
+    this.registeredUserSnapshot = this.buildRegisterSnapshot(this.registerForm.value);
+    this.updateRegisterControlStates();
+    if (this.showRankSelect) {
+      this.loadRanks();
+    }
+  }
+
+  private mapRoleToUserType(role?: string | null): string {
+    const r = (role || '').trim().toLowerCase();
+    if (r === 'admin') return 'instructor';
+    if (r === 'instructor' || r === 'teacher') return 'instructor';
+    if (r === 'student') return 'student';
+    return 'guest';
   }
 
   private initForm(): void {
@@ -125,7 +177,8 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
         phone: [''],
         dateOfBirth: [''],
         profileImageUrl: [''],
-        bio: ['']
+        bio: [''],
+        isActive: [true]
       },
       { validators: [this.passwordsMatchValidator] }
     );
@@ -192,7 +245,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
         }
         this.registerSuccess = 'ההרשמה הושלמה. ניתן להתחבר כעת.';
         this.switchToLoginTab.emit(request.username || request.email || '');
-        this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null });
+        this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null, isActive: true });
         this.setRegisterModeValidators();
       },
       error: error => {
@@ -274,6 +327,11 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
 
   get showConnectedRegistrationUpdateButton(): boolean {
     return this.showConnectedRegistrationSuccess && this.hasRegisterChanges();
+  }
+
+  /** Show update button when editing existing user from user management */
+  get showEditUserUpdateButton(): boolean {
+    return !!this.registeredUserId && this.isAdminConnected && !this.showLoginTab;
   }
 
   get showRankSelect(): boolean {

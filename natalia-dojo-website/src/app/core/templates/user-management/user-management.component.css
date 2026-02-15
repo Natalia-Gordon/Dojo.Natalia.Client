@@ -13,10 +13,63 @@
   margin-bottom: 16px;
 }
 
+.user-management__header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
 .user-management__title {
   font-size: 28px;
   font-weight: 700;
   margin: 0;
+}
+
+.user-management__btn-register {
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.user-management__btn-register:hover {
+  background-color: #1d4ed8;
+}
+
+.user-management__btn-update {
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #059669;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.user-management__btn-update:hover {
+  background-color: #047857;
+}
+
+.user-management__btn-delete {
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #b91c1c;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.user-management__btn-delete:hover {
+  background-color: #991b1b;
 }
 
 .user-management__content {
@@ -43,12 +96,13 @@
 
 .user-management__table-wrapper {
   margin-top: 16px;
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
   direction: rtl;
   border-radius: 8px;
   background: #ffffff;
+  max-height: 520px;
+  border: 1px solid #e5e7eb;
 }
 
 .user-management__table {
@@ -71,6 +125,9 @@
 .user-management__table thead th {
   background: #f3f4f6;
   font-weight: 400;
+  position: sticky;
+  top: 0;
+  z-index: 3;
 }
 
 /* Sticky first column (profile image) – always visible when scrolling (RTL: sticks to right edge) */
@@ -110,8 +167,30 @@
   background: #f9fafb;
 }
 
+.user-management__table tbody tr {
+  cursor: pointer;
+}
+
 .user-management__table tbody tr:hover {
   background: #f9fafb;
+}
+
+.user-management__table tbody tr.user-management__row--selected {
+  background: #dbeafe;
+}
+
+.user-management__table tbody tr.user-management__row--selected:hover {
+  background: #bfdbfe;
+}
+
+.user-management__table tbody tr.user-management__row--selected td:first-child,
+.user-management__table tbody tr.user-management__row--selected td:nth-child(2) {
+  background: #dbeafe;
+}
+
+.user-management__table tbody tr.user-management__row--selected:hover td:first-child,
+.user-management__table tbody tr.user-management__row--selected:hover td:nth-child(2) {
+  background: #bfdbfe;
 }
 
 .user-management__avatar-btn {
@@ -132,6 +211,116 @@
   object-fit: cover;
   display: inline-block;
   background: #e5e7eb;
+}
+
+/* Delete confirmation modal - matches registration form design */
+.user-management__confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: pointer;
+}
+
+.user-management__confirm-dialog {
+  background: rgba(30, 41, 59, 0.98);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+  cursor: default;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.user-management__confirm-header {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 0;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.8);
+  padding-bottom: 1rem;
+}
+
+.user-management__confirm-title {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.user-management__confirm-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.user-management__confirm-close:hover {
+  color: #ffffff;
+}
+
+.user-management__confirm-body {
+  padding: 1.5rem;
+}
+
+.user-management__confirm-message {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+}
+
+.user-management__confirm-warning {
+  color: #f87171;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.user-management__confirm-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1.5rem 1.5rem;
+  flex-direction: row-reverse;
+}
+
+.user-management__confirm-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-management__confirm-btn--cancel {
+  background: rgba(51, 65, 85, 0.6);
+  color: #ffffff;
+  border: 1px solid rgba(100, 116, 139, 0.5);
+}
+
+.user-management__confirm-btn--cancel:hover {
+  background: rgba(51, 65, 85, 0.8);
+  border-color: rgba(100, 116, 139, 0.7);
+}
+
+.user-management__confirm-btn--delete {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.user-management__confirm-btn--delete:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
 .user-management__popup-overlay {

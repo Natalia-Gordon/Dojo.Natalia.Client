@@ -1,6 +1,33 @@
 <section class="user-management" dir="rtl">
   <div class="user-management__header">
-    <h1 class="user-management__title">ניהול משתמשים</h1>
+    <div class="user-management__header-row">
+      <h1 class="user-management__title">ניהול משתמשים</h1>
+      @if (isAdmin) {
+        <button
+          type="button"
+          class="user-management__btn-register"
+          (click)="openRegisterForm()"
+        >
+          רישום משתמש חדש
+        </button>
+        @if (selectedUserId) {
+          <button
+            type="button"
+            class="user-management__btn-update"
+            (click)="openUpdateUserForm()"
+          >
+            עידכון משתמש
+          </button>
+          <button
+            type="button"
+            class="user-management__btn-delete"
+            (click)="deleteSelectedUser()"
+          >
+            מחיקת משתמש
+          </button>
+        }
+      }
+    </div>
     @if (isAdmin && !isLoading && !errorMessage) {
       <div
         class="user-management__success"
@@ -50,6 +77,16 @@
                   </button>
                 </th>
                 <th>
+                  <button type="button" class="user-management__sort-btn" (click)="setSort('isActive')">
+                    פעיל
+                    @if (sortField === 'isActive') {
+                      <span class="user-management__sort-indicator">
+                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                      </span>
+                    }
+                  </button>
+                </th>
+                <th>
                   <button type="button" class="user-management__sort-btn" (click)="setSort('username')">
                     שם משתמש
                     @if (sortField === 'username') {
@@ -63,6 +100,16 @@
                   <button type="button" class="user-management__sort-btn" (click)="setSort('role')">
                     תפקיד
                     @if (sortField === 'role') {
+                      <span class="user-management__sort-indicator">
+                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                      </span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="user-management__sort-btn" (click)="setSort('level')">
+                    רמה
+                    @if (sortField === 'level') {
                       <span class="user-management__sort-indicator">
                         {{ sortDirection === 'asc' ? '▲' : '▼' }}
                       </span>
@@ -99,75 +146,16 @@
                     }
                   </button>
                 </th>
-                <th>אימייל</th>
                 <th>טלפון</th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('dateOfBirth')">
-                    תאריך לידה
-                    @if (sortField === 'dateOfBirth') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('level')">
-                    רמה
-                    @if (sortField === 'level') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>תיאור</th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('joinDate')">
-                    תאריך הצטרפות
-                    @if (sortField === 'joinDate') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('isActive')">
-                    פעיל
-                    @if (sortField === 'isActive') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('isEmailVerified')">
-                    אימות אימייל
-                    @if (sortField === 'isEmailVerified') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="user-management__sort-btn" (click)="setSort('lastLoginAt')">
-                    התחברות אחרונה
-                    @if (sortField === 'lastLoginAt') {
-                      <span class="user-management__sort-indicator">
-                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                      </span>
-                    }
-                  </button>
-                </th>
+                <th>דואר אלקטרוני</th>
               </tr>
             </thead>
             <tbody>
               @for (user of users; track trackByUserId($index, user)) {
-                <tr>
-                  <td>
+                <tr
+                  [class.user-management__row--selected]="isUserSelected(user)"
+                  (click)="selectUser(user)">
+                  <td (click)="$event.stopPropagation()">
                     @if (hasDisplayableAvatar(user)) {
                       <button
                         type="button"
@@ -189,26 +177,53 @@
                       }
                     </td>
                     <td>{{ user.id }}</td>
+                    <td>{{ user.isActive === true ? 'כן' : (user.isActive === false ? 'לא' : '—') }}</td>
                     <td>{{ user.username || '—' }}</td>
                     <td>{{ user.role || '—' }}</td>
+                    <td>{{ user.level || '—' }}</td>
                     <td>{{ getRankName(user.currentRankId) }}</td>
                     <td>{{ user.firstName || '—' }}</td>
                     <td>{{ user.lastName || '—' }}</td>
-                    <td>{{ user.email || '—' }}</td>
                     <td>{{ user.phone || '—' }}</td>
-                    <td>{{ user.dateOfBirth || '—' }}</td>
-                    <td>{{ user.level || '—' }}</td>
-                    <td>{{ user.bio || '—' }}</td>
-                    <td>{{ user.joinDate || '—' }}</td>
-                    <td>{{ user.isActive === true ? 'כן' : (user.isActive === false ? 'לא' : '—') }}</td>
-                    <td>{{ user.isEmailVerified === true ? 'כן' : (user.isEmailVerified === false ? 'לא' : '—') }}</td>
-                    <td>{{ formatLastLogin(user.lastLoginAt) }}</td>
+                    <td>{{ user.email || '—' }}</td>
                   </tr>
                 }
               </tbody>
             </table>
           </div>
         }
+      </div>
+    }
+
+    <!-- Delete confirmation popup -->
+    @if (deleteConfirmUser) {
+      <div
+        class="user-management__confirm-overlay"
+        (click)="cancelDeleteUser()"
+        role="button"
+        tabindex="0"
+        aria-label="סגור אישור מחיקה"
+        dir="rtl">
+        <div class="user-management__confirm-dialog" (click)="$event.stopPropagation()">
+          <div class="user-management__confirm-header">
+            <h3 class="user-management__confirm-title">אישור מחיקה</h3>
+            <button type="button" class="user-management__confirm-close" (click)="cancelDeleteUser()" aria-label="סגור">&times;</button>
+          </div>
+          <div class="user-management__confirm-body">
+            <p class="user-management__confirm-message">
+              האם למחוק את המשתמש "{{ getDeleteConfirmUserName() }}"?
+            </p>
+            <p class="user-management__confirm-warning">פעולה זו אינה ניתנת לשחזור.</p>
+          </div>
+          <div class="user-management__confirm-actions">
+            <button type="button" class="user-management__confirm-btn user-management__confirm-btn--cancel" (click)="cancelDeleteUser()">
+              ביטול
+            </button>
+            <button type="button" class="user-management__confirm-btn user-management__confirm-btn--delete" (click)="confirmDeleteUser()">
+              מחיקה
+            </button>
+          </div>
+        </div>
       </div>
     }
 

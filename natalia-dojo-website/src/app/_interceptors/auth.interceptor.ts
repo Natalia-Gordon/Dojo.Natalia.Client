@@ -50,53 +50,50 @@ export class AuthInterceptor implements HttpInterceptor {
           error.status === 401 &&
           !isPublicEventsListRequest &&
           !isRefreshTokenRequest &&
-          isBrowser &&
-          this.authDialogService
+          isBrowser
         ) {
-          if (!this.authDialogService.isOpen) {
-            if (isRegistrationRequest && !token) {
-              return throwError(() => error);
-            }
-
-            const hasRefreshToken = !!this.authService.getRefreshToken();
-
-            if (!hasRefreshToken) {
-              this.authService.logout().subscribe();
-              return EMPTY;
-            }
-
-            const choice$ = this.authDialogService.open();
-
-            return choice$.pipe(
-              take(1),
-              switchMap((choice) => {
-                if (choice === 'refresh') {
-                  return this.authService.refreshToken().pipe(
-                    switchMap((tokenResponse) => {
-                      const newToken = tokenResponse.accessToken;
-                      if (newToken) {
-                        const retryReq = req.clone({
-                          setHeaders: {
-                            Authorization: `Bearer ${newToken}`,
-                          },
-                        });
-                        return next.handle(retryReq);
-                      }
-                      return throwError(() => new Error('Failed to refresh token'));
-                    }),
-                    catchError((refreshError) => {
-                      this.authService.logout().subscribe();
-                      return throwError(() => refreshError);
-                    })
-                  );
-                } else if (choice === 'logout') {
-                  this.authService.logout().subscribe();
-                  return EMPTY;
-                }
-                return throwError(() => error);
-              })
-            );
+          if (isRegistrationRequest && !token) {
+            return throwError(() => error);
           }
+
+          const hasRefreshToken = !!this.authService.getRefreshToken();
+
+          if (!hasRefreshToken) {
+            this.authService.logout().subscribe();
+            return EMPTY;
+          }
+
+          /* Try refresh automatically first; only show dialog if refresh fails */
+          return this.authService.refreshToken().pipe(
+            switchMap((tokenResponse) => {
+              const newToken = tokenResponse.accessToken ?? this.authService.getToken();
+              if (newToken) {
+                const retryReq = req.clone({
+                  setHeaders: { Authorization: `Bearer ${newToken}` },
+                });
+                return next.handle(retryReq);
+              }
+              return throwError(() => new Error('Failed to refresh token'));
+            }),
+            catchError((refreshError) => {
+              /* Refresh failed – show dialog as fallback */
+              if (this.authDialogService && !this.authDialogService.isOpen) {
+                const choice$ = this.authDialogService.open();
+                return choice$.pipe(
+                  take(1),
+                  switchMap((choice) => {
+                    if (choice === 'logout') {
+                      this.authService.logout().subscribe();
+                      return EMPTY;
+                    }
+                    return throwError(() => refreshError);
+                  })
+                );
+              }
+              this.authService.logout().subscribe();
+              return throwError(() => refreshError);
+            })
+          );
         }
         return throwError(() => error);
       })

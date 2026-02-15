@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, Inject, PLATFORM_ID, HostListener } from 
 import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AuthService, User, UserInfo } from '../../../_services/auth.service';
+import { LoginModalService } from '../../../_services/login-modal.service';
 import { Rank, RanksService } from '../../../_services/ranks.service';
 
 @Component({
@@ -38,6 +39,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   /** Popup: full-size profile image URL when open, null when closed */
   popupImageSrc: string | null = null;
 
+  /** Selected user row (by id), null when none selected */
+  selectedUserId: number | null = null;
+
+  /** User pending delete confirmation, null when dialog closed */
+  deleteConfirmUser: User | null = null;
+
   /** Per-user avatar URL overrides when primary Google Drive format fails (fallback attempts) */
   avatarSrcOverride: Record<number, string> = {};
   /** Per-user attempt index: 0=thumbnail, 1=uc view, 2=uc download */
@@ -56,6 +63,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
+    private loginModalService: LoginModalService,
     private ranksService: RanksService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
@@ -434,6 +442,14 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     return this.getProfileImageUrlForAttempt(url, 0, 'w800');
   }
 
+  selectUser(user: User): void {
+    this.selectedUserId = this.selectedUserId === user.id ? null : user.id;
+  }
+
+  isUserSelected(user: User): boolean {
+    return this.selectedUserId === user.id;
+  }
+
   openImagePopup(src: string): void {
     this.popupImageSrc = src;
   }
@@ -442,9 +458,71 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.popupImageSrc = null;
   }
 
+  openRegisterForm(): void {
+    this.loginModalService.open('register');
+  }
+
+  getSelectedUser(): User | null {
+    if (!this.selectedUserId) return null;
+    return this.users.find(u => u.id === this.selectedUserId) ?? null;
+  }
+
+  deleteSelectedUser(): void {
+    const user = this.getSelectedUser();
+    if (!user || !isPlatformBrowser(this.platformId)) return;
+    this.deleteConfirmUser = user;
+  }
+
+  cancelDeleteUser(): void {
+    this.deleteConfirmUser = null;
+  }
+
+  confirmDeleteUser(): void {
+    const user = this.deleteConfirmUser;
+    if (!user) return;
+    this.deleteConfirmUser = null;
+    this.authService.deleteUser(user.id).subscribe({
+      next: () => {
+        this.selectedUserId = null;
+        this.loadUsers();
+      },
+      error: err => {
+        this.errorMessage = err.error?.message ?? 'שגיאה במחיקת המשתמש. נסה שוב.';
+      }
+    });
+  }
+
+  getDeleteConfirmUserName(): string {
+    const u = this.deleteConfirmUser;
+    if (!u) return '';
+    return (u.displayName || u.username || u.email || `משתמש ${u.id}`).trim();
+  }
+
+  openUpdateUserForm(): void {
+    const user = this.getSelectedUser();
+    if (!user) return;
+    this.loginModalService.openRegisterForEditUser({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      displayName: user.displayName,
+      phone: user.phone ?? user.phoneNumber,
+      dateOfBirth: user.dateOfBirth,
+      role: user.role,
+      currentRankId: user.currentRankId,
+      profileImageUrl: user.profileImageUrl,
+      bio: user.bio,
+      isActive: user.isActive
+    });
+  }
+
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.popupImageSrc) {
+    if (this.deleteConfirmUser) {
+      this.cancelDeleteUser();
+    } else if (this.popupImageSrc) {
       this.closeImagePopup();
     }
   }

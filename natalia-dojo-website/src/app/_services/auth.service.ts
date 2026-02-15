@@ -97,6 +97,7 @@ export interface UpdateUserRequest {
   dateOfBirth?: string | null; // Format: YYYY-MM-DD
   isActive?: boolean;
   currentRankId?: number | null;
+  userType?: string | null;
 }
 
 @Injectable({
@@ -476,6 +477,30 @@ export class AuthService {
       }),
       catchError((error: any) => {
         console.error('Update user error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Delete a user
+   * @param userId User ID to delete
+   * @returns Observable that completes when delete succeeds
+   */
+  deleteUser(userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/users/${userId}`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(() => {
+        const currentUserInfo = this.getUserInfo();
+        if (currentUserInfo && currentUserInfo.userId === userId) {
+          this.logout().subscribe();
+        } else {
+          this.usersRefreshSubject.next();
+        }
+      }),
+      catchError((error: any) => {
+        console.error('Delete user error:', error);
         return throwError(() => error);
       })
     );
