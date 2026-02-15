@@ -3,6 +3,19 @@
     <div class="user-management__header-row">
       <h1 class="user-management__title">ניהול משתמשים</h1>
       @if (isAdmin) {
+        <div class="user-management__search-wrap">
+          <span class="user-management__search-icon" aria-hidden="true">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="user-management__search-input"
+            [value]="usernameSearchQuery"
+            (input)="onUsernameSearchInput($event)"
+            placeholder="חיפוש לפי שם משתמש..."
+            aria-label="חיפוש לפי שם משתמש"
+          />
+        </div>
         <button
           type="button"
           class="user-management__btn-register"
@@ -33,6 +46,9 @@
         class="user-management__success"
         >
         נטענו בהצלחה {{ users.length }} משתמשים.
+        @if (usernameSearchQuery.trim() && filteredUsers.length !== users.length) {
+          <span class="user-management__search-result">({{ filteredUsers.length }} תואמים לחיפוש)</span>
+        }
       </div>
     }
     @if (isAdmin && !isLoading && errorMessage) {
@@ -61,6 +77,12 @@
         </div>
       }
       @if (!isLoading && !errorMessage && users.length > 0) {
+        @if (usernameSearchQuery.trim() && filteredUsers.length === 0) {
+          <div class="user-management__empty user-management__empty--search">
+            אין תוצאות התואמות לחיפוש "{{ usernameSearchQuery.trim() }}".
+          </div>
+        }
+        @if (!(usernameSearchQuery.trim() && filteredUsers.length === 0)) {
         <div class="user-management__table-wrapper">
           <table class="user-management__table">
             <thead>
@@ -151,7 +173,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (user of users; track trackByUserId($index, user)) {
+              @for (user of filteredUsers; track trackByUserId($index, user)) {
                 <tr
                   [class.user-management__row--selected]="isUserSelected(user)"
                   (click)="selectUser(user)">
@@ -191,6 +213,7 @@
               </tbody>
             </table>
           </div>
+        }
         }
       </div>
     }

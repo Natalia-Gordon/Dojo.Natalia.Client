@@ -42,6 +42,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   /** Selected user row (by id), null when none selected */
   selectedUserId: number | null = null;
 
+  /** Username search filter (client-side) */
+  usernameSearchQuery = '';
+
   /** User pending delete confirmation, null when dialog closed */
   deleteConfirmUser: User | null = null;
 
@@ -178,6 +181,21 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   trackByUserId(index: number, user: User): number {
     return user.id;
+  }
+
+  onUsernameSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.usernameSearchQuery = input?.value ?? '';
+  }
+
+  /** Users filtered by username search query; returns full list when query is empty */
+  get filteredUsers(): User[] {
+    const query = (this.usernameSearchQuery || '').trim().toLowerCase();
+    if (!query) return this.users;
+    return this.users.filter(user => {
+      const username = (user.username || '').toLowerCase();
+      return username.includes(query);
+    });
   }
 
   formatLastLogin(lastLoginAt?: string | null): string {
