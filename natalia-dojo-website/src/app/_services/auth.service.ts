@@ -1,10 +1,17 @@
 import { Injectable, Inject, PLATFORM_ID, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, Subject, of, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs';
+import { catchError, tap, take } from 'rxjs';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
+import { AuthDialogService } from './auth-dialog.service';
+import { LoginModalService } from './login-modal.service';
+
+/** Show session-expired dialog this many ms before access token expiry. */
+const SESSION_EXPIRY_WARN_BEFORE_MS = 60 * 1000;
+const STORAGE_KEY_ACCESS_TOKEN_EXPIRES_AT = 'auth_token_expires_at';
+const STORAGE_KEY_REFRESH_TOKEN_EXPIRES_AT = 'refresh_token_expires_at';
 
 // Force explicit check - ensure we're using the correct environment
 if (!environment.apiUrl) {
@@ -32,6 +39,7 @@ export interface CreateUserRequest {
   CurrentRankId?: number | null;
 }
 
+/** Matches API schema TokenResponse (accessTokenExpiresAt, refreshTokenExpiresAt are date-time ISO strings). */
 export interface TokenResponse {
   userId: number;
   username: string | null;
@@ -44,6 +52,12 @@ export interface TokenResponse {
   accessTokenExpiresAt: string;
   refreshToken: string | null;
   refreshTokenExpiresAt: string;
+}
+
+/** Request body for POST /api/users/refresh and POST /api/users/refresh-token. */
+export interface RefreshTokenRequest {
+  refreshToken: string | null;
+  deviceInfo?: string | null;
 }
 
 export interface LogoutRequest {
@@ -117,10 +131,19 @@ export class AuthService {
   private usersRefreshSubject = new Subject<void>();
   public usersRefresh$ = this.usersRefreshSubject.asObservable();
 
+  /** Emits when access token is about to expire (proactive session-expiry). */
+  private sessionExpiringSubject = new Subject<void>();
+  public sessionExpiring$ = this.sessionExpiringSubject.asObservable();
+
+  private expiryTimerId: ReturnType<typeof setTimeout> | null = null;
+  private refreshExpiryTimerId: ReturnType<typeof setTimeout> | null = null;
+
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Optional() private router: Router | null = null
+    @Optional() private router: Router | null = null,
+    @Optional() private authDialogService: AuthDialogService | null = null,
+    @Optional() private loginModalService: LoginModalService | null = null
   ) {
     // Log environment info for debugging (only in production to help diagnose issues)
     if (environment.production) {
@@ -156,6 +179,15 @@ export class AuthService {
       if (userInfo) {
         this.userInfoSubject.next(userInfo);
       }
+      const expiresAt = this.getStoredAccessTokenExpiresAt();
+      if (expiresAt && this.getStoredToken()) {
+        this.scheduleSessionExpiryTimer();
+      }
+      const refreshExpiresAt = this.getStoredRefreshTokenExpiresAt();
+      if (refreshExpiresAt && this.getStoredRefreshToken()) {
+        this.scheduleRefreshTokenExpiryTimer();
+      }
+      this.sessionExpiring$.subscribe(() => this.onSessionExpiring());
     }
   }
 
@@ -173,7 +205,7 @@ export class AuthService {
       deviceInfo: deviceInfo || null
     };
 
-    // Use the actual API endpoint from Swagger
+    // POST /api/users/login → TokenResponse (accessTokenExpiresAt, refreshTokenExpiresAt used for expiry timers)
     return this.http.post<TokenResponse>(`${this.apiUrl}/users/login`, loginRequest, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json'
@@ -185,6 +217,12 @@ export class AuthService {
         }
         if (response.refreshToken) {
           this.setRefreshToken(response.refreshToken);
+        }
+        if (response.accessTokenExpiresAt) {
+          this.setAccessTokenExpiresAt(response.accessTokenExpiresAt);
+        }
+        if (response.refreshTokenExpiresAt) {
+          this.setRefreshTokenExpiresAt(response.refreshTokenExpiresAt);
         }
         // Store user info
         const userInfo: UserInfo = {
@@ -265,6 +303,15 @@ export class AuthService {
         return of(void 0);
       })
     );
+  }
+
+  /**
+   * Clear token and user info locally without calling logout API or navigating.
+   * Use when session is expired (e.g. 401) and the user should re-login on the same page.
+   */
+  clearSessionLocally(): void {
+    this.clearToken();
+    this.clearUserInfo();
   }
 
   /**
@@ -405,16 +452,143 @@ export class AuthService {
    * Clear token from localStorage and update subject
    */
   private clearToken(): void {
+    this.clearExpiryTimer();
+    this.clearRefreshExpiryTimer();
     if (isPlatformBrowser(this.platformId)) {
       try {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem(STORAGE_KEY_ACCESS_TOKEN_EXPIRES_AT);
+        localStorage.removeItem(STORAGE_KEY_REFRESH_TOKEN_EXPIRES_AT);
       } catch {
         // Ignore localStorage errors
       }
     }
     this.tokenSubject.next(null);
     this.refreshTokenSubject.next(null);
+  }
+
+  private getStoredAccessTokenExpiresAt(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    try {
+      return localStorage.getItem(STORAGE_KEY_ACCESS_TOKEN_EXPIRES_AT);
+    } catch {
+      return null;
+    }
+  }
+
+  private setAccessTokenExpiresAt(isoString: string): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    try {
+      localStorage.setItem(STORAGE_KEY_ACCESS_TOKEN_EXPIRES_AT, isoString);
+    } catch {
+      // Ignore
+    }
+    this.scheduleSessionExpiryTimer();
+  }
+
+  private clearExpiryTimer(): void {
+    if (this.expiryTimerId != null) {
+      clearTimeout(this.expiryTimerId);
+      this.expiryTimerId = null;
+    }
+  }
+
+  private getStoredRefreshTokenExpiresAt(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    try {
+      return localStorage.getItem(STORAGE_KEY_REFRESH_TOKEN_EXPIRES_AT);
+    } catch {
+      return null;
+    }
+  }
+
+  private setRefreshTokenExpiresAt(isoString: string): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    try {
+      localStorage.setItem(STORAGE_KEY_REFRESH_TOKEN_EXPIRES_AT, isoString);
+    } catch {
+      // Ignore
+    }
+    this.scheduleRefreshTokenExpiryTimer();
+  }
+
+  private clearRefreshExpiryTimer(): void {
+    if (this.refreshExpiryTimerId != null) {
+      clearTimeout(this.refreshExpiryTimerId);
+      this.refreshExpiryTimerId = null;
+    }
+  }
+
+  /**
+   * Schedule a timer to auto-logout when refresh token expires (Option C: no dialog).
+   */
+  private scheduleRefreshTokenExpiryTimer(): void {
+    this.clearRefreshExpiryTimer();
+    const expiresAt = this.getStoredRefreshTokenExpiresAt();
+    if (!expiresAt || !isPlatformBrowser(this.platformId)) return;
+    const expiresMs = new Date(expiresAt).getTime();
+    const nowMs = Date.now();
+    const delayMs = Math.max(0, expiresMs - nowMs);
+    this.refreshExpiryTimerId = setTimeout(() => {
+      this.refreshExpiryTimerId = null;
+      this.logoutSilently();
+    }, delayMs);
+  }
+
+  /**
+   * Clear session and redirect to home without showing any dialog (used when refresh token expires).
+   */
+  private logoutSilently(): void {
+    this.clearToken();
+    this.clearUserInfo();
+    if (isPlatformBrowser(this.platformId) && this.router) {
+      this.router.navigate(['/home']);
+    }
+  }
+
+  /**
+   * Schedule a single timer to emit sessionExpiring$ shortly before access token expiry.
+   * Call after login/refresh; cleared on logout.
+   */
+  private scheduleSessionExpiryTimer(): void {
+    this.clearExpiryTimer();
+    const expiresAt = this.getStoredAccessTokenExpiresAt();
+    if (!expiresAt || !isPlatformBrowser(this.platformId)) return;
+    const expiresMs = new Date(expiresAt).getTime();
+    const nowMs = Date.now();
+    const warnAt = expiresMs - SESSION_EXPIRY_WARN_BEFORE_MS;
+    const delayMs = Math.max(0, warnAt - nowMs);
+    this.expiryTimerId = setTimeout(() => {
+      this.expiryTimerId = null;
+      this.sessionExpiringSubject.next();
+    }, delayMs);
+  }
+
+  /**
+   * Called when session is about to expire (timer or 401). Opens auth dialog and handles choice.
+   */
+  private onSessionExpiring(): void {
+    if (!this.authDialogService || this.authDialogService.isOpen) return;
+    this.authDialogService.open().pipe(take(1)).subscribe(choice => {
+      if (choice === 'refresh') {
+        const hasRefresh = !!this.getRefreshToken();
+        if (!hasRefresh) {
+          this.clearSessionLocally();
+          this.loginModalService?.open('login');
+          return;
+        }
+        this.refreshToken().subscribe({
+          next: () => { /* new timer scheduled in refreshToken tap */ },
+          error: () => {
+            this.clearSessionLocally();
+            this.loginModalService?.open('login');
+          }
+        });
+      } else if (choice === 'logout') {
+        this.logout().subscribe();
+      }
+    });
   }
 
   /**
@@ -490,9 +664,8 @@ export class AuthService {
       return throwError(() => new Error('No refresh token available'));
     }
 
-    return this.http.post<TokenResponse>(`${this.apiUrl}/users/refresh-token`, {
-      refreshToken: refreshToken
-    }, {
+    const body: RefreshTokenRequest = { refreshToken, deviceInfo: null };
+    return this.http.post<TokenResponse>(`${this.apiUrl}/users/refresh-token`, body, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json'
       })
@@ -503,6 +676,12 @@ export class AuthService {
         }
         if (response.refreshToken) {
           this.setRefreshToken(response.refreshToken);
+        }
+        if (response.accessTokenExpiresAt) {
+          this.setAccessTokenExpiresAt(response.accessTokenExpiresAt);
+        }
+        if (response.refreshTokenExpiresAt) {
+          this.setRefreshTokenExpiresAt(response.refreshTokenExpiresAt);
         }
         // Update user info if provided
         if (response.userId) {

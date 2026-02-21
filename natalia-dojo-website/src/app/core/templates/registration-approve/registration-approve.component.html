@@ -1,0 +1,73 @@
+<section class="registration-approve" dir="rtl">
+  <div class="registration-approve__hero">
+    <div class="registration-approve__hero-overlay">
+      <div class="registration-approve__hero-content">
+        <h1 class="registration-approve__hero-title">פרטי תשלום</h1>
+        <p class="registration-approve__hero-subtitle">
+          בדף זה ניתן לצפות בפרטי הרשמה והתשלום של משתתף לאירוע. אם התשלום ממתין לאישור — ניתן לאשר או לדחות את התשלום ולהוסיף הערות.
+        </p>
+        <div class="registration-approve__hero-breadcrumbs">
+          <a routerLink="/home">דף הבית</a>
+          <span class="divider">/</span>
+          <a routerLink="/admin/events">ניהול אירועים</a>
+          <span class="divider">/</span>
+          @if (eventId != null) {
+            <a [routerLink]="['/admin/events', eventId, 'registrations']">נרשמו לאירוע</a>
+            <span class="divider">/</span>
+          }
+          <span class="current-page">פרטי תשלום</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="registration-approve__main">
+  @if (errorMessage) {
+    <div class="registration-approve__error">{{ errorMessage }}</div>
+  }
+  @if (message) {
+    <div class="registration-approve__message">{{ message }}</div>
+  }
+  @if (!isAdminOrInstructor && !isLoading) {
+    <div class="registration-approve__restricted">
+      אין לך הרשאה לאשר תשלום. התחבר כמנהל או מדריך האירוע.
+    </div>
+  }
+  @if (isLoading) {
+    <div class="registration-approve__status">טוען...</div>
+  }
+  @if (!isLoading && event && registration && isAdminOrInstructor) {
+    <div class="registration-approve__card">
+      <h2 class="registration-approve__event-title">{{ event.title || "אירוע #" + eventId }}</h2>
+      <dl class="registration-approve__dl">
+        <dt>מזהה הרשמה</dt>
+        <dd>{{ registrationId }}</dd>
+        <dt>משתמש</dt>
+        <dd>{{ getRegDisplayName() }}</dd>
+        <dt>סטטוס תשלום</dt>
+        <dd>{{ getPaymentStatusLabel() }}</dd>
+        <dt>תאריך הרשמה</dt>
+        <dd>{{ formatDate(registration.registeredAt) }}</dd>
+      </dl>
+      @if (canApprove()) {
+        <div class="registration-approve__notes-wrap">
+          <label for="approvalNotes">הערות (אופציונלי)</label>
+          <textarea id="approvalNotes" class="registration-approve__notes" [(ngModel)]="approvalNotes" rows="3" placeholder="הערות"></textarea>
+        </div>
+        <div class="registration-approve__actions">
+          <button type="button" class="registration-approve__btn registration-approve__btn--approve" [disabled]="approveLoading || rejectLoading" (click)="approve()">{{ approveLoading ? "מאשר..." : "אשר תשלום" }}</button>
+          <button type="button" class="registration-approve__btn registration-approve__btn--reject" [disabled]="rejectLoading || approveLoading" (click)="reject()">{{ rejectLoading ? "דוחה..." : "דחה תשלום" }}</button>
+        </div>
+      } @else {
+        <p class="registration-approve__no-action">ההרשמה אינה במצב ממתין לאישור תשלום.</p>
+      }
+      <div class="registration-approve__links">
+        <a routerLink="/admin/events" class="registration-approve__link">ניהול אירועים</a>
+        @if (eventId != null) {
+          <button type="button" class="registration-approve__link registration-approve__link--btn" (click)="goToEventRegistrations()">נרשמים לאירוע זה</button>
+          <button type="button" class="registration-approve__link registration-approve__link--btn" (click)="goToEvent()">צפייה באירוע</button>
+        }
+      </div>
+    </div>
+  }
+  </div>
+</section>

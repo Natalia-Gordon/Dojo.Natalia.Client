@@ -1,0 +1,269 @@
+<section class="events-management" dir="rtl">
+  <div class="events-management__header">
+    <h1 class="events-management__title">ניהול אירועים</h1>
+    @if (isAdmin) {
+    }
+    @if (isAdmin && !isLoading && !errorMessage && totalCount > 0) {
+      <div class="events-management__success">
+        {{ totalCount }} אירועים
+      </div>
+    }
+    @if (isAdmin && !isLoading && errorMessage) {
+      <div class="events-management__error">{{ errorMessage }}</div>
+    }
+  </div>
+
+  @if (!isAdmin) {
+    <div class="events-management__restricted">
+      אין לך הרשאה לצפות בעמוד זה.
+    </div>
+  }
+
+  @if (isAdmin) {
+    <div class="events-management__content">
+      @if (isLoading) {
+        <div class="events-management__status">טוען אירועים...</div>
+      }
+
+      @if (!isLoading && !errorMessage) {
+        <div class="events-management__filters">
+          <label class="events-management__filter">
+            <span>חיפוש (כותרת/תיאור)</span>
+            <input
+              type="text"
+              class="events-management__input"
+              [ngModel]="filterTitle"
+              (ngModelChange)="filterTitle = $event; onFilterChange()"
+              placeholder="חפש..."
+            />
+          </label>
+          <label class="events-management__filter">
+            <span>סוג</span>
+            <select
+              class="events-management__select"
+              [ngModel]="filterType"
+              (ngModelChange)="filterType = $event; onFilterChange()"
+            >
+              @for (opt of eventTypes; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="events-management__filter">
+            <span>סטטוס</span>
+            <select
+              class="events-management__select"
+              [ngModel]="filterStatus"
+              (ngModelChange)="filterStatus = $event; onFilterChange()"
+            >
+              @for (opt of eventStatuses; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <div class="events-management__table-wrapper">
+          <table class="events-management__table">
+            <thead>
+              <tr>
+                <th>
+                  <button type="button" class="events-management__sort-btn" (click)="setSort('id')">
+                    מזהה
+                    @if (sortField === 'id') {
+                      <span class="events-management__sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="events-management__sort-btn" (click)="setSort('title')">
+                    כותרת
+                    @if (sortField === 'title') {
+                      <span class="events-management__sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="events-management__sort-btn" (click)="setSort('eventType')">
+                    סוג
+                    @if (sortField === 'eventType') {
+                      <span class="events-management__sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="events-management__sort-btn" (click)="setSort('status')">
+                    סטטוס
+                    @if (sortField === 'status') {
+                      <span class="events-management__sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="events-management__sort-btn" (click)="setSort('startDateTime')">
+                    תאריך התחלה
+                    @if (sortField === 'startDateTime') {
+                      <span class="events-management__sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="events-management__sort-btn" (click)="setSort('price')">
+                    מחיר
+                    @if (sortField === 'price') {
+                      <span class="events-management__sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>פעולה</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ev of pagedEvents; track trackByEventId($index, ev)) {
+                <tr>
+                  <td>{{ ev.id }}</td>
+                  <td>{{ ev.title || '—' }}</td>
+                  <td>{{ getTypeLabel(ev.eventType) }}</td>
+                  <td>{{ getStatusLabel(ev.status) }}</td>
+                  <td>{{ formatDate(ev.startDateTime) }}</td>
+                  <td>{{ getPriceDisplay(ev) }}</td>
+                  <td>
+                    <button type="button" class="events-management__link-btn" (click)="goToEvent(ev.id)">
+                      לצפייה
+                    </button>
+                    <button type="button" class="events-management__link-btn events-management__link-btn--secondary" (click)="openResendModal(ev)">
+                      שליחת מייל מחדש
+                    </button>
+                    <a [routerLink]="['/admin/events', ev.id, 'registrations']" class="events-management__link-btn events-management__link-btn--approve">
+                      נרשמים
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="events-management__pagination">
+            <button
+              type="button"
+              class="events-management__page-btn"
+              [disabled]="page <= 1"
+              (click)="setPage(page - 1)"
+            >
+              הקודם
+            </button>
+            <span class="events-management__page-info">
+              עמוד {{ page }} מתוך {{ totalPages }} — {{ totalCount }} אירועים
+            </span>
+            <button
+              type="button"
+              class="events-management__page-btn"
+              [disabled]="page >= totalPages"
+              (click)="setPage(page + 1)"
+            >
+              הבא
+            </button>
+          </div>
+        }
+      }
+
+      @if (!isLoading && !errorMessage && totalCount === 0) {
+        <div class="events-management__empty">אין אירועים להצגה.</div>
+      }
+    </div>
+  }
+
+  <!-- Resend email modal -->
+  @if (selectedEvent) {
+    <div class="events-management__modal-overlay" (click)="closeResendModal()" role="button" tabindex="0">
+      <div class="events-management__modal" (click)="$event.stopPropagation()" role="dialog">
+        <div class="events-management__modal-header">
+          <h2 class="events-management__modal-title">שליחת מייל מחדש — {{ selectedEvent.title || selectedEvent.id }}</h2>
+          <button type="button" class="events-management__modal-close" (click)="closeResendModal()" aria-label="סגור">×</button>
+        </div>
+        <div class="events-management__modal-body">
+          @if (loadingRegistrations) {
+            <p>טוען הרשמות...</p>
+          }
+          @if (registrationsError) {
+            <p class="events-management__modal-error">{{ registrationsError }}</p>
+          }
+          @if (resendMessage) {
+            <p class="events-management__modal-success">{{ resendMessage }}</p>
+          }
+          @if (attendanceMessage) {
+            <p class="events-management__modal-success">{{ attendanceMessage }}</p>
+          }
+          @if (!loadingRegistrations && !registrationsError && eventRegistrations.length === 0 && selectedEvent) {
+            <p>אין הרשמות לאירוע זה.</p>
+          }
+          @if (!loadingRegistrations && !registrationsError && eventRegistrations.length > 0) {
+            <div class="events-management__modal-table-wrap">
+              <table class="events-management__modal-table">
+                <thead>
+                  <tr>
+                    <th>מזהה</th>
+                    <th>משתמש / אימייל</th>
+                    <th>סטטוס</th>
+                    <th>תשלום</th>
+                    <th>אימייל אישור נשלח</th>
+                    <th>אימייל תשלום נשלח</th>
+                    <th>נוכחות</th>
+                    <th>שליחה מחדש</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (reg of eventRegistrations; track trackByRegistrationId($index, reg)) {
+                    <tr>
+                      <td>{{ reg.registrationId }}</td>
+                      <td>{{ getRegDisplayName(reg) }}</td>
+                      <td>{{ reg.status || '—' }}</td>
+                      <td>{{ reg.paymentStatus || '—' }}</td>
+                      <td>{{ formatEmailSentAt(reg.confirmationEmailSentAt) }}</td>
+                      <td>{{ formatEmailSentAt(reg.paymentApprovalEmailSentAt) }}</td>
+                      <td>
+                        <label class="events-management__attendance-cell">
+                          <input
+                            type="checkbox"
+                            [ngModel]="getAttendance(reg)"
+                            (ngModelChange)="setAttendance(reg.registrationId, $event)">
+                          <span>השתתפ/ה</span>
+                        </label>
+                        <button
+                          type="button"
+                          class="events-management__link-btn events-management__link-btn--small"
+                          [disabled]="attendanceLoadingId === reg.registrationId"
+                          (click)="saveAttendance(reg)">
+                          {{ attendanceLoadingId === reg.registrationId ? 'שומר...' : 'שמור נוכחות' }}
+                        </button>
+                      </td>
+                      <td>
+                        <select
+                          class="events-management__modal-select"
+                          [ngModel]="getResendType(reg)"
+                          (ngModelChange)="setResendType(reg.registrationId, $event)">
+                          @for (opt of resendTypes; track opt.value) {
+                            <option [value]="opt.value">{{ opt.label }}</option>
+                          }
+                        </select>
+                        <button
+                          type="button"
+                          class="events-management__link-btn events-management__link-btn--small"
+                          [disabled]="resendLoadingId === reg.registrationId"
+                          (click)="resendEmail(reg, getResendType(reg))">
+                          {{ resendLoadingId === reg.registrationId ? 'שולח...' : 'שלח' }}
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</section>

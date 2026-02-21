@@ -53,6 +53,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       if (isPlatformBrowser(this.platformId)) {
         if (isOpen) {
           document.body.classList.add('modal-open');
+          if (this.showRankSelect) {
+            this.loadRanks();
+          }
         } else {
           document.body.classList.remove('modal-open');
         }
@@ -68,17 +71,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.userInfoSubscription = this.authService.userInfo$.subscribe(() => {
       this.syncUserTypeWithRole();
       this.setUserTypeControlState();
-      if (this.showRankSelect) {
-        this.loadRanks();
-      } else {
-        this.ranks = [];
-        this.setRankValidators();
-      }
+      // Do not load ranks on login (userInfo$ emits after login). Ranks load only when modal opens or user type changes.
+      this.ranks = [];
+      this.setRankValidators();
     });
 
     this.userTypeSubscription = this.registerForm.get('userType')?.valueChanges.subscribe(() => {
       this.setRankControlState();
-      if (this.showRankSelect) {
+      if (this.showRankSelect && this.showModal) {
         this.loadRanks();
       } else {
         this.ranks = [];
@@ -98,9 +98,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.activeTab = 'register';
     }
 
-    if (this.showRankSelect) {
-      this.loadRanks();
-    }
+    // Do not load ranks on init — only when modal is open (see modalSubscription above).
+    // This avoids /api/ranks on every page refresh.
 
     this.updateRegisterControlStates();
   }
@@ -185,6 +184,9 @@ export class LoginComponent implements OnInit, OnDestroy {
         // Handle different error scenarios
         if (error.status === 401 || error.status === 400) {
           this.errorMessage = 'שם משתמש או סיסמה שגויים';
+        } else if (error.status === 503) {
+          // Service Unavailable: backend up but dependency (e.g. DB) down
+          this.errorMessage = 'השירות זמנית לא זמין (ייתכן שמסד הנתונים לא מחובר). נסה שוב בעוד רגע.';
         } else if (error.status === 0) {
           // Network error (CORS, connection refused, server unreachable, etc.)
           this.errorMessage = 'שגיאת רשת: לא ניתן להתחבר לשרת. אנא בדוק את החיבור לאינטרנט ונסה שוב.';

@@ -7,12 +7,12 @@ import { EventsService, Event } from '../../_services/events.service';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { EventDetailHeroComponent } from './event-detail-hero/event-detail-hero.component';
-import { RegistrationDialogComponent } from './registration-dialog/registration-dialog.component';
+import { EventRegistrationDialogComponent } from '../../core/templates/event-registration-dialog/event-registration-dialog.component';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, EventDetailHeroComponent, RegistrationDialogComponent],
+  imports: [CommonModule, RouterModule, EventDetailHeroComponent, EventRegistrationDialogComponent],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.css'
 })
@@ -148,7 +148,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (!this.event) return;
 
     if (!this.isAuthenticated || !this.userInfo?.userId) {
-      this.loginModalService.open();
+      this.authService.clearSessionLocally();
+      this.loginModalService.open('login');
       this.errorMessage = 'יש להתחבר או להירשם כאורח כדי להירשם לסמינר.';
       return;
     }

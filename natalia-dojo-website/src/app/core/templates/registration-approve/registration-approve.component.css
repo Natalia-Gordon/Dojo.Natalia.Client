@@ -1,0 +1,259 @@
+.registration-approve {
+  min-height: 100vh;
+  padding: 0 0 48px 0;
+}
+
+.registration-approve__hero {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  background-image: linear-gradient(rgba(220, 38, 38, 0.7), rgba(153, 27, 27, 0.75)), url('/assets/img/carousel-1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.registration-approve__hero-overlay {
+  width: 100%;
+  padding: 3rem 1.5rem;
+}
+
+.registration-approve__hero-content {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: right;
+  color: #ffffff;
+}
+
+.registration-approve__hero-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 1rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.registration-approve__hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.8;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.registration-approve__hero-breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(26, 26, 26, 0.7);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.registration-approve__hero-breadcrumbs a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.registration-approve__hero-breadcrumbs a:hover {
+  color: #fff;
+}
+
+.registration-approve__hero-breadcrumbs .divider {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.registration-approve__hero-breadcrumbs .current-page {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.registration-approve__main {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.registration-approve__header {
+  margin-bottom: 20px;
+}
+
+.registration-approve__title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.registration-approve__error {
+  padding: 12px;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.registration-approve__message {
+  padding: 12px;
+  background: #f0fdf4;
+  color: #15803d;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.registration-approve__restricted {
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.registration-approve__status {
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.registration-approve__card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  background: #fff;
+}
+
+.registration-approve__event-title {
+  font-size: 20px;
+  margin: 0 0 16px 0;
+}
+
+.registration-approve__dl {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px 16px;
+  margin: 0 0 20px 0;
+}
+
+.registration-approve__dl dt {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.registration-approve__dl dd {
+  margin: 0;
+}
+
+.registration-approve__notes-wrap {
+  margin-bottom: 16px;
+}
+
+.registration-approve__notes-wrap label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.registration-approve__notes {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.registration-approve__actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.registration-approve__btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.registration-approve__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.registration-approve__btn--approve {
+  background: #15803d;
+  color: #fff;
+  border-color: #15803d;
+}
+
+.registration-approve__btn--approve:hover:not(:disabled) {
+  background: #166534;
+}
+
+.registration-approve__btn--reject {
+  background: transparent;
+  color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.registration-approve__btn--reject:hover:not(:disabled) {
+  background: #b91c1c;
+  color: #fff;
+}
+
+.registration-approve__no-action {
+  color: #6b7280;
+  margin: 0 0 20px 0;
+}
+
+.registration-approve__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.registration-approve__link {
+  color: #dc2626;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.registration-approve__link:hover {
+  color: #b91c1c;
+}
+
+.registration-approve__link--btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+
+@media (max-width: 768px) {
+  .registration-approve__hero {
+    min-height: 280px;
+  }
+
+  .registration-approve__hero-overlay {
+    padding: 3rem 1.25rem;
+  }
+
+  .registration-approve__hero-breadcrumbs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    row-gap: 0.25rem;
+    justify-content: flex-end;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
+  }
+}

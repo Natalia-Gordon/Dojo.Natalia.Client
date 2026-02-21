@@ -55,10 +55,16 @@
         <a routerLink="/user-details" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">פרופיל משתמש</a>
       }
       @if (isAuthenticated && isBrowser) {
+        <a routerLink="/my-events" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">אירועים שלי</a>
+      }
+      @if (isAuthenticated && isBrowser) {
         <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">רכישות</a>
       }
       @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
         <a routerLink="/admin/users" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול משתמשים</a>
+      }
+      @if (isAuthenticated && isAdmin() && isBrowser) {
+        <a routerLink="/admin/events" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול אירועים</a>
       }
       @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
         <a href="#" class="nav-item nav-link d-lg-none" (click)="openRegisterNewUser(); closeMobileMenu(); $event.preventDefault()">רישום משתמש חדש</a>

@@ -1,0 +1,122 @@
+<section class="event-registrations" dir="rtl">
+  <div class="event-registrations__hero">
+    <div class="event-registrations__hero-overlay">
+      <div class="event-registrations__hero-content">
+        <h1 class="event-registrations__hero-title">נרשמו לאירוע</h1>
+        @if (event) {
+          <p class="event-registrations__hero-subtitle">{{ event.title || 'אירוע #' + eventId }}</p>
+        } @else if (eventId != null) {
+          <p class="event-registrations__hero-subtitle">טוען...</p>
+        } @else {
+          <p class="event-registrations__hero-subtitle">רשימת נרשמים לאירוע — צפייה, אישור תשלום וייצוא</p>
+        }
+        <div class="event-registrations__hero-breadcrumbs">
+          <a routerLink="/home">דף הבית</a>
+          <span class="divider">/</span>
+          <a routerLink="/admin/events">ניהול אירועים</a>
+          <span class="divider">/</span>
+          <span class="current-page">נרשמו לאירוע</span>
+        </div>
+        @if (isAdminOrInstructor && eventId != null && event) {
+          <div class="event-registrations__hero-actions">
+            <button type="button" class="event-registrations__hero-btn event-registrations__hero-btn--export"
+              [disabled]="exportCsvLoading"
+              (click)="exportCsv()">
+              <i class="bi bi-download me-2"></i>{{ exportCsvLoading ? 'מייצא...' : 'ייצא ל-CSV' }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="event-registrations__main">
+
+  @if (errorMessage) {
+    <div class="event-registrations__error">{{ errorMessage }}</div>
+  }
+  @if (message) {
+    <div class="event-registrations__message">{{ message }}</div>
+  }
+
+  @if (!isAdminOrInstructor) {
+    <div class="event-registrations__restricted">אין לך הרשאה לצפות בעמוד זה.</div>
+  }
+
+  @if (isAdminOrInstructor && eventId != null) {
+    <div class="event-registrations__content">
+      @if (isLoading) {
+        <div class="event-registrations__status">טוען הרשמות...</div>
+      }
+
+      @if (!isLoading && registrations.length === 0) {
+        <div class="event-registrations__empty">אין הרשמות לאירוע זה.</div>
+      }
+
+      @if (!isLoading && registrations.length > 0) {
+        <div class="event-registrations__table-wrapper">
+          <table class="event-registrations__table">
+            <thead>
+              <tr>
+                <th>מזהה הרשמה</th>
+                <th>משתמש / אימייל</th>
+                <th>סטטוס</th>
+                <th>תשלום</th>
+                <th>תאריך הרשמה</th>
+                <th>פרטי תשלום</th>
+                <th>הערות</th>
+                <th>אישור תשלום</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (reg of registrations; track trackByRegistrationId($index, reg)) {
+                <tr>
+                  <td>{{ reg.registrationId }}</td>
+                  <td>{{ getRegDisplayName(reg) }}</td>
+                  <td>{{ reg.status || '—' }}</td>
+                  <td>{{ getPaymentStatusLabel(reg.paymentStatus) }}</td>
+                  <td>{{ formatDate(reg.registeredAt) }}</td>
+                  <td>
+                    @if (eventId != null) {
+                      <a [routerLink]="['/events', eventId, 'registrations', reg.registrationId, 'approve']" class="event-registrations__link">פרטי תשלום / אישור</a>
+                    } @else {
+                      —
+                    }
+                  </td>
+                  <td>
+                    @if (isPending(reg)) {
+                      <input type="text" class="event-registrations__notes"
+                        [ngModel]="getApprovalNotesForDisplay(reg.registrationId)"
+                        (ngModelChange)="setApprovalNotes(reg.registrationId, $event)"
+                        placeholder="הערות">
+                    } @else {
+                      —
+                    }
+                  </td>
+                  <td>
+                    @if (isPending(reg)) {
+                      <button type="button" class="event-registrations__btn event-registrations__btn--approve"
+                        [disabled]="approveLoadingId === reg.registrationId || rejectLoadingId === reg.registrationId"
+                        (click)="approvePayment(reg)">
+                        {{ approveLoadingId === reg.registrationId ? 'מאשר...' : 'אשר תשלום' }}
+                      </button>
+                      <button type="button" class="event-registrations__btn event-registrations__btn--reject"
+                        [disabled]="rejectLoadingId === reg.registrationId || approveLoadingId === reg.registrationId"
+                        (click)="rejectPayment(reg)">
+                        {{ rejectLoadingId === reg.registrationId ? 'דוחה...' : 'דחה תשלום' }}
+                      </button>
+                    } @else {
+                      —
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  </div>
+</section>

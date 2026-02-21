@@ -12,6 +12,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, catchError, switchMap, take, throwError, EMPTY } from 'rxjs';
 import { AuthService } from '../_services/auth.service';
 import { AuthDialogService } from '../_services/auth-dialog.service';
+import { LoginModalService } from '../_services/login-modal.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -19,7 +20,8 @@ export class AuthInterceptor implements HttpInterceptor {
     private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
-    private authDialogService: AuthDialogService
+    private authDialogService: AuthDialogService,
+    private loginModalService: LoginModalService
   ) {}
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -58,19 +60,18 @@ export class AuthInterceptor implements HttpInterceptor {
               return throwError(() => error);
             }
 
-            const hasRefreshToken = !!this.authService.getRefreshToken();
-
-            if (!hasRefreshToken) {
-              this.authService.logout().subscribe();
-              return EMPTY;
-            }
-
             const choice$ = this.authDialogService.open();
 
             return choice$.pipe(
               take(1),
               switchMap((choice) => {
                 if (choice === 'refresh') {
+                  const hasRefreshToken = !!this.authService.getRefreshToken();
+                  if (!hasRefreshToken) {
+                    this.authService.clearSessionLocally();
+                    this.loginModalService.open('login');
+                    return EMPTY;
+                  }
                   return this.authService.refreshToken().pipe(
                     switchMap((tokenResponse) => {
                       const newToken = tokenResponse.accessToken;
@@ -82,11 +83,14 @@ export class AuthInterceptor implements HttpInterceptor {
                         });
                         return next.handle(retryReq);
                       }
-                      return throwError(() => new Error('Failed to refresh token'));
+                      this.authService.clearSessionLocally();
+                      this.loginModalService.open('login');
+                      return EMPTY;
                     }),
-                    catchError((refreshError) => {
-                      this.authService.logout().subscribe();
-                      return throwError(() => refreshError);
+                    catchError(() => {
+                      this.authService.clearSessionLocally();
+                      this.loginModalService.open('login');
+                      return EMPTY;
                     })
                   );
                 } else if (choice === 'logout') {

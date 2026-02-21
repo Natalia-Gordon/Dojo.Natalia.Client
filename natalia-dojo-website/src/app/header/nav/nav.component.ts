@@ -58,6 +58,11 @@ export class NavComponent implements OnInit, OnDestroy {
     return role === 'admin' || role === 'instructor' || role === 'teacher';
   }
 
+  isAdmin(): boolean {
+    const role = (this.userInfo?.role || '').trim().toLowerCase();
+    return role === 'admin';
+  }
+
   getUserInitials(): string {
     const source =
       (this.userInfo?.displayName || '').trim() ||

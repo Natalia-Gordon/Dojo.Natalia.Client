@@ -1,0 +1,68 @@
+<section class="my-events" dir="rtl">
+  <div class="my-events__header">
+    <h1 class="my-events__title">אירועים שלי</h1>
+    <p class="my-events__subtitle">האירועים שהרשמת אליהם</p>
+  </div>
+
+  @if (!isAuthenticated) {
+    <div class="my-events__restricted">
+      יש להתחבר כדי לראות את האירועים שהרשמת אליהם.
+    </div>
+  }
+
+  @if (isAuthenticated) {
+    <div class="my-events__content">
+      @if (isLoading) {
+        <div class="my-events__status">טוען אירועים...</div>
+      }
+
+      @if (!isLoading && errorMessage) {
+        <div class="my-events__error">{{ errorMessage }}</div>
+      }
+
+      @if (!isLoading && !errorMessage && registrations.length === 0) {
+        <div class="my-events__empty">
+          עדיין לא נרשמת לאף אירוע. אפשר להצטרף לאירועים מהדף <a routerLink="/events" class="my-events__link">סמינרים</a>.
+        </div>
+      }
+
+      @if (!isLoading && !errorMessage && registrations.length > 0) {
+        <div class="my-events__list">
+          @for (r of registrations; track trackByRegistrationId($index, r)) {
+            <article class="my-events__card">
+              <div class="my-events__card-header">
+                <h2 class="my-events__card-title">{{ r.eventTitle || 'אירוע' }}</h2>
+                @if (r.eventType) {
+                  <span class="my-events__card-type">{{ getEventTypeLabel(r.eventType) }}</span>
+                }
+              </div>
+              <dl class="my-events__card-details">
+                <dt>תאריך התחלה</dt>
+                <dd>{{ formatDate(r.startDateTime) }}</dd>
+                <dt>תאריך סיום</dt>
+                <dd>{{ formatDate(r.endDateTime) }}</dd>
+                <dt>סטטוס הרשמה</dt>
+                <dd>{{ r.status || '—' }}</dd>
+                <dt>סטטוס תשלום</dt>
+                <dd>{{ getPaymentStatusLabel(r.paymentStatus) }}</dd>
+                <dt>תאריך הרשמה</dt>
+                <dd>{{ formatDate(r.registeredAt) }}</dd>
+                <dt>אימייל אישור נשלח</dt>
+                <dd>{{ formatEmailSentAt(r.confirmationEmailSentAt) }}</dd>
+                <dt>אימייל אישור תשלום נשלח</dt>
+                <dd>{{ formatEmailSentAt(r.paymentApprovalEmailSentAt) }}</dd>
+                @if (r.attended) {
+                  <dt>השתתפות</dt>
+                  <dd>השתתפת באירוע</dd>
+                }
+              </dl>
+              <button type="button" class="my-events__card-btn" (click)="goToEvent(r.eventId)">
+                לצפייה באירוע
+              </button>
+            </article>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

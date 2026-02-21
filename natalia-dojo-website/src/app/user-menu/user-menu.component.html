@@ -51,10 +51,18 @@
             <span class="menu-icon">⚙️</span>
             <span>פרופיל משתמש</span>
           </a>
+          <a href="#" class="menu-item" (click)="onMyEventsClick(); $event.preventDefault()">
+            <span class="menu-icon">📅</span>
+            <span>אירועים שלי</span>
+          </a>
           @if (isAdmin()) {
             <a href="#" class="menu-item" (click)="onManageUsersClick(); $event.preventDefault()">
               <span class="menu-icon">👥</span>
               <span>ניהול משתמשים</span>
+            </a>
+            <a href="#" class="menu-item" (click)="onManageEventsClick(); $event.preventDefault()">
+              <span class="menu-icon">📋</span>
+              <span>ניהול אירועים</span>
             </a>
           }
           @if (isTeacherOrInstructor()) {

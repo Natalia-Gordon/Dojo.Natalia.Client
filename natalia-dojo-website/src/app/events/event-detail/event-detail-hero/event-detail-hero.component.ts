@@ -73,6 +73,8 @@ export class EventDetailHeroComponent {
       'Masterclass': 'כיתת אמן',
       'Grading': 'מבחן דרגה',
       'Retreat': 'ריטריט',
+      'retreat': 'ריטריט',
+      'zen_session': 'מפגש זן',
       'Special': 'אירוע מיוחד'
     };
     return typeMap[this.eventType || ''] || 'אירוע';

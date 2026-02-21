@@ -4,15 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { EventsService, Event as EventModel, PaymentMethod, EventRegistrationResponse, Instructor } from '../../../_services/events.service';
 import { AuthService, UserInfo } from '../../../_services/auth.service';
+import { LoginModalService } from '../../../_services/login-modal.service';
 
 @Component({
-  selector: 'app-registration-dialog',
+  selector: 'app-event-registration-dialog',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './registration-dialog.component.html',
-  styleUrl: './registration-dialog.component.css'
+  templateUrl: './event-registration-dialog.component.html',
+  styleUrl: './event-registration-dialog.component.css'
 })
-export class RegistrationDialogComponent implements OnInit, OnDestroy {
+export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
   showDialog = false;
   event: EventModel | null = null;
   userInfo: UserInfo | null = null;
@@ -25,7 +26,9 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
   registrationResult: EventRegistrationResponse | null = null;
   instructor: Instructor | null = null;
   isLoadingInstructor = false;
-  
+  /** Set when loadInstructor fails (e.g. 401). Used to show re-login message instead of generic "no bank details". */
+  instructorLoadErrorStatus: number | null = null;
+
   paymentMethods: { value: PaymentMethod; label: string }[] = [
     { value: 'cash', label: 'מזומן' },
     { value: 'bank_transfer', label: 'העברה בנקאית' }
@@ -36,6 +39,7 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
   constructor(
     private eventsService: EventsService,
     private authService: AuthService,
+    private loginModalService: LoginModalService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -44,7 +48,7 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
       this.showDialog = state.isOpen;
       this.event = state.event;
       this.userInfo = this.authService.getUserInfo();
-      
+
       if (isPlatformBrowser(this.platformId)) {
         if (state.isOpen) {
           document.body.classList.add('modal-open');
@@ -56,7 +60,8 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
           this.errorMessage = '';
           this.registrationResult = null;
           this.instructor = null;
-          
+          this.instructorLoadErrorStatus = null;
+
           // Load instructor details if event has instructorId
           if (state.event?.instructorId) {
             this.loadInstructor(state.event.instructorId);
@@ -67,15 +72,17 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   /**
    * Load instructor details by ID
    */
   loadInstructor(instructorId: number): void {
     this.isLoadingInstructor = true;
+    this.instructorLoadErrorStatus = null;
     this.eventsService.getInstructorById(instructorId).subscribe({
       next: (instructor) => {
         this.instructor = instructor;
+        this.instructorLoadErrorStatus = null;
         this.isLoadingInstructor = false;
       },
       error: (error) => {
@@ -84,9 +91,33 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
           console.error('Error loading instructor:', error);
         }
         this.instructor = null;
+        this.instructorLoadErrorStatus = error?.status ?? null;
         this.isLoadingInstructor = false;
       }
     });
+  }
+
+  /** True when instructor was loaded and has at least one bank detail (for showing payment proof upload). */
+  hasInstructorBankDetails(): boolean {
+    if (!this.instructor) return false;
+    const i = this.instructor;
+    return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankId || i.branchNumber);
+  }
+
+  /** True when submit should be disabled: missing payment method, or bank transfer without proof file. */
+  isEnrollDisabled(): boolean {
+    if (this.isEnrolling) return true;
+    if (!this.event) return true;
+    if (this.event.price > 0 && !this.selectedPaymentMethod) return true;
+    if (this.selectedPaymentMethod === 'bank_transfer' && this.hasInstructorBankDetails() && !this.paymentProofFile) return true;
+    return false;
+  }
+
+  /** Log out (clear session) then close registration dialog and show login popup on the same page (e.g. after 401 on instructor load). */
+  goToLogin(): void {
+    this.authService.clearSessionLocally();
+    this.eventsService.closeRegistrationDialog();
+    this.loginModalService.open('login');
   }
 
   ngOnDestroy(): void {
@@ -112,6 +143,12 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Validate payment proof file when bank transfer is selected and bank details are shown
+    if (this.selectedPaymentMethod === 'bank_transfer' && this.hasInstructorBankDetails() && !this.paymentProofFile) {
+      this.errorMessage = 'בהעברה בנקאית יש לצרף קובץ להוכחת תשלום.';
+      return;
+    }
+
     if (this.isEnrolling) {
       return;
     }
@@ -131,12 +168,12 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isEnrolling = false;
-        
+
         // Only log non-network and non-503 errors to reduce console noise
         if (error.status !== 0 && error.status !== 503) {
           console.error('Error enrolling for event:', error);
         }
-        
+
         if (error.status === 503) {
           // Service Unavailable - database connection issues
           this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
@@ -171,6 +208,17 @@ export class RegistrationDialogComponent implements OnInit, OnDestroy {
     if (!method) return '';
     const methodObj = this.paymentMethods.find(m => m.value === method);
     return methodObj?.label || method;
+  }
+
+  /** Hebrew message for registration result (API sends in background; message reflects pending/success). */
+  getRegistrationMessage(result: EventRegistrationResponse): string {
+    if (result.message) {
+      const m = result.message.toLowerCase();
+      if (m.includes('pending') && m.includes('payment')) return 'ההרשמה ממתינה לאישור תשלום. תקבל/י אימייל אישור לאחר שאישור התשלום יטופל.';
+      if (m.includes('confirmation') && m.includes('approved')) return 'תקבל/י אימייל אישור לאחר שאישור התשלום יטופל.';
+    }
+    if (result.paymentStatus === 'pending') return 'ההרשמה ממתינה לאישור תשלום. תקבל/י אימייל אישור לאחר שאישור התשלום יטופל.';
+    return 'נרשמת בהצלחה. תקבל/י אימייל אישור בהתאם להגדרות האירוע.';
   }
 
   /**
