@@ -395,6 +395,28 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     return deadline > new Date();
   }
 
+  /** Formatted price for display (avoids ICU/pipe parsing issues in template). */
+  getFormattedPrice(amount: number): string {
+    return amount == null ? '' : new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+  }
+
+  /** Registration status label for display. */
+  getRegistrationStatusLabel(): string {
+    return this.event?.registrationOpen ? 'פתוח להרשמה' : 'הרשמה סגורה';
+  }
+
+  /** Early bird deadline label for display. */
+  getEarlyBirdDeadlineLabel(): string {
+    return this.isEarlyBirdAvailable() ? 'זמין עד' : 'פג תוקף';
+  }
+
+  /** Formatted registration deadline (avoids ICU parsing of date format in template). */
+  getFormattedRegistrationDeadline(): string {
+    if (!this.event?.registrationDeadline) return '';
+    const d = new Date(this.event.registrationDeadline);
+    return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {
     const role = (userInfo?.role || '').toLowerCase();
     return role === 'admin' || role === 'instructor';
