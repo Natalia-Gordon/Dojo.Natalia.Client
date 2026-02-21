@@ -70,6 +70,15 @@
                 }
                 <!-- Event Details Grid -->
                 <div class="event-details-grid">
+                  @if (instructorName) {
+                    <div class="detail-item">
+                      <i class="bi bi-person-badge"></i>
+                      <div class="detail-content">
+                        <strong>מדריך/ה:</strong>
+                        <div>{{ instructorName }}</div>
+                      </div>
+                    </div>
+                  }
                   <div class="detail-item">
                     <i class="bi bi-calendar-event"></i>
                     <div class="detail-content">
