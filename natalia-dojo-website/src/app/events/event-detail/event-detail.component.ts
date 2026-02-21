@@ -184,24 +184,24 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (driveFileMatch) {
       this.imageId = driveFileMatch[1];
       this.imageLoadAttempt = 0;
-      // Convert to direct view URL - this format works best for shared images
-      const convertedUrl = `https://drive.google.com/uc?export=view&id=${this.imageId}`;
-      return convertedUrl;
+      // Prefer thumbnail API first (uc?export=view was disabled by Google in 2024)
+      const thumbnailUrl = `https://drive.google.com/thumbnail?id=${this.imageId}&sz=w1920`;
+      return thumbnailUrl;
     }
     
     // If it's already in a direct format, extract the ID for fallbacks
     const idMatch = cleanUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (idMatch && cleanUrl.includes('drive.google.com')) {
+      this.imageId = idMatch[1];
+      this.imageLoadAttempt = 0;
+      return `https://drive.google.com/thumbnail?id=${this.imageId}&sz=w1920`;
+    }
     if (idMatch) {
       this.imageId = idMatch[1];
       this.imageLoadAttempt = 0;
     }
     
-    // If it's already in the direct format, return as is
-    if (cleanUrl.includes('drive.google.com/uc?export=')) {
-      return cleanUrl;
-    }
-    
-    // For other URLs (including Google CDN), return as is
+    // For other URLs (including non-Drive), return as is
     return cleanUrl;
   }
 
@@ -235,16 +235,16 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       
       switch (this.imageLoadAttempt) {
         case 1:
-          // Try thumbnail API
-          fallbackUrl = `https://drive.google.com/thumbnail?id=${this.imageId}&sz=w1920`;
+          // Try uc?export=view (may be blocked by Google)
+          fallbackUrl = `https://drive.google.com/uc?export=view&id=${this.imageId}`;
           break;
         case 2:
           // Try export=download format
           fallbackUrl = `https://drive.google.com/uc?export=download&id=${this.imageId}`;
           break;
         case 3:
-          // Last resort: show error message with link to view on Google Drive
-          this.showErrorMessageWithLink(imgElement);
+          // Last resort: show Drive preview iframe so image is still visible
+          this.showDrivePreviewWithLink(imgElement);
           return;
       }
       
@@ -261,10 +261,10 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Show error message with link to view image on Google Drive
-   * (iframe embedding is blocked by Google Drive's CSP)
+   * When direct image URLs fail, show Google Drive preview iframe so the image is still visible,
+   * plus a link to open in Drive.
    */
-  private showErrorMessageWithLink(imgElement: HTMLImageElement): void {
+  private showDrivePreviewWithLink(imgElement: HTMLImageElement): void {
     if (!isPlatformBrowser(this.platformId)) return;
     
     if (!this.imageId) {
@@ -275,37 +275,42 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     const container = imgElement.parentElement;
     if (!container) return;
 
-    // Hide the image
     imgElement.style.display = 'none';
+    if (container.querySelector('.drive-iframe-embed')) return;
 
-    // Check if error message already exists
-    if (container.querySelector('.drive-image-error')) return;
+    const previewUrl = `https://drive.google.com/file/d/${this.imageId}/preview`;
+    const iframeWrap = document.createElement('div');
+    iframeWrap.className = 'drive-iframe-embed';
+    const iframe = document.createElement('iframe');
+    iframe.src = previewUrl;
+    iframe.title = 'תצוגה מקדימה של התמונה';
+    iframeWrap.appendChild(iframe);
+    container.appendChild(iframeWrap);
 
-    // Create error message with link
-    const errorWrapper = document.createElement('div');
-    errorWrapper.className = 'drive-image-error';
-    errorWrapper.style.cssText = 'padding: 2rem; text-align: center; color: #6b7280; background: #f8f9fa; border-radius: 8px; margin-top: 1rem;';
-    
-    const errorIcon = document.createElement('i');
-    errorIcon.className = 'bi bi-exclamation-triangle';
-    errorIcon.style.cssText = 'font-size: 2rem; color: #f59e0b; margin-bottom: 1rem; display: block;';
-    
-    const errorText = document.createElement('p');
-    errorText.textContent = 'לא ניתן לטעון את התמונה ישירות.';
-    errorText.style.cssText = 'margin-bottom: 1rem;';
-    
+    const linkWrap = document.createElement('div');
+    linkWrap.className = 'drive-image-error';
+    linkWrap.style.cssText = 'padding: 0.75rem 0; text-align: center;';
     const driveLink = document.createElement('a');
     driveLink.href = `https://drive.google.com/file/d/${this.imageId}/view`;
     driveLink.target = '_blank';
     driveLink.rel = 'noopener noreferrer';
     driveLink.textContent = 'לצפייה בתמונה ב-Google Drive';
-    driveLink.className = 'btn btn-primary';
-    driveLink.style.cssText = 'margin-top: 0.5rem;';
+    driveLink.className = 'btn btn-outline-primary btn-sm';
+    linkWrap.appendChild(driveLink);
+    container.appendChild(linkWrap);
+  }
+
+  /**
+   * Show error message with link when we have no image ID (non-Drive URL failed).
+   */
+  private showErrorMessageWithLink(imgElement: HTMLImageElement): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     
-    errorWrapper.appendChild(errorIcon);
-    errorWrapper.appendChild(errorText);
-    errorWrapper.appendChild(driveLink);
-    container.appendChild(errorWrapper);
+    if (!this.imageId) {
+      this.showErrorMessage(imgElement);
+      return;
+    }
+    this.showDrivePreviewWithLink(imgElement);
   }
 
   /**

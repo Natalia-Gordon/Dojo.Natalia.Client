@@ -44,7 +44,7 @@
             <!-- Event Image -->
             @if (event.imageUrl && displayImageUrl && isBrowser) {
               <div class="event-detail-image">
-                <img [src]="displayImageUrl" [alt]="event.title || 'Event'" loading="lazy"
+                <img [src]="displayImageUrl" [alt]="event.title || 'Event'" loading="eager"
                   (error)="onImageError($event)"
                   (load)="onImageLoad($event)">
                 </div>
