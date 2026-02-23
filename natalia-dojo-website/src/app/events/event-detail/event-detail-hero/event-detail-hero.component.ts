@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-event-detail-hero',
   standalone: true,
-  imports: [RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './event-detail-hero.component.html',
   styleUrl: './event-detail-hero.component.css'
 })
@@ -17,6 +17,8 @@ export class EventDetailHeroComponent {
   @Input() price: number = 0;
   @Input() earlyBirdPrice: number | null = null;
   @Input() earlyBirdDeadline: string | null = null;
+  /** When true, breadcrumb shows "ניהול אירועים" link back to admin events instead of "סמינרים". */
+  @Input() fromEventsManagement: boolean = false;
 
   /**
    * Generate a compelling martial arts marketing summary

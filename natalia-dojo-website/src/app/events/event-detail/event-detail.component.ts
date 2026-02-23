@@ -29,8 +29,11 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   displayImageUrl: string = ''; // Pre-computed image URL for SSR safety
   isBrowser = false; // Platform check for template
   instructorName: string | null = null;
+  /** When true, event detail hero shows "ניהול אירועים" in breadcrumb (from query param from=admin-events). */
+  fromEventsManagement = false;
 
   private routeSubscription?: Subscription;
+  private queryParamSubscription?: Subscription;
   private authSubscription?: Subscription;
   private userInfoSubscription?: Subscription;
 
@@ -80,10 +83,16 @@ export class EventDetailComponent implements OnInit, OnDestroy {
         this.loadEvent(eventId);
       }
     });
+
+    this.queryParamSubscription = this.route.queryParams.subscribe(q => {
+      this.fromEventsManagement = q['from'] === 'admin-events';
+    });
+    this.fromEventsManagement = this.route.snapshot.queryParams['from'] === 'admin-events';
   }
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
+    this.queryParamSubscription?.unsubscribe();
     this.authSubscription?.unsubscribe();
     this.userInfoSubscription?.unsubscribe();
   }

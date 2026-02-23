@@ -5,7 +5,7 @@ import {
   Inject,
   PLATFORM_ID,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -42,13 +42,15 @@ type AdminSortBy = 'id' | 'title' | 'type' | 'status' | 'startDate' | 'price';
 @Component({
   selector: 'app-events-management',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './events-management.component.html',
   styleUrl: './events-management.component.css',
 })
 export class EventsManagementComponent implements OnInit, OnDestroy {
   pagedEvents: Event[] = [];
   totalCount = 0;
+  /** Event ID (string) -> registered count from API */
+  registeredCountByEventId: Record<string, number> = {};
   isLoading = false;
   errorMessage = '';
   isAdmin = false;
@@ -167,6 +169,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
         next: (res) => {
           this.pagedEvents = res.items ?? [];
           this.totalCount = res.totalCount ?? 0;
+          this.registeredCountByEventId = res.registeredCountByEventId ?? {};
           this.totalPages = Math.max(1, Math.ceil(this.totalCount / this.pageSize));
           this.isLoading = false;
         },
@@ -174,6 +177,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.pagedEvents = [];
           this.totalCount = 0;
+          this.registeredCountByEventId = {};
           this.totalPages = 0;
           if (err.status === 403 || err.status === 401) {
             this.errorMessage = 'אין הרשאה לצפות באירועים.';
@@ -280,8 +284,14 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
     return ev.price != null ? ev.price : '—';
   }
 
+  /** Registered count for event from API (registeredCountByEventId). */
+  getRegisteredCount(eventId: number): number {
+    const key = String(eventId);
+    return this.registeredCountByEventId[key] ?? 0;
+  }
+
   goToEvent(id: number): void {
-    this.router.navigate(['/events', id]);
+    this.router.navigate(['/events', id], { queryParams: { from: 'admin-events' } });
   }
 
   openResendModal(ev: Event): void {

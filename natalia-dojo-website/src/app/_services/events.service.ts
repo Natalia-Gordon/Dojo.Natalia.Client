@@ -158,12 +158,13 @@ export interface EventRegistrationHistoryResponse {
   paymentApprovalEmailSentAt?: string | null;
 }
 
-/** Admin events list: GET /api/events/admin (sorting, filtering, paging) */
+/** Admin events list: GET /api/events/admin (sorting, filtering, paging). registeredCountByEventId has string keys (e.g. "1", "2"). */
 export interface PagedEventsResponse {
   items: Event[] | null;
   totalCount: number;
   page: number;
   pageSize: number;
+  registeredCountByEventId?: Record<string, number>;
 }
 
 /** One registration with its event (for admin pending-payments list). */
