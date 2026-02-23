@@ -68,16 +68,16 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-/* Minimal gap between hero and content */
+/* Minimal gap between hero and content, and between content and footer */
 .events-management-container {
   padding-top: 0.75rem;
-  padding-bottom: 2rem;
+  padding-bottom: 0.75rem;
 }
 
 @media (min-width: 768px) {
   .events-management-container {
     padding-top: 1rem;
-    padding-bottom: 2.5rem;
+    padding-bottom: 1rem;
   }
 }
 
@@ -86,7 +86,7 @@
   background: #fff;
   border-radius: 16px;
   padding: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   border: 1px solid rgba(148, 163, 184, 0.15);
 }

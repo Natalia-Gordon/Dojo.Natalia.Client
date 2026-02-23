@@ -1,0 +1,150 @@
+/* Terms of Use – hero (same style as סמינרים) + professional legal layout */
+
+/* Hero – image background + overlay, title, explanation text, breadcrumbs */
+.terms-hero {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  background-image: linear-gradient(rgba(220, 38, 38, 0.7), rgba(15, 23, 42, 0.8)), url('../../assets/img/carousel-2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.terms-hero__overlay {
+  width: 100%;
+  padding: 4rem 1.5rem;
+}
+
+.terms-hero__content {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: right;
+  color: #ffffff;
+}
+
+.terms-hero__title {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.terms-hero__subtitle {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.terms-hero__breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(26, 26, 26, 0.7);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.terms-hero__breadcrumbs a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.terms-hero__breadcrumbs a:hover {
+  color: #fff;
+}
+
+.terms-hero__breadcrumbs .divider {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media (max-width: 768px) {
+  .terms-hero {
+    min-height: 300px;
+  }
+
+  .terms-hero__overlay {
+    padding: 3rem 1.25rem;
+  }
+
+  .terms-hero__breadcrumbs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    row-gap: 0.25rem;
+    justify-content: center;
+  }
+}
+
+.terms-page {
+  min-height: 60vh;
+  padding-bottom: 4rem;
+}
+
+.terms-page__body {
+  padding: 0 0 3rem;
+}
+
+.terms-page__inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.terms-page__updated {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.terms-page__content {
+  line-height: 1.8;
+  color: #334155;
+}
+
+/* Section styling – professional, like legal documents */
+.terms-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.terms-section:last-of-type {
+  border-bottom: none;
+}
+
+.terms-section__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+  margin-top: 0;
+}
+
+.terms-section p {
+  margin: 0;
+  font-size: 1rem;
+  text-align: justify;
+}
+
+.terms-page__link {
+  color: var(--bs-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.terms-page__link:hover {
+  text-decoration: underline;
+  color: var(--bs-primary);
+}

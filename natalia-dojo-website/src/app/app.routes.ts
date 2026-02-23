@@ -52,6 +52,7 @@ import { EventsManagementComponent } from './core/templates/events-management/ev
 import { EventRegistrationsComponent } from './core/templates/event-registrations/event-registrations.component';
 import { RegistrationApproveComponent } from './core/templates/registration-approve/registration-approve.component';
 import { MyEventsComponent } from './my-events/my-events.component';
+import { TermsOfUseComponent } from './terms-of-use/terms-of-use.component';
 
 export const routes: Routes = [
   {
@@ -75,6 +76,7 @@ export const routes: Routes = [
       { path: 'gallery', component: PhotoGalleryComponent },
       { path: 'about', component: AboutComponent },
       { path: 'contact', component: ContactComponent },
+      { path: 'terms', component: TermsOfUseComponent },
       { path: 'workouts', component: WorkoutsComponent },
       { path: 'team', component: TeamComponent },
       { path: 'blog', component: BlogComponent },

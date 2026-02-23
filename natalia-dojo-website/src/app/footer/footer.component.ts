@@ -1,16 +1,18 @@
 import { Component, HostListener, Inject, PLATFORM_ID, OnInit, OnDestroy } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, RouterLink],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css'
 })
 export class FooterComponent implements OnInit, OnDestroy {
   isBackToTopVisible = false;
   isBrowser = false;
+  currentYear = new Date().getFullYear();
   private scrollListener?: () => void;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
