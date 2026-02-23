@@ -9,12 +9,6 @@
         <div class="registration-approve__hero-breadcrumbs">
           <a routerLink="/home">דף הבית</a>
           <span class="divider">/</span>
-          <a routerLink="/admin/events">ניהול אירועים</a>
-          <span class="divider">/</span>
-          @if (eventId != null) {
-            <a [routerLink]="['/admin/events', eventId, 'registrations']">נרשמו לאירוע</a>
-            <span class="divider">/</span>
-          }
           <span class="current-page">פרטי תשלום</span>
         </div>
       </div>
@@ -60,13 +54,6 @@
       } @else {
         <p class="registration-approve__no-action">ההרשמה אינה במצב ממתין לאישור תשלום.</p>
       }
-      <div class="registration-approve__links">
-        <a routerLink="/admin/events" class="registration-approve__link">ניהול אירועים</a>
-        @if (eventId != null) {
-          <button type="button" class="registration-approve__link registration-approve__link--btn" (click)="goToEventRegistrations()">נרשמים לאירוע זה</button>
-          <button type="button" class="registration-approve__link registration-approve__link--btn" (click)="goToEvent()">צפייה באירוע</button>
-        }
-      </div>
     </div>
   }
   </div>

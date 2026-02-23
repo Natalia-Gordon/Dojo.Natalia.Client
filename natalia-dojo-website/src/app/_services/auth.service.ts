@@ -575,6 +575,7 @@ export class AuthService {
         const hasRefresh = !!this.getRefreshToken();
         if (!hasRefresh) {
           this.clearSessionLocally();
+          this.router?.navigate(['/home']);
           this.loginModalService?.open('login');
           return;
         }
@@ -582,6 +583,7 @@ export class AuthService {
           next: () => { /* new timer scheduled in refreshToken tap */ },
           error: () => {
             this.clearSessionLocally();
+            this.router?.navigate(['/home']);
             this.loginModalService?.open('login');
           }
         });

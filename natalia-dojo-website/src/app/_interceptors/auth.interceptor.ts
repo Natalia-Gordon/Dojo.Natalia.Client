@@ -24,6 +24,13 @@ export class AuthInterceptor implements HttpInterceptor {
     private loginModalService: LoginModalService
   ) {}
 
+  /** Global handling: clear session, redirect to home, open login. Use when refresh fails or retry gets 401. */
+  private doGlobalLogoutAndRedirect(): void {
+    this.authService.clearSessionLocally();
+    this.router.navigate(['/home']);
+    this.loginModalService.open('login');
+  }
+
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const isBrowser = isPlatformBrowser(this.platformId);
     const token = this.authService.getToken();
@@ -68,8 +75,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 if (choice === 'refresh') {
                   const hasRefreshToken = !!this.authService.getRefreshToken();
                   if (!hasRefreshToken) {
-                    this.authService.clearSessionLocally();
-                    this.loginModalService.open('login');
+                    this.doGlobalLogoutAndRedirect();
                     return EMPTY;
                   }
                   return this.authService.refreshToken().pipe(
@@ -81,15 +87,21 @@ export class AuthInterceptor implements HttpInterceptor {
                             Authorization: `Bearer ${newToken}`,
                           },
                         });
-                        return next.handle(retryReq);
+                        return next.handle(retryReq).pipe(
+                          catchError((retryErr: HttpErrorResponse) => {
+                            if (retryErr?.status === 401) {
+                              this.doGlobalLogoutAndRedirect();
+                              return EMPTY;
+                            }
+                            return throwError(() => retryErr);
+                          })
+                        );
                       }
-                      this.authService.clearSessionLocally();
-                      this.loginModalService.open('login');
+                      this.doGlobalLogoutAndRedirect();
                       return EMPTY;
                     }),
                     catchError(() => {
-                      this.authService.clearSessionLocally();
-                      this.loginModalService.open('login');
+                      this.doGlobalLogoutAndRedirect();
                       return EMPTY;
                     })
                   );

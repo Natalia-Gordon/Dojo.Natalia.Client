@@ -233,6 +233,35 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Date only (dd/MM/yyyy) for table display. */
+  formatDateOnly(dateStr: string | null): string {
+    if (!dateStr) return '—';
+    try {
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return '—';
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch {
+      return '—';
+    }
+  }
+
+  /** Number of days between event start and end (at least 1 for same-day). */
+  getEventDays(ev: Event): number | string {
+    if (!ev.startDateTime || !ev.endDateTime) return '—';
+    try {
+      const start = new Date(ev.startDateTime).getTime();
+      const end = new Date(ev.endDateTime).getTime();
+      if (Number.isNaN(start) || Number.isNaN(end) || end < start) return '—';
+      const days = Math.ceil((end - start) / (24 * 60 * 60 * 1000));
+      return days < 1 ? 1 : days;
+    } catch {
+      return '—';
+    }
+  }
+
   getTypeLabel(type: string | null): string {
     if (!type) return '—';
     const t = type.toString().toLowerCase();
