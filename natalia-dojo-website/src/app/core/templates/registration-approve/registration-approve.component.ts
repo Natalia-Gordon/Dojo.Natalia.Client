@@ -124,6 +124,12 @@ export class RegistrationApproveComponent implements OnInit, OnDestroy {
   getRegDisplayName(): string {
     if (!this.registration) return '—';
     const r = this.registration;
+    const first = (r.firstName ?? '').trim();
+    const last = (r.lastName ?? '').trim();
+    if (first || last) {
+      const full = [first, last].filter(Boolean).join(' ').trim();
+      if (full) return full;
+    }
     const name = [r.username, r.email].filter(Boolean).join(' / ');
     return name || `משתמש #${r.userId}`;
   }

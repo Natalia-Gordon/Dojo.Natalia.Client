@@ -129,6 +129,12 @@ export interface EventRegistrationDetailsResponse {
   userId: number;
   username: string | null;
   email: string | null;
+  /** User first name (from user profile). */
+  firstName?: string | null;
+  /** User last name (from user profile). */
+  lastName?: string | null;
+  /** User phone (from user profile). */
+  phone?: string | null;
   status: string | null;
   paymentStatus: string | null;
   attended: boolean;
@@ -139,6 +145,13 @@ export interface EventRegistrationDetailsResponse {
   confirmationEmailSentAt?: string | null;
   /** When the payment approval email was last sent to the event creator (null = not sent). */
   paymentApprovalEmailSentAt?: string | null;
+}
+
+/** Optional query filters for GET /api/events/{id}/registrations (case-insensitive substring where applicable). */
+export interface EventRegistrationsFilters {
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
 }
 
 export interface EventRegistrationHistoryResponse {
@@ -483,11 +496,20 @@ export class EventsService {
   /**
    * Admin/instructor: list registrations for an event.
    * GET /api/events/{eventId}/registrations
+   * Optional query filters: firstName, lastName, phone (substring, case-insensitive for names).
    */
-  getEventRegistrations(eventId: number): Observable<EventRegistrationDetailsResponse[]> {
+  getEventRegistrations(eventId: number, filters?: EventRegistrationsFilters | null): Observable<EventRegistrationDetailsResponse[]> {
+    let params = new HttpParams();
+    if (filters) {
+      const f = filters;
+      if (f.firstName != null && String(f.firstName).trim() !== '') params = params.set('firstName', String(f.firstName).trim());
+      if (f.lastName != null && String(f.lastName).trim() !== '') params = params.set('lastName', String(f.lastName).trim());
+      if (f.phone != null && String(f.phone).trim() !== '') params = params.set('phone', String(f.phone).trim());
+    }
     return this.http
       .get<EventRegistrationDetailsResponse[]>(`${this.apiUrl}/events/${eventId}/registrations`, {
-        headers: this.getAuthHeaders()
+        headers: this.getAuthHeaders(),
+        params
       })
       .pipe(
         map((data) => (Array.isArray(data) ? data : [])),

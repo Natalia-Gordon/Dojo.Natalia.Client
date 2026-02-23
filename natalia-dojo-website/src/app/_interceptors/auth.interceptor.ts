@@ -62,57 +62,61 @@ export class AuthInterceptor implements HttpInterceptor {
           isBrowser &&
           this.authDialogService
         ) {
-          if (!this.authDialogService.isOpen) {
-            if (isRegistrationRequest && !token) {
-              return throwError(() => error);
-            }
+          // Dialog already open: another request got 401 while user is choosing or we're refreshing.
+          // Don't propagate to component — avoid page error; global logout/redirect will happen from the first request's flow.
+          if (this.authDialogService.isOpen) {
+            return EMPTY;
+          }
 
-            const choice$ = this.authDialogService.open();
+          if (isRegistrationRequest && !token) {
+            return throwError(() => error);
+          }
 
-            return choice$.pipe(
-              take(1),
-              switchMap((choice) => {
-                if (choice === 'refresh') {
-                  const hasRefreshToken = !!this.authService.getRefreshToken();
-                  if (!hasRefreshToken) {
-                    this.doGlobalLogoutAndRedirect();
-                    return EMPTY;
-                  }
-                  return this.authService.refreshToken().pipe(
-                    switchMap((tokenResponse) => {
-                      const newToken = tokenResponse.accessToken;
-                      if (newToken) {
-                        const retryReq = req.clone({
-                          setHeaders: {
-                            Authorization: `Bearer ${newToken}`,
-                          },
-                        });
-                        return next.handle(retryReq).pipe(
-                          catchError((retryErr: HttpErrorResponse) => {
-                            if (retryErr?.status === 401) {
-                              this.doGlobalLogoutAndRedirect();
-                              return EMPTY;
-                            }
-                            return throwError(() => retryErr);
-                          })
-                        );
-                      }
-                      this.doGlobalLogoutAndRedirect();
-                      return EMPTY;
-                    }),
-                    catchError(() => {
-                      this.doGlobalLogoutAndRedirect();
-                      return EMPTY;
-                    })
-                  );
-                } else if (choice === 'logout') {
-                  this.authService.logout().subscribe();
+          const choice$ = this.authDialogService.open();
+
+          return choice$.pipe(
+            take(1),
+            switchMap((choice) => {
+              if (choice === 'refresh') {
+                const hasRefreshToken = !!this.authService.getRefreshToken();
+                if (!hasRefreshToken) {
+                  this.doGlobalLogoutAndRedirect();
                   return EMPTY;
                 }
-                return throwError(() => error);
-              })
-            );
-          }
+                return this.authService.refreshToken().pipe(
+                  switchMap((tokenResponse) => {
+                    const newToken = tokenResponse.accessToken;
+                    if (newToken) {
+                      const retryReq = req.clone({
+                        setHeaders: {
+                          Authorization: `Bearer ${newToken}`,
+                        },
+                      });
+                      return next.handle(retryReq).pipe(
+                        catchError((retryErr: HttpErrorResponse) => {
+                          if (retryErr?.status === 401) {
+                            this.doGlobalLogoutAndRedirect();
+                            return EMPTY;
+                          }
+                          return throwError(() => retryErr);
+                        })
+                      );
+                    }
+                    this.doGlobalLogoutAndRedirect();
+                    return EMPTY;
+                  }),
+                  catchError(() => {
+                    this.doGlobalLogoutAndRedirect();
+                    return EMPTY;
+                  })
+                );
+              } else if (choice === 'logout') {
+                this.authService.logout().subscribe();
+                return EMPTY;
+              }
+              return throwError(() => error);
+            })
+          );
         }
         return throwError(() => error);
       })

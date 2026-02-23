@@ -477,10 +477,20 @@ export class AuthService {
     }
   }
 
+  /**
+   * Normalize API expiry ISO string so Date() parses correctly.
+   * Server may send 7 fractional seconds (e.g. 2026-02-23T07:51:23.2284645+00:00); JS expects at most 3 (ms).
+   */
+  private normalizeExpiryIso(isoString: string): string {
+    if (!isoString || typeof isoString !== 'string') return isoString;
+    return isoString.replace(/\.(\d{3})\d*/, '.$1');
+  }
+
   private setAccessTokenExpiresAt(isoString: string): void {
     if (!isPlatformBrowser(this.platformId)) return;
     try {
-      localStorage.setItem(STORAGE_KEY_ACCESS_TOKEN_EXPIRES_AT, isoString);
+      const normalized = this.normalizeExpiryIso(isoString);
+      localStorage.setItem(STORAGE_KEY_ACCESS_TOKEN_EXPIRES_AT, normalized);
     } catch {
       // Ignore
     }
@@ -506,7 +516,8 @@ export class AuthService {
   private setRefreshTokenExpiresAt(isoString: string): void {
     if (!isPlatformBrowser(this.platformId)) return;
     try {
-      localStorage.setItem(STORAGE_KEY_REFRESH_TOKEN_EXPIRES_AT, isoString);
+      const normalized = this.normalizeExpiryIso(isoString);
+      localStorage.setItem(STORAGE_KEY_REFRESH_TOKEN_EXPIRES_AT, normalized);
     } catch {
       // Ignore
     }
@@ -527,7 +538,8 @@ export class AuthService {
     this.clearRefreshExpiryTimer();
     const expiresAt = this.getStoredRefreshTokenExpiresAt();
     if (!expiresAt || !isPlatformBrowser(this.platformId)) return;
-    const expiresMs = new Date(expiresAt).getTime();
+    const expiresMs = new Date(this.normalizeExpiryIso(expiresAt)).getTime();
+    if (Number.isNaN(expiresMs)) return;
     const nowMs = Date.now();
     const delayMs = Math.max(0, expiresMs - nowMs);
     this.refreshExpiryTimerId = setTimeout(() => {
@@ -555,7 +567,8 @@ export class AuthService {
     this.clearExpiryTimer();
     const expiresAt = this.getStoredAccessTokenExpiresAt();
     if (!expiresAt || !isPlatformBrowser(this.platformId)) return;
-    const expiresMs = new Date(expiresAt).getTime();
+    const expiresMs = new Date(this.normalizeExpiryIso(expiresAt)).getTime();
+    if (Number.isNaN(expiresMs)) return;
     const nowMs = Date.now();
     const warnAt = expiresMs - SESSION_EXPIRY_WARN_BEFORE_MS;
     const delayMs = Math.max(0, warnAt - nowMs);

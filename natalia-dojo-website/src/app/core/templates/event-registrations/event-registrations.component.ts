@@ -14,6 +14,7 @@ import {
   EventsService,
   Event,
   EventRegistrationDetailsResponse,
+  EventRegistrationsFilters,
 } from '../../../_services/events.service';
 
 @Component({
@@ -37,6 +38,11 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
   rejectLoadingId: number | null = null;
   approvalNotesByRegId: Record<number, string> = {};
   exportCsvLoading = false;
+
+  /** Optional filters for GET registrations (firstName, lastName, phone). */
+  filterFirstName = '';
+  filterLastName = '';
+  filterPhone = '';
 
   private routeSubscription?: Subscription;
   private authSubscription?: Subscription;
@@ -116,7 +122,11 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
 
   private loadRegistrations(): void {
     if (this.eventId == null) return;
-    this.eventsService.getEventRegistrations(this.eventId).subscribe({
+    const filters: EventRegistrationsFilters = {};
+    if (this.filterFirstName.trim() !== '') filters.firstName = this.filterFirstName.trim();
+    if (this.filterLastName.trim() !== '') filters.lastName = this.filterLastName.trim();
+    if (this.filterPhone.trim() !== '') filters.phone = this.filterPhone.trim();
+    this.eventsService.getEventRegistrations(this.eventId, Object.keys(filters).length > 0 ? filters : undefined).subscribe({
       next: (list) => {
         this.registrations = list ?? [];
         this.isLoading = false;
@@ -127,6 +137,11 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
         this.errorMessage = this.errorMessage || 'שגיאה בטעינת ההרשמות.';
       },
     });
+  }
+
+  onFilterChange(): void {
+    if (this.eventId == null) return;
+    this.loadRegistrations();
   }
 
   goBack(): void {
@@ -172,6 +187,12 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
   }
 
   getRegDisplayName(reg: EventRegistrationDetailsResponse): string {
+    const first = (reg.firstName ?? '').trim();
+    const last = (reg.lastName ?? '').trim();
+    if (first || last) {
+      const full = [first, last].filter(Boolean).join(' ').trim();
+      if (full) return full;
+    }
     const name = [reg.username, reg.email].filter(Boolean).join(' / ');
     return name || `משתמש #${reg.userId}`;
   }

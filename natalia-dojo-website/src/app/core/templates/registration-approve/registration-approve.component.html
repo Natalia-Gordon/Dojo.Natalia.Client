@@ -76,6 +76,10 @@
           <dd><span class="registration-approve__reg-id">#{{ registrationId }}</span></dd>
           <dt>משתמש</dt>
           <dd class="registration-approve__user">{{ getRegDisplayName() }}</dd>
+          <dt *ngIf="registration.email">אימייל</dt>
+          <dd *ngIf="registration.email">{{ registration.email }}</dd>
+          <dt *ngIf="registration.phone">טלפון</dt>
+          <dd *ngIf="registration.phone">{{ registration.phone }}</dd>
           <dt>תאריך הרשמה</dt>
           <dd>{{ formatDate(registration.registeredAt) }}</dd>
           <dt *ngIf="registration.notes">הערות מהמשתתף</dt>
