@@ -9,6 +9,12 @@
         <div class="registration-approve__hero-breadcrumbs">
           <a routerLink="/home">דף הבית</a>
           <span class="divider">/</span>
+          <ng-container *ngIf="fromEventRegistrations && eventId != null">
+            <a routerLink="/admin/events">ניהול אירועים</a>
+            <span class="divider">/</span>
+            <a [routerLink]="['/events', eventId, 'registrations']">נרשמו לאירוע</a>
+            <span class="divider">/</span>
+          </ng-container>
           <span class="current-page">פרטי תשלום</span>
         </div>
       </div>

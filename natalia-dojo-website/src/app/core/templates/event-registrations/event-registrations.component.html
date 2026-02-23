@@ -78,7 +78,7 @@
                   <td>{{ formatDate(reg.registeredAt) }}</td>
                   <td>
                     @if (eventId != null) {
-                      <a [routerLink]="['/events', eventId, 'registrations', reg.registrationId, 'approve']" class="event-registrations__link">פרטי תשלום / אישור</a>
+                      <a [routerLink]="['/events', eventId, 'registrations', reg.registrationId, 'approve']" [queryParams]="{ from: 'event-registrations' }" class="event-registrations__link">פרטי תשלום / אישור</a>
                     } @else {
                       —
                     }

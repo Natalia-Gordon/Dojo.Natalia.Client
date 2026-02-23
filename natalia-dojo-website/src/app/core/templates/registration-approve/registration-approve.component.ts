@@ -1,7 +1,9 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { AuthService, UserInfo } from '../../../_services/auth.service';
 import {
   EventsService,
@@ -12,11 +14,11 @@ import {
 @Component({
   selector: 'app-registration-approve',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './registration-approve.component.html',
   styleUrl: './registration-approve.component.css',
 })
-export class RegistrationApproveComponent implements OnInit {
+export class RegistrationApproveComponent implements OnInit, OnDestroy {
   eventId: number | null = null;
   registrationId: number | null = null;
   event: Event | null = null;
@@ -29,6 +31,10 @@ export class RegistrationApproveComponent implements OnInit {
   rejectLoading = false;
   isAdminOrInstructor = false;
   userInfo: UserInfo | null = null;
+  /** When true, breadcrumb shows full path: דף הבית / ניהול אירועים / נרשמו לאירוע (from query param from=event-registrations). */
+  fromEventRegistrations = false;
+
+  private queryParamSubscription?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -51,6 +57,11 @@ export class RegistrationApproveComponent implements OnInit {
       this.isLoading = false;
       return;
     }
+    this.fromEventRegistrations = this.route.snapshot.queryParams['from'] === 'event-registrations';
+    this.queryParamSubscription = this.route.queryParams.subscribe((q) => {
+      this.fromEventRegistrations = q['from'] === 'event-registrations';
+    });
+
     this.eventsService.getEventById(this.eventId, true).subscribe({
       next: (ev) => {
         this.event = ev;
@@ -67,6 +78,10 @@ export class RegistrationApproveComponent implements OnInit {
         }
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.queryParamSubscription?.unsubscribe();
   }
 
   private canApprovePayments(userInfo: UserInfo | null): boolean {
