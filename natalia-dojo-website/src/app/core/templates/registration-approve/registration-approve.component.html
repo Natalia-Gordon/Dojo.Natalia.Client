@@ -21,46 +21,107 @@
     </div>
   </div>
   <div class="registration-approve__main">
-  @if (errorMessage) {
-    <div class="registration-approve__error">{{ errorMessage }}</div>
-  }
-  @if (message) {
-    <div class="registration-approve__message">{{ message }}</div>
-  }
-  @if (!isAdminOrInstructor && !isLoading) {
-    <div class="registration-approve__restricted">
+    <div *ngIf="errorMessage" class="registration-approve__error">
+      <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="message" class="registration-approve__message">
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+      {{ message }}
+    </div>
+    <div *ngIf="!isAdminOrInstructor && !isLoading" class="registration-approve__restricted">
       אין לך הרשאה לאשר תשלום. התחבר כמנהל או מדריך האירוע.
     </div>
-  }
-  @if (isLoading) {
-    <div class="registration-approve__status">טוען...</div>
-  }
-  @if (!isLoading && event && registration && isAdminOrInstructor) {
-    <div class="registration-approve__card">
-      <h2 class="registration-approve__event-title">{{ event.title || "אירוע #" + eventId }}</h2>
-      <dl class="registration-approve__dl">
-        <dt>מזהה הרשמה</dt>
-        <dd>{{ registrationId }}</dd>
-        <dt>משתמש</dt>
-        <dd>{{ getRegDisplayName() }}</dd>
-        <dt>סטטוס תשלום</dt>
-        <dd>{{ getPaymentStatusLabel() }}</dd>
-        <dt>תאריך הרשמה</dt>
-        <dd>{{ formatDate(registration.registeredAt) }}</dd>
-      </dl>
-      @if (canApprove()) {
+    <div *ngIf="isLoading" class="registration-approve__status">
+      <span class="registration-approve__spinner" aria-hidden="true"></span>
+      טוען פרטי הרשמה...
+    </div>
+
+    <div *ngIf="!isLoading && event && registration && isAdminOrInstructor" class="registration-approve__card">
+      <!-- Event summary -->
+      <div class="registration-approve__section registration-approve__section--event">
+        <h2 class="registration-approve__section-title">
+          <i class="bi bi-calendar-event" aria-hidden="true"></i>
+          פרטי האירוע
+        </h2>
+        <h3 class="registration-approve__event-title">{{ event.title || 'אירוע #' + eventId }}</h3>
+        <div class="registration-approve__event-meta">
+          <span class="registration-approve__badge registration-approve__badge--type">{{ getEventTypeLabel(event.eventType) }}</span>
+          <span class="registration-approve__meta-item">
+            <i class="bi bi-calendar3" aria-hidden="true"></i>
+            {{ getEventDateRange() }}
+          </span>
+          <span *ngIf="event.location" class="registration-approve__meta-item">
+            <i class="bi bi-geo-alt" aria-hidden="true"></i>
+            {{ event.location }}
+          </span>
+          <span class="registration-approve__meta-item registration-approve__price">
+            <i class="bi bi-currency-exchange" aria-hidden="true"></i>
+            {{ formatPrice(event.price) }}
+            <span *ngIf="event.earlyBirdPrice != null && event.earlyBirdPrice !== event.price" class="registration-approve__early-bird">
+              (מחיר מוקדם {{ formatPrice(event.earlyBirdPrice) }})
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Participant & registration -->
+      <div class="registration-approve__section registration-approve__section--participant">
+        <h2 class="registration-approve__section-title">
+          <i class="bi bi-person-badge" aria-hidden="true"></i>
+          פרטי המשתתף
+        </h2>
+        <dl class="registration-approve__dl">
+          <dt>מזהה הרשמה</dt>
+          <dd><span class="registration-approve__reg-id">#{{ registrationId }}</span></dd>
+          <dt>משתמש</dt>
+          <dd class="registration-approve__user">{{ getRegDisplayName() }}</dd>
+          <dt>תאריך הרשמה</dt>
+          <dd>{{ formatDate(registration.registeredAt) }}</dd>
+          <dt *ngIf="registration.notes">הערות מהמשתתף</dt>
+          <dd *ngIf="registration.notes" class="registration-approve__notes-text">{{ registration.notes }}</dd>
+        </dl>
+      </div>
+
+      <!-- Payment status -->
+      <div class="registration-approve__section registration-approve__section--payment">
+        <h2 class="registration-approve__section-title">
+          <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
+          סטטוס תשלום
+        </h2>
+        <div class="registration-approve__payment-row">
+          <span class="registration-approve__badge registration-approve__badge--payment" [ngClass]="getPaymentStatusBadgeClass()">
+            {{ getPaymentStatusLabel() }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Approval actions (when pending) -->
+      <div *ngIf="canApprove()" class="registration-approve__section registration-approve__section--actions">
+        <h2 class="registration-approve__section-title">
+          <i class="bi bi-pencil-square" aria-hidden="true"></i>
+          אישור / דחייה
+        </h2>
         <div class="registration-approve__notes-wrap">
           <label for="approvalNotes">הערות (אופציונלי)</label>
-          <textarea id="approvalNotes" class="registration-approve__notes" [(ngModel)]="approvalNotes" rows="3" placeholder="הערות"></textarea>
+          <textarea id="approvalNotes" class="registration-approve__notes" [(ngModel)]="approvalNotes" rows="3" placeholder="הערות לאישור או לדחייה"></textarea>
         </div>
         <div class="registration-approve__actions">
-          <button type="button" class="registration-approve__btn registration-approve__btn--approve" [disabled]="approveLoading || rejectLoading" (click)="approve()">{{ approveLoading ? "מאשר..." : "אשר תשלום" }}</button>
-          <button type="button" class="registration-approve__btn registration-approve__btn--reject" [disabled]="rejectLoading || approveLoading" (click)="reject()">{{ rejectLoading ? "דוחה..." : "דחה תשלום" }}</button>
+          <button type="button" class="registration-approve__btn registration-approve__btn--approve" [disabled]="approveLoading || rejectLoading" (click)="approve()">
+            <i class="bi bi-check-lg" aria-hidden="true"></i>
+            {{ approveLoading ? 'מאשר...' : 'אשר תשלום' }}
+          </button>
+          <button type="button" class="registration-approve__btn registration-approve__btn--reject" [disabled]="rejectLoading || approveLoading" (click)="reject()">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+            {{ rejectLoading ? 'דוחה...' : 'דחה תשלום' }}
+          </button>
         </div>
-      } @else {
-        <p class="registration-approve__no-action">ההרשמה אינה במצב ממתין לאישור תשלום.</p>
-      }
+      </div>
+
+      <p *ngIf="!canApprove() && registration" class="registration-approve__no-action">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        ההרשמה אינה במצב ממתין לאישור תשלום.
+      </p>
     </div>
-  }
   </div>
 </section>

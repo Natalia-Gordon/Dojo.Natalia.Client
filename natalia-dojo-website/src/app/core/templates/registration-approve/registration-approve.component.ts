@@ -138,6 +138,56 @@ export class RegistrationApproveComponent implements OnInit, OnDestroy {
     return this.registration.paymentStatus ?? '—';
   }
 
+  /** CSS class for payment status badge (pending, paid, rejected, free). */
+  getPaymentStatusBadgeClass(): string {
+    if (!this.registration) return '';
+    const s = (this.registration.paymentStatus ?? '').toLowerCase();
+    if (s === 'pending') return 'registration-approve__badge--pending';
+    if (s === 'paid') return 'registration-approve__badge--paid';
+    if (s === 'failed' || s === 'rejected') return 'registration-approve__badge--rejected';
+    if (s === 'free') return 'registration-approve__badge--free';
+    return '';
+  }
+
+  formatPrice(amount: number | null | undefined): string {
+    if (amount == null) return '—';
+    return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+  }
+
+  getEventTypeLabel(type: string | null | undefined): string {
+    if (!type) return '—';
+    const map: Record<string, string> = {
+      seminar: 'סמינר',
+      workshop: 'סדנה',
+      grading: 'דרגות',
+      social: 'חברתי',
+      special_training: 'אימון מיוחד',
+      online_session: 'מפגש אונליין',
+      retreat: 'ריטריט',
+      zen_session: 'מפגש זן',
+    };
+    return map[(type as string).toLowerCase()] ?? type;
+  }
+
+  getEventDateRange(): string {
+    if (!this.event) return '—';
+    const start = this.event.startDateTime;
+    const end = this.event.endDateTime;
+    if (!start) return '—';
+    try {
+      const d1 = new Date(start);
+      const d2 = end ? new Date(end) : null;
+      if (Number.isNaN(d1.getTime())) return '—';
+      const fmt = (d: Date) => d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      if (d2 && !Number.isNaN(d2.getTime()) && d1.getTime() !== d2.getTime()) {
+        return `${fmt(d1)} – ${fmt(d2)}`;
+      }
+      return fmt(d1);
+    } catch {
+      return '—';
+    }
+  }
+
   canApprove(): boolean {
     return this.registration != null && (this.registration.paymentStatus ?? '').toLowerCase() === 'pending';
   }
