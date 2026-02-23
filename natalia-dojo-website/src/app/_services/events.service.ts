@@ -479,11 +479,12 @@ export class EventsService {
           items: res?.items ?? [],
           totalCount: res?.totalCount ?? 0,
           page: res?.page ?? 1,
-          pageSize: res?.pageSize ?? 10
+          pageSize: res?.pageSize ?? 10,
+          registeredCountByEventId: res?.registeredCountByEventId ?? {}
         })),
         catchError((error) => {
           if (error.status === 503) {
-            return of({ items: [], totalCount: 0, page: 1, pageSize: 10 });
+            return of({ items: [], totalCount: 0, page: 1, pageSize: 10, registeredCountByEventId: {} });
           }
           if (error.status !== 0 && error.status !== 503) {
             console.error('Get admin events error:', error);
