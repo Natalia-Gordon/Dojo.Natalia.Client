@@ -60,16 +60,19 @@
 
   <!-- Credits bar: copyright, terms, built by -->
   <div class="footer__credits container-fluid py-3 px-4 px-lg-5" style="background: #111111;">
-    <div class="row align-items-center g-3">
-      <div class="col-lg-6 text-center text-lg-start order-2 order-lg-1">
-        <p class="footer__credits-text text-secondary mb-0">
+    <div class="row align-items-center g-3 footer__credits-row">
+      <div class="col-lg-6 text-center order-2 order-lg-1">
+        <p class="footer__credits-text footer__credits-left mb-0">
           &copy; {{ currentYear }} <a routerLink="/home" class="footer__brand-link">Bujinkan Ninjutsu – Natalia Dojo</a>
           <span class="footer__credits-sep d-none d-md-inline"> · </span>
-          <a routerLink="/terms" class="text-secondary text-decoration-none footer__credits-link">תנאי שימוש</a>
+          <a routerLink="/terms" class="footer__terms-link">תנאי שימוש</a>
         </p>
       </div>
-      <div class="col-lg-6 text-center text-lg-end order-1 order-lg-2">
-        <p class="footer__credits-text text-secondary mb-0">האתר נבנה על ידי נטליה גורדון</p>
+      <div class="col-lg-6 text-center order-1 order-lg-2">
+        <p class="footer__credits-text footer__built-by mb-0">
+          <i class="bi bi-code-slash footer__built-by-icon" aria-hidden="true"></i>
+          האתר נבנה על ידי <strong class="footer__built-by-name">נטליה גורדון</strong>
+        </p>
       </div>
     </div>
   </div>

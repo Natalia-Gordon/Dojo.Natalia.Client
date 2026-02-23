@@ -171,9 +171,45 @@
   color: var(--bs-primary) !important;
 }
 
-/* Creator line */
-.footer__credits-text .mb-0 {
+/* Credits row – same alignment and text size for both sides */
+.footer__credits-row .footer__credits-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Terms link – noticeable at first glance */
+.footer__credits-left {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.footer__terms-link {
   font-size: inherit;
+  font-weight: 600;
+  color: #e67e22 !important;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer__terms-link:hover {
+  color: var(--bs-primary) !important;
+}
+
+/* Creator line – noticeable at first glance */
+.footer__built-by {
+  font-size: inherit;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.footer__built-by-icon {
+  color: var(--bs-primary);
+  margin-inline-end: 0.35rem;
+  font-size: 1rem;
+}
+
+.footer__built-by-name {
+  color: #e67e22;
+  font-weight: 700;
 }
 
 /* Back to top */
