@@ -89,11 +89,11 @@
 
 .terms-page {
   min-height: 60vh;
-  padding-bottom: 4rem;
+  padding-bottom: 0;
 }
 
 .terms-page__body {
-  padding: 0 0 3rem;
+  padding: 0 0 1rem;
 }
 
 .terms-page__inner {
@@ -102,10 +102,22 @@
 }
 
 .terms-page__updated {
-  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
   color: #64748b;
-  margin-bottom: 2rem;
-  text-align: left;
+  margin-bottom: 1.5rem;
+  padding: 0.4rem 0.75rem;
+  background: #f1f5f9;
+  border-radius: 6px;
+  border-inline-start: 3px solid var(--bs-primary);
+  text-align: right;
+}
+
+.terms-page__updated-label {
+  font-weight: 600;
+  color: #475569;
 }
 
 .terms-page__content {
@@ -122,6 +134,8 @@
 
 .terms-section:last-of-type {
   border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .terms-section__title {
