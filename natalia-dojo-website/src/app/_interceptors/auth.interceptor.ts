@@ -69,7 +69,7 @@ export class AuthInterceptor implements HttpInterceptor {
           }
 
           if (isRegistrationRequest && !token) {
-            return throwError(() => error);
+            return throwError(() => this.normalizeNetworkError(error));
           }
 
           const choice$ = this.authDialogService.open();
@@ -98,7 +98,7 @@ export class AuthInterceptor implements HttpInterceptor {
                             this.doGlobalLogoutAndRedirect();
                             return EMPTY;
                           }
-                          return throwError(() => retryErr);
+                          return throwError(() => this.normalizeNetworkError(retryErr));
                         })
                       );
                     }
@@ -114,13 +114,32 @@ export class AuthInterceptor implements HttpInterceptor {
                 this.authService.logout().subscribe();
                 return EMPTY;
               }
-              return throwError(() => error);
+              return throwError(() => this.normalizeNetworkError(error));
             })
           );
         }
-        return throwError(() => error);
+        return throwError(() => this.normalizeNetworkError(error));
       })
     );
+  }
+
+  /** Transform "Failed to fetch" and network errors to user-friendly Hebrew message */
+  private normalizeNetworkError(error: HttpErrorResponse): HttpErrorResponse {
+    const isNetworkError =
+      error.status === 0 ||
+      (typeof error?.message === 'string' &&
+        (error.message.toLowerCase().includes('failed to fetch') ||
+          error.message.toLowerCase().includes('networkerror') ||
+          error.message.toLowerCase().includes('load failed')));
+    if (isNetworkError) {
+      return new HttpErrorResponse({
+        error: { message: 'השרות לא זמין כרגע, אנא נסה מאוחר יותר' },
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url ?? undefined
+      });
+    }
+    return error;
   }
 }
 

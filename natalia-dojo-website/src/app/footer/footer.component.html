@@ -5,12 +5,20 @@
       <!-- CTA block – red, full height of footer body, no vertical gap -->
       <div class="col-lg-4 col-md-6 mb-4 mb-lg-0 d-flex footer__main-col footer__main-col--cta">
         <div class="footer__cta d-flex flex-column align-items-center justify-content-center text-center flex-grow-1 bg-primary p-4 p-lg-5">
-          <h4 class="footer__heading footer__heading--cta text-uppercase text-white mb-3">הצטרף אלינו</h4>
-          <p class="footer__subheading text-white mb-4">תתעדכן כבר עכשיו על האימונים והסדנאות שלנו</p>
-          <form class="w-100" (submit)="$event.preventDefault(); onSave()">
+          <h4 class="footer__heading footer__heading--cta text-uppercase text-white mb-3">הצטרפי אלינו</h4>
+          <p class="footer__subheading text-white mb-4">הירשמי לרשימת התפוצה ותתעדכני על האימונים, הסדנאות והאירועים</p>
+          <form class="w-100" (ngSubmit)="onNewsletterSubmit()" #newsletterForm="ngForm">
             <div class="input-group" dir="ltr">
-              <input type="email" id="footer-email" class="form-control border-white p-2 p-lg-3" placeholder="השאר כתובת מייל כאן" required>
-              <button type="submit" class="btn btn-dark px-3 px-lg-4">הצטרף</button>
+              <input type="email" id="footer-email" name="footerEmail" class="form-control border-white p-2 p-lg-3" placeholder="השאר כתובת מייל כאן"
+                [(ngModel)]="newsletterEmail" required email [disabled]="newsletterLoading">
+              <button type="submit" class="btn btn-dark px-3 px-lg-4" [disabled]="newsletterLoading || !newsletterForm.valid">
+                <span *ngIf="!newsletterLoading">הצטרפי</span>
+                <span *ngIf="newsletterLoading">שולח...</span>
+              </button>
+            </div>
+            <div *ngIf="newsletterMessage" class="footer__newsletter-feedback mt-3" [class.footer__newsletter-feedback--success]="newsletterSuccess" [class.footer__newsletter-feedback--error]="!newsletterSuccess">
+              <i class="bi footer__newsletter-feedback__icon" [class.bi-check-circle-fill]="newsletterSuccess" [class.bi-exclamation-circle-fill]="!newsletterSuccess" aria-hidden="true"></i>
+              <span class="footer__newsletter-feedback__text">{{ newsletterMessage }}</span>
             </div>
           </form>
         </div>

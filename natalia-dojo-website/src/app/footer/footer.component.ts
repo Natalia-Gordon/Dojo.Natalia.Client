@@ -1,11 +1,13 @@
 import { Component, HostListener, Inject, PLATFORM_ID, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { NewsletterService } from '../_services/newsletter.service';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css'
 })
@@ -15,7 +17,15 @@ export class FooterComponent implements OnInit, OnDestroy {
   currentYear = new Date().getFullYear();
   private scrollListener?: () => void;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  newsletterEmail = '';
+  newsletterLoading = false;
+  newsletterMessage = '';
+  newsletterSuccess = false;
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private newsletterService: NewsletterService
+  ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
@@ -41,12 +51,34 @@ export class FooterComponent implements OnInit, OnDestroy {
     this.isBackToTopVisible = (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0) > 200;
   }
 
-  onSave() {
-    console.log(' saved!');
-  }
+  onNewsletterSubmit(): void {
+    const email = this.newsletterEmail?.trim();
+    if (!email) return;
 
-  onSubmit() {
-    console.log('Form submitted!');
+    this.newsletterLoading = true;
+    this.newsletterMessage = '';
+    this.newsletterSuccess = false;
+
+    this.newsletterService.subscribe(email).subscribe({
+      next: (result) => {
+        this.newsletterLoading = false;
+        if (result.success) {
+          this.newsletterEmail = '';
+          this.newsletterSuccess = true;
+          this.newsletterMessage = result.alreadySubscribed
+            ? 'כתובת המייל כבר רשומה אצלנו. תודה!'
+            : 'נרשמת בהצלחה!';
+        } else {
+          this.newsletterSuccess = false;
+          this.newsletterMessage = result.error;
+        }
+      },
+      error: () => {
+        this.newsletterLoading = false;
+        this.newsletterSuccess = false;
+        this.newsletterMessage = 'אירעה שגיאה. נסי שוב מאוחר יותר.';
+      }
+    });
   }
 
   scrollToTop(event: Event): void {
