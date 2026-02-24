@@ -45,6 +45,7 @@ export interface Instructor {
   username: string | null;
   displayName: string | null;
   email: string | null;
+  phone: string | null;
   rank: string | null;
   yearsOfExperience: number | null;
   specialization: string[] | null;

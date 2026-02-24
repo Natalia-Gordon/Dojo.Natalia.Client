@@ -31,7 +31,8 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
 
   paymentMethods: { value: PaymentMethod; label: string }[] = [
     { value: 'cash', label: 'מזומן' },
-    { value: 'bank_transfer', label: 'העברה בנקאית' }
+    { value: 'bank_transfer', label: 'העברה בנקאית' },
+    { value: 'bit', label: 'העברה ביט' }
   ];
 
   private subscription?: Subscription;
@@ -104,12 +105,18 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
     return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankId || i.branchNumber);
   }
 
-  /** True when submit should be disabled: missing payment method, or bank transfer without proof file. */
+  /** True when instructor has phone (for Bit transfer payment proof upload). */
+  hasInstructorBitPhone(): boolean {
+    return !!(this.instructor?.phone);
+  }
+
+  /** True when submit should be disabled: missing payment method, or bank/bit transfer without proof file. */
   isEnrollDisabled(): boolean {
     if (this.isEnrolling) return true;
     if (!this.event) return true;
     if (this.event.price > 0 && !this.selectedPaymentMethod) return true;
     if (this.selectedPaymentMethod === 'bank_transfer' && this.hasInstructorBankDetails() && !this.paymentProofFile) return true;
+    if (this.selectedPaymentMethod === 'bit' && this.hasInstructorBitPhone() && !this.paymentProofFile) return true;
     return false;
   }
 
@@ -146,6 +153,12 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
     // Validate payment proof file when bank transfer is selected and bank details are shown
     if (this.selectedPaymentMethod === 'bank_transfer' && this.hasInstructorBankDetails() && !this.paymentProofFile) {
       this.errorMessage = 'בהעברה בנקאית יש לצרף קובץ להוכחת תשלום.';
+      return;
+    }
+
+    // Validate payment proof file when Bit transfer is selected and instructor phone is shown
+    if (this.selectedPaymentMethod === 'bit' && this.hasInstructorBitPhone() && !this.paymentProofFile) {
+      this.errorMessage = 'בהעברת ביט יש לצרף קובץ להוכחת תשלום.';
       return;
     }
 
@@ -241,6 +254,10 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
     return deadline > new Date();
   }
 
+  onPaymentMethodChange(): void {
+    this.removeFile();
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -252,12 +269,12 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
   removeFile(): void {
     this.paymentProofFile = null;
     this.paymentProofFileName = '';
-    // Reset the file input
+    // Reset the file input (bank transfer and Bit use different ids, only one in DOM at a time)
     if (isPlatformBrowser(this.platformId)) {
-      const fileInput = document.getElementById('paymentProofFile') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = '';
-      }
+      const bankInput = document.getElementById('paymentProofFile') as HTMLInputElement;
+      const bitInput = document.getElementById('paymentProofFileBit') as HTMLInputElement;
+      if (bankInput) bankInput.value = '';
+      if (bitInput) bitInput.value = '';
     }
   }
 

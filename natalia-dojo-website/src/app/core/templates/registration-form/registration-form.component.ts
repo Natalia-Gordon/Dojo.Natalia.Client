@@ -76,6 +76,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     this.userInfoSubscription = this.authService.userInfo$.subscribe(() => {
       this.syncUserTypeWithRole();
       this.setUserTypeControlState();
+      this.setPhoneValidators();
       if (this.showRankSelect) {
         this.loadRanks();
       } else {
@@ -86,6 +87,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
 
     this.userTypeSubscription = this.registerForm.get('userType')?.valueChanges.subscribe(() => {
       this.setRankControlState();
+      this.setPhoneValidators();
       if (this.showRankSelect) {
         this.loadRanks();
       } else {
@@ -474,6 +476,20 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
   private updateRegisterControlStates(): void {
     this.setUserTypeControlState();
     this.setRankControlState();
+    this.setPhoneValidators();
+  }
+
+  /** Phone is required when registering/editing an instructor or teacher. */
+  private setPhoneValidators(): void {
+    const phoneControl = this.registerForm.get('phone');
+    if (!phoneControl) return;
+    const isInstructor = this.getNormalizedRegisterUserType() === 'instructor';
+    if (isInstructor) {
+      phoneControl.setValidators([Validators.required]);
+    } else {
+      phoneControl.clearValidators();
+    }
+    phoneControl.updateValueAndValidity();
   }
 
   private setUserTypeControlState(): void {
