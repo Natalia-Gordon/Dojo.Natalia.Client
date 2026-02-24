@@ -12,6 +12,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, catchError, switchMap, take, throwError, EMPTY } from 'rxjs';
 import { AuthService } from '../_services/auth.service';
 import { AuthDialogService } from '../_services/auth-dialog.service';
+import { LoginModalService } from '../_services/login-modal.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -19,8 +20,16 @@ export class AuthInterceptor implements HttpInterceptor {
     private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
-    private authDialogService: AuthDialogService
+    private authDialogService: AuthDialogService,
+    private loginModalService: LoginModalService
   ) {}
+
+  /** Global handling: clear session, redirect to home, open login. Use when refresh fails or retry gets 401. */
+  private doGlobalLogoutAndRedirect(): void {
+    this.authService.clearSessionLocally();
+    this.router.navigate(['/home']);
+    this.loginModalService.open('login');
+  }
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const isBrowser = isPlatformBrowser(this.platformId);
@@ -52,52 +61,84 @@ export class AuthInterceptor implements HttpInterceptor {
           !isRefreshTokenRequest &&
           isBrowser
         ) {
-          if (isRegistrationRequest && !token) {
-            return throwError(() => error);
-          }
-
-          const hasRefreshToken = !!this.authService.getRefreshToken();
-
-          if (!hasRefreshToken) {
-            this.authService.logout().subscribe();
+          // Dialog already open: another request got 401 while user is choosing or we're refreshing.
+          // Don't propagate to component — avoid page error; global logout/redirect will happen from the first request's flow.
+          if (this.authDialogService.isOpen) {
             return EMPTY;
           }
 
-          /* Try refresh automatically first; only show dialog if refresh fails */
-          return this.authService.refreshToken().pipe(
-            switchMap((tokenResponse) => {
-              const newToken = tokenResponse.accessToken ?? this.authService.getToken();
-              if (newToken) {
-                const retryReq = req.clone({
-                  setHeaders: { Authorization: `Bearer ${newToken}` },
-                });
-                return next.handle(retryReq);
-              }
-              return throwError(() => new Error('Failed to refresh token'));
-            }),
-            catchError((refreshError) => {
-              /* Refresh failed – show dialog as fallback */
-              if (this.authDialogService && !this.authDialogService.isOpen) {
-                const choice$ = this.authDialogService.open();
-                return choice$.pipe(
-                  take(1),
-                  switchMap((choice) => {
-                    if (choice === 'logout') {
-                      this.authService.logout().subscribe();
-                      return EMPTY;
+          if (isRegistrationRequest && !token) {
+            return throwError(() => this.normalizeNetworkError(error));
+          }
+
+          const choice$ = this.authDialogService.open();
+
+          return choice$.pipe(
+            take(1),
+            switchMap((choice) => {
+              if (choice === 'refresh') {
+                const hasRefreshToken = !!this.authService.getRefreshToken();
+                if (!hasRefreshToken) {
+                  this.doGlobalLogoutAndRedirect();
+                  return EMPTY;
+                }
+                return this.authService.refreshToken().pipe(
+                  switchMap((tokenResponse) => {
+                    const newToken = tokenResponse.accessToken;
+                    if (newToken) {
+                      const retryReq = req.clone({
+                        setHeaders: {
+                          Authorization: `Bearer ${newToken}`,
+                        },
+                      });
+                      return next.handle(retryReq).pipe(
+                        catchError((retryErr: HttpErrorResponse) => {
+                          if (retryErr?.status === 401) {
+                            this.doGlobalLogoutAndRedirect();
+                            return EMPTY;
+                          }
+                          return throwError(() => this.normalizeNetworkError(retryErr));
+                        })
+                      );
                     }
-                    return throwError(() => refreshError);
+                    this.doGlobalLogoutAndRedirect();
+                    return EMPTY;
+                  }),
+                  catchError(() => {
+                    this.doGlobalLogoutAndRedirect();
+                    return EMPTY;
                   })
                 );
+              } else if (choice === 'logout') {
+                this.authService.logout().subscribe();
+                return EMPTY;
               }
-              this.authService.logout().subscribe();
-              return throwError(() => refreshError);
+              return throwError(() => this.normalizeNetworkError(error));
             })
           );
         }
-        return throwError(() => error);
+        return throwError(() => this.normalizeNetworkError(error));
       })
     );
+  }
+
+  /** Transform "Failed to fetch" and network errors to user-friendly Hebrew message */
+  private normalizeNetworkError(error: HttpErrorResponse): HttpErrorResponse {
+    const isNetworkError =
+      error.status === 0 ||
+      (typeof error?.message === 'string' &&
+        (error.message.toLowerCase().includes('failed to fetch') ||
+          error.message.toLowerCase().includes('networkerror') ||
+          error.message.toLowerCase().includes('load failed')));
+    if (isNetworkError) {
+      return new HttpErrorResponse({
+        error: { message: 'השרות לא זמין כרגע, אנא נסה מאוחר יותר' },
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url ?? undefined
+      });
+    }
+    return error;
   }
 }
 

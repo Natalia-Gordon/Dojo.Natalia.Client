@@ -48,6 +48,11 @@ import { UserDetailsComponent } from './user/user-details/user-details.component
 import { EventsComponent } from './events/events.component';
 import { EventDetailComponent } from './events/event-detail/event-detail.component';
 import { UserManagementComponent } from './core/templates/user-management/user-management.component';
+import { EventsManagementComponent } from './core/templates/events-management/events-management.component';
+import { EventRegistrationsComponent } from './core/templates/event-registrations/event-registrations.component';
+import { RegistrationApproveComponent } from './core/templates/registration-approve/registration-approve.component';
+import { MyEventsComponent } from './my-events/my-events.component';
+import { TermsOfUseComponent } from './terms-of-use/terms-of-use.component';
 
 export const routes: Routes = [
   {
@@ -59,13 +64,19 @@ export const routes: Routes = [
       { path: 'login', component: LoginComponent, data: { skipPrerender: true } },
       { path: 'user-details', component: UserDetailsComponent, data: { skipPrerender: true } },
       { path: 'admin/users', component: UserManagementComponent, data: { skipPrerender: true } },
+      { path: 'admin/events/:eventId/registrations', component: EventRegistrationsComponent, data: { skipPrerender: true } },
+      { path: 'admin/events/:id', component: EventsManagementComponent, data: { skipPrerender: true } },
+      { path: 'admin/events', component: EventsManagementComponent, data: { skipPrerender: true } },
+      { path: 'my-events', component: MyEventsComponent, data: { skipPrerender: true } },
       { path: 'events', component: EventsComponent, data: { skipPrerender: true } },
+      { path: 'events/:eventId/registrations/:registrationId/approve', component: RegistrationApproveComponent, data: { skipPrerender: true } },
       { path: 'events/:id', component: EventDetailComponent, data: { skipPrerender: true } },
       { path: 'profile', redirectTo: 'home', pathMatch: 'full' },
       { path: 'purchases', redirectTo: 'home', pathMatch: 'full' },
       { path: 'gallery', component: PhotoGalleryComponent },
       { path: 'about', component: AboutComponent },
       { path: 'contact', component: ContactComponent },
+      { path: 'terms', component: TermsOfUseComponent },
       { path: 'workouts', component: WorkoutsComponent },
       { path: 'team', component: TeamComponent },
       { path: 'blog', component: BlogComponent },

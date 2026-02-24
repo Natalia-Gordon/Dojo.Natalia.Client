@@ -153,6 +153,9 @@ export class LoginComponent implements OnInit, OnDestroy {
         // Handle different error scenarios
         if (error.status === 401 || error.status === 400) {
           this.errorMessage = 'שם משתמש או סיסמה שגויים';
+        } else if (error.status === 503) {
+          // Service Unavailable: backend up but dependency (e.g. DB) down
+          this.errorMessage = 'השירות זמנית לא זמין (ייתכן שמסד הנתונים לא מחובר). נסה שוב בעוד רגע.';
         } else if (error.status === 0) {
           // Network error (CORS, connection refused, server unreachable, etc.)
           this.errorMessage = 'שגיאת רשת: לא ניתן להתחבר לשרת. אנא בדוק את החיבור לאינטרנט ונסה שוב.';

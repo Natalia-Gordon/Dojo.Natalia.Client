@@ -79,6 +79,16 @@ export class UserMenuComponent implements OnInit, OnDestroy {
     this.router.navigate(['/admin/users']);
   }
 
+  onMyEventsClick(): void {
+    this.closeMenu();
+    this.router.navigate(['/my-events']);
+  }
+
+  onManageEventsClick(): void {
+    this.closeMenu();
+    this.router.navigate(['/admin/events']);
+  }
+
   closeMenu(): void {
     this.isMenuOpen = false;
   }
@@ -121,6 +131,11 @@ export class UserMenuComponent implements OnInit, OnDestroy {
   isAdmin(): boolean {
     const role = (this.userInfo?.role || '').trim().toLowerCase();
     return role === 'admin';
+  }
+
+  isAdminOrInstructor(): boolean {
+    const role = (this.userInfo?.role || '').trim().toLowerCase();
+    return role === 'admin' || role === 'instructor';
   }
 
   private isMobileView(): boolean {

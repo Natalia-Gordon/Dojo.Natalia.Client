@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   min-height: 360px;
-  background-image: linear-gradient(rgba(220, 38, 38, 0.7), rgba(15, 23, 42, 0.8)), url('/assets/img/carousel-2.jpg');
+  background-image: linear-gradient(rgba(220, 38, 38, 0.7), rgba(15, 23, 42, 0.8)), url('../../../assets/img/carousel-2.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
