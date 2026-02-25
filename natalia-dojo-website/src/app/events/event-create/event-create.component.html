@@ -1,0 +1,191 @@
+<app-event-create-hero></app-event-create-hero>
+<div class="container-fluid px-2 px-md-5 py-2 py-md-3" style="overflow-x: hidden; max-width: 100vw; width: 100%;">
+  <div class="row g-5" style="margin: 0;">
+    <div class="col-12" dir="rtl" style="padding: 0;">
+      <div class="events-content-card">
+        @if (errorMessage) {
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ errorMessage }}
+            <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="סגור"></button>
+          </div>
+        }
+        @if (successMessage) {
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ successMessage }}
+            <button type="button" class="btn-close" (click)="successMessage = ''" aria-label="סגור"></button>
+          </div>
+        }
+
+        <div class="admin-section">
+          <div class="admin-form-header">
+            <div class="admin-form-header__content">
+              <h3 class="admin-form-header__title">יצירת סמינר חדש</h3>
+              <p class="admin-form-header__subtitle">בנו חוויה מקצועית למתאמנים – פרטים מדויקים, תמחור ברור, והרשמה פשוטה.</p>
+            </div>
+            <div class="admin-form-header__badge">
+              <i class="bi bi-shield-check"></i>
+              מנהל/מדריך
+            </div>
+          </div>
+          <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="seminar-form">
+            <div class="seminar-form__section">
+              <h5 class="seminar-form__title">
+                <i class="bi bi-journal-text me-2"></i>
+                פרטי סמינר
+              </h5>
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">כותרת <span class="text-danger">*</span></label>
+                  <input class="form-control seminar-form__input" type="text" formControlName="title" placeholder="כותרת לסמינר"
+                    [class.is-invalid]="createForm.get('title')?.invalid && createForm.get('title')?.touched">
+                  @if (createForm.get('title')?.invalid && createForm.get('title')?.touched) {
+                    <div class="invalid-feedback">כותרת נדרשת</div>
+                  }
+                  <small class="seminar-form__hint">שם קצר וברור שמסביר את מטרת הסמינר.</small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">סוג אירוע</label>
+                  <select class="form-control seminar-form__input" formControlName="eventType">
+                    <option value="Seminar">סמינר</option>
+                    <option value="Workshop">סדנה</option>
+                    <option value="Masterclass">כיתת אמן</option>
+                    <option value="Grading">מבחן דרגה</option>
+                    <option value="retreat">ריטריט</option>
+                    <option value="zen_session">מפגש זן</option>
+                    <option value="Special">אירוע מיוחד</option>
+                  </select>
+                  <small class="seminar-form__hint">בחר/י את סוג האירוע מתוך הרשימה.</small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">מדריך</label>
+                  <select class="form-control seminar-form__input" formControlName="instructorId" [disabled]="isLoadingInstructors">
+                    <option value="">-- בחר/י מדריך --</option>
+                    @for (inst of instructors; track inst.instructorId) {
+                      <option [value]="inst.instructorId">
+                        {{ inst.displayName || inst.username || 'מדריך ' + inst.instructorId }}
+                      </option>
+                    }
+                  </select>
+                  @if (!isLoadingInstructors) {
+                    <small class="seminar-form__hint">בחר/י מדריך לאירוע (אופציונלי)</small>
+                  }
+                  @if (isLoadingInstructors) {
+                    <small class="seminar-form__hint text-muted">
+                      <span class="spinner-border spinner-border-sm me-1"></span>
+                      טוען מדריכים...
+                    </small>
+                  }
+                </div>
+                <div class="col-12">
+                  <label class="form-label seminar-form__label">תיאור</label>
+                  <textarea class="form-control seminar-form__input" rows="3" formControlName="description" placeholder="תיאור קצר"></textarea>
+                  <small class="seminar-form__hint">ספרו למשתתפים למה הסמינר מיועד ולמי הוא מתאים.</small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">תאריך התחלה</label>
+                  <input class="form-control seminar-form__input" type="datetime-local" formControlName="startDateTime">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">תאריך סיום</label>
+                  <input class="form-control seminar-form__input" type="datetime-local" formControlName="endDateTime">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">מיקום</label>
+                  <input class="form-control seminar-form__input" type="text" formControlName="location">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">קישור למיקום</label>
+                  <input class="form-control seminar-form__input" type="url" formControlName="locationUrl" placeholder="https://maps.google.com/..." (click)="openGoogleMapsIfEmpty()">
+                  <small class="seminar-form__hint">הדבק/י קישור למיקום מ-Google Maps.</small>
+                </div>
+                <div class="col-12">
+                  <label class="form-label seminar-form__label">קישור לתמונה</label>
+                  <input class="form-control seminar-form__input" type="url" formControlName="imageUrl" placeholder="https://drive.google.com/...">
+                  <small class="seminar-form__hint">
+                    <strong>איך לטעון תמונה מ-Google Drive:</strong><br>
+                    1. העלה את התמונה ל-Google Drive<br>
+                    2. לחץ לחיצה ימנית על הקובץ → "קבל קישור" → "כל מי שיש לו את הקישור" → "העתק קישור"<br>
+                    3. הדבק את הקישור כאן (ההמרה תתבצע אוטומטית)
+                  </small>
+                </div>
+              </div>
+            </div>
+            <div class="seminar-form__section">
+              <h5 class="seminar-form__title">
+                <i class="bi bi-cash-stack me-2"></i>
+                תמחור והרשמה
+              </h5>
+              <div class="row g-4">
+                <div class="col-md-4">
+                  <label class="form-label seminar-form__label">כמות משתתפים</label>
+                  <input class="form-control seminar-form__input" type="number" formControlName="maxAttendees" min="0">
+                  <small class="seminar-form__hint">השאירו ריק אם אין הגבלה.</small>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label seminar-form__label">מחיר <span class="text-danger">*</span></label>
+                  <input class="form-control seminar-form__input" type="number" formControlName="price" min="0" step="1"
+                    [class.is-invalid]="createForm.get('price')?.invalid && createForm.get('price')?.touched">
+                  @if (createForm.get('price')?.invalid && createForm.get('price')?.touched) {
+                    <div class="invalid-feedback">מחיר נדרש וחייב להיות 0 או יותר</div>
+                  }
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label seminar-form__label">מחיר הרשמה מוקדמת</label>
+                  <input class="form-control seminar-form__input" type="number" formControlName="earlyBirdPrice" min="0" step="1">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">תאריך יעד להרשמה מוקדמת</label>
+                  <input class="form-control seminar-form__input" type="date" formControlName="earlyBirdDeadline">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label seminar-form__label">דדליין הרשמה</label>
+                  <input class="form-control seminar-form__input" type="datetime-local" formControlName="registrationDeadline">
+                </div>
+              </div>
+            </div>
+            <div class="seminar-form__section">
+              <h5 class="seminar-form__title">
+                <i class="bi bi-gear me-2"></i>
+                הגדרות נוספות
+              </h5>
+              <div class="row g-4 align-items-center">
+                <div class="col-md-6">
+                  <div class="form-check seminar-form__check">
+                    <input class="form-check-input" type="checkbox" formControlName="registrationOpen" id="registrationOpen">
+                    <label class="form-check-label" for="registrationOpen">פתוח להרשמה</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check seminar-form__check">
+                    <input class="form-check-input" type="checkbox" formControlName="isPublished" id="isPublished">
+                    <label class="form-check-label" for="isPublished">פרסום מיידי</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="seminar-form__actions">
+              <button class="btn btn-danger px-5 py-3" type="submit" [disabled]="isCreating || createForm.invalid" [attr.aria-busy]="isCreating">
+                @if (isCreating) {
+                  <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                }
+                @if (!isCreating) {
+                  <i class="bi bi-check-lg me-2"></i>
+                }
+                @if (!isCreating) { <span>צור סמינר</span> }
+                @if (isCreating) { <span>שומר...</span> }
+              </button>
+              <button type="button" class="btn btn-outline-secondary px-4 py-3 ms-2"
+                (click)="createForm.reset(); createForm.patchValue({eventType: 'Seminar', registrationOpen: true, isPublished: true, price: 0})"
+                [disabled]="isCreating">
+                <i class="bi bi-arrow-counterclockwise me-2"></i>
+                איפוס
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

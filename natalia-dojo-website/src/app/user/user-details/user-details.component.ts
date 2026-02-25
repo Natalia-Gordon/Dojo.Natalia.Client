@@ -7,6 +7,8 @@ import { AuthService, User, UpdateUserRequest } from '../../_services/auth.servi
 import { LoginModalService } from '../../_services/login-modal.service';
 import { Title, Meta } from '@angular/platform-browser';
 import { UserDetailsHeroComponent } from '../user-details-hero/user-details-hero.component';
+import { PaymentMethodsService, CreateOrUpdatePaymentMethodRequest } from '../../_services/payment-methods.service';
+import { InstructorPaymentMethodDto } from '../../_services/events.service';
 
 @Component({
   selector: 'app-user-details',
@@ -25,13 +27,22 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   profileForm: FormGroup;
   private destroy$ = new Subject<void>();
 
+  paymentMethods: InstructorPaymentMethodDto[] = [];
+  isLoadingPaymentMethods = false;
+  paymentMethodError: string | null = null;
+  showPaymentMethodForm = false;
+  editingPaymentMethod: InstructorPaymentMethodDto | null = null;
+  isSavingPaymentMethod = false;
+  paymentMethodForm!: FormGroup;
+
   constructor(
     private authService: AuthService,
     private fb: FormBuilder,
     private router: Router,
     private title: Title,
     private meta: Meta,
-    private loginModalService: LoginModalService
+    private loginModalService: LoginModalService,
+    private paymentMethodsService: PaymentMethodsService
   ) {
     this.profileForm = this.fb.group({
       username: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(3)]],
@@ -45,6 +56,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       password: ['', [Validators.minLength(6)]],
       confirmPassword: ['']
     }, { validators: this.passwordMatchValidator });
+
+    this.paymentMethodForm = this.fb.group({
+      paymentType: ['bank_transfer' as 'bit' | 'bank_transfer', Validators.required],
+      isDefault: [false],
+      phoneNumber: [''],
+      bankName: [''],
+      accountHolderName: [''],
+      accountNumber: [''],
+      iban: [''],
+      swiftBic: [''],
+      bankAddress: [''],
+      bankNumber: [''],
+      branchName: [''],
+      branchNumber: ['']
+    });
   }
 
   ngOnInit(): void {
@@ -78,6 +104,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           this.populateForm(user);
           this.isLoading = false;
           this.isUnauthorized = false;
+          if (this.isInstructor()) {
+            this.loadPaymentMethods();
+          }
         },
         error: (error: any) => {
           console.error('Error loading user details:', error);
@@ -355,5 +384,158 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   openLoginModal(): void {
     this.loginModalService.open();
+  }
+
+  isInstructor(): boolean {
+    const r = this.user?.role;
+    return r != null && String(r).toLowerCase() === 'instructor';
+  }
+
+  loadPaymentMethods(): void {
+    if (!this.isInstructor()) return;
+    this.isLoadingPaymentMethods = true;
+    this.paymentMethodError = null;
+    this.paymentMethodsService.getMyPaymentMethods()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (list) => {
+          this.paymentMethods = list;
+          this.isLoadingPaymentMethods = false;
+        },
+        error: (err) => {
+          this.paymentMethodError = err?.error?.message || 'שגיאה בטעינת שיטות התשלום';
+          this.paymentMethods = [];
+          this.isLoadingPaymentMethods = false;
+        }
+      });
+  }
+
+  getPaymentMethodDisplayText(pm: InstructorPaymentMethodDto): string {
+    if (pm.paymentType === 'bit') {
+      return pm.phoneNumber ? `ביט – ${pm.phoneNumber}` : 'ביט';
+    }
+    const parts: string[] = [];
+    if (pm.bankName) parts.push(pm.bankName);
+    if (pm.bankNumber || pm.branchName || pm.branchNumber) {
+      parts.push([pm.bankNumber, pm.branchName, pm.branchNumber].filter(Boolean).join(' / '));
+    }
+    if (pm.accountNumber) parts.push(`חשבון ${pm.accountNumber}`);
+    if (pm.accountHolderName) parts.push(pm.accountHolderName);
+    return parts.length ? parts.join(' · ') : 'העברה בנקאית';
+  }
+
+  openAddPaymentMethod(): void {
+    this.editingPaymentMethod = null;
+    this.paymentMethodForm.reset({
+      paymentType: 'bank_transfer',
+      isDefault: false,
+      phoneNumber: '',
+      bankName: '', accountHolderName: '', accountNumber: '', iban: '', swiftBic: '', bankAddress: '', bankNumber: '', branchName: '', branchNumber: ''
+    });
+    this.showPaymentMethodForm = true;
+    this.paymentMethodError = null;
+  }
+
+  openEditPaymentMethod(pm: InstructorPaymentMethodDto): void {
+    this.editingPaymentMethod = pm;
+    this.paymentMethodForm.patchValue({
+      paymentType: pm.paymentType,
+      isDefault: !!pm.isDefault,
+      phoneNumber: pm.phoneNumber || '',
+      bankName: pm.bankName || '',
+      accountHolderName: pm.accountHolderName || '',
+      accountNumber: pm.accountNumber || '',
+      iban: pm.iban || '',
+      swiftBic: pm.swiftBic || '',
+      bankAddress: pm.bankAddress || '',
+      bankNumber: pm.bankNumber || '',
+      branchName: pm.branchName || '',
+      branchNumber: pm.branchNumber || ''
+    });
+    this.showPaymentMethodForm = true;
+    this.paymentMethodError = null;
+  }
+
+  closePaymentMethodForm(): void {
+    this.showPaymentMethodForm = false;
+    this.editingPaymentMethod = null;
+    this.paymentMethodError = null;
+  }
+
+  buildPaymentMethodRequest(): CreateOrUpdatePaymentMethodRequest | null {
+    const v = this.paymentMethodForm.value;
+    const paymentType = v.paymentType as 'bit' | 'bank_transfer';
+    if (paymentType === 'bit') {
+      const phone = (v.phoneNumber || '').trim();
+      if (!phone) return null;
+      return { paymentType: 'bit', isDefault: !!v.isDefault, phoneNumber: phone };
+    }
+    const bank: CreateOrUpdatePaymentMethodRequest = {
+      paymentType: 'bank_transfer',
+      isDefault: !!v.isDefault,
+      phoneNumber: null
+    };
+    const set = (key: keyof CreateOrUpdatePaymentMethodRequest, val: string) => {
+      const s = (val || '').trim();
+      if (s) (bank as any)[key] = s;
+    };
+    set('bankName', v.bankName);
+    set('accountHolderName', v.accountHolderName);
+    set('accountNumber', v.accountNumber);
+    set('iban', v.iban);
+    set('swiftBic', v.swiftBic);
+    set('bankAddress', v.bankAddress);
+    set('bankNumber', v.bankNumber);
+    set('branchName', v.branchName);
+    set('branchNumber', v.branchNumber);
+    const hasBank = !!(bank.bankName || bank.accountHolderName || bank.accountNumber || bank.iban || bank.bankNumber || bank.branchName || bank.branchNumber);
+    if (!hasBank) return null;
+    return bank;
+  }
+
+  savePaymentMethod(): void {
+    const request = this.buildPaymentMethodRequest();
+    if (!request) {
+      this.paymentMethodError = this.paymentMethodForm.value.paymentType === 'bit'
+        ? 'יש להזין מספר טלפון לביט'
+        : 'יש למלא לפחות שדה אחד של פרטי בנק';
+      return;
+    }
+    this.isSavingPaymentMethod = true;
+    this.paymentMethodError = null;
+    const obs = this.editingPaymentMethod
+      ? this.paymentMethodsService.update(this.editingPaymentMethod.id, request)
+      : this.paymentMethodsService.create(request);
+    obs.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.isSavingPaymentMethod = false;
+        this.closePaymentMethodForm();
+        this.loadPaymentMethods();
+      },
+      error: (err) => {
+        this.paymentMethodError = err?.error?.message || 'שגיאה בשמירת שיטת התשלום';
+        this.isSavingPaymentMethod = false;
+      }
+    });
+  }
+
+  deletePaymentMethod(id: number): void {
+    if (!confirm('למחוק שיטת תשלום זו?')) return;
+    this.paymentMethodsService.delete(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.loadPaymentMethods(),
+        error: (err) => {
+          this.paymentMethodError = err?.error?.message || 'שגיאה במחיקת שיטת התשלום';
+        }
+      });
+  }
+
+  get paymentTypeFormValue(): 'bit' | 'bank_transfer' {
+    return this.paymentMethodForm?.get('paymentType')?.value ?? 'bank_transfer';
+  }
+
+  get paymentMethodFormTitle(): string {
+    return this.editingPaymentMethod ? 'עריכת שיטת תשלום' : 'הוספת שיטת תשלום';
   }
 }

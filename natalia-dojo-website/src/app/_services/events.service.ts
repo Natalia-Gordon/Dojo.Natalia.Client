@@ -50,14 +50,37 @@ export interface Instructor {
   specialization: string[] | null;
   hourlyRate: number | null;
   isAvailable: boolean;
+  /** Top-level bank fields for backward compatibility; prefer paymentMethods when present. */
   bankName: string | null;
   accountHolderName: string | null;
   accountNumber: string | null;
   iban: string | null;
   swiftBic: string | null;
   bankAddress: string | null;
+  /** @deprecated Prefer bankNumber + branchName */
   bankId: string | null;
+  bankNumber: string | null;
+  branchName: string | null;
   branchNumber: string | null;
+  /** Source of truth for instructor payment methods (Bit + bank transfer). */
+  paymentMethods?: InstructorPaymentMethodDto[];
+}
+
+/** One payment method on InstructorResponse (bit or bank_transfer). */
+export interface InstructorPaymentMethodDto {
+  id: number;
+  paymentType: 'bit' | 'bank_transfer';
+  isDefault: boolean;
+  phoneNumber?: string | null;
+  bankName?: string | null;
+  accountHolderName?: string | null;
+  accountNumber?: string | null;
+  iban?: string | null;
+  swiftBic?: string | null;
+  bankAddress?: string | null;
+  bankNumber?: string | null;
+  branchName?: string | null;
+  branchNumber?: string | null;
 }
 
 export interface CreateEventRequest {

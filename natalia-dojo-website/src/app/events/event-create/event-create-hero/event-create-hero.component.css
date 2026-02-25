@@ -1,8 +1,8 @@
-.events-hero {
+.event-create-hero {
   position: relative;
   width: 100%;
   min-height: 360px;
-  background-image: linear-gradient(rgba(220, 38, 38, 0.7), rgba(15, 23, 42, 0.8)), url('../../../assets/img/carousel-2.jpg');
+  background-image: linear-gradient(rgba(220, 38, 38, 0.7), rgba(15, 23, 42, 0.8)), url('../../../../assets/img/carousel-2.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -12,19 +12,19 @@
   margin-bottom: 1rem;
 }
 
-.events-hero__overlay {
+.event-create-hero__overlay {
   width: 100%;
   padding: 4rem 1.5rem;
 }
 
-.events-hero__content {
+.event-create-hero__content {
   max-width: 960px;
   margin: 0 auto;
   text-align: right;
   color: #ffffff;
 }
 
-.events-hero__title {
+.event-create-hero__title {
   font-size: clamp(2.25rem, 4vw, 3.5rem);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -32,7 +32,7 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.events-hero__subtitle {
+.event-create-hero__subtitle {
   font-size: clamp(1.1rem, 2vw, 1.5rem);
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1.5rem;
@@ -40,7 +40,7 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.events-hero__breadcrumbs {
+.event-create-hero__breadcrumbs {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
@@ -52,31 +52,36 @@
   backdrop-filter: blur(10px);
 }
 
-.events-hero__breadcrumbs a {
+.event-create-hero__breadcrumbs a {
   color: #ffd700;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
-.events-hero__breadcrumbs a:hover {
+.event-create-hero__breadcrumbs a:hover {
   color: #fff;
 }
 
-.events-hero__breadcrumbs .divider {
+.event-create-hero__breadcrumbs .divider {
   color: rgba(255, 255, 255, 0.75);
 }
 
+.event-create-hero__breadcrumbs .current-page {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+}
+
 @media (max-width: 768px) {
-  .events-hero {
+  .event-create-hero {
     min-height: 300px;
   }
 
-  .events-hero__overlay {
+  .event-create-hero__overlay {
     padding: 3rem 1.25rem;
   }
 
-  .events-hero__breadcrumbs {
+  .event-create-hero__breadcrumbs {
     flex-wrap: wrap;
     gap: 0.5rem;
     row-gap: 0.25rem;
