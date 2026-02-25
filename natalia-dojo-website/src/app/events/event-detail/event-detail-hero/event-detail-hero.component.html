@@ -7,7 +7,8 @@
         <a routerLink="/home">דף הבית</a>
         <span class="divider">/</span>
         <a *ngIf="fromEventsManagement" routerLink="/admin/events">ניהול אירועים</a>
-        <a *ngIf="!fromEventsManagement" routerLink="/events">סמינרים</a>
+        <a *ngIf="fromMyEvents && !fromEventsManagement" routerLink="/my-events">אירועים שלי</a>
+        <a *ngIf="!fromEventsManagement && !fromMyEvents" routerLink="/events">סמינרים</a>
         <span *ngIf="eventTitle" class="divider">/</span>
         <span *ngIf="eventTitle" class="current-page">{{ eventTitle }}</span>
       </div>

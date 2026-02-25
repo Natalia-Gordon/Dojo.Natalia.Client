@@ -392,7 +392,223 @@
   font-size: 1.1rem;
 }
 
+/* Toolbar: list/calendar toggle + download */
+.my-events-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.my-events-view-toggle {
+  display: inline-flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: #f1f5f9;
+}
+
+.my-events-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.my-events-view-btn:hover {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.my-events-view-btn.active {
+  background: #dc2626;
+  color: #fff;
+}
+
+.my-events-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.my-events-download-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+}
+
+.my-events-download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.my-events-download-btn i {
+  font-size: 1.1rem;
+}
+
+/* Calendar visualization */
+.my-events-calendar {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  animation: myEventsFadeIn 0.4s ease-in;
+}
+
+.my-events-calendar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.my-events-calendar__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.my-events-calendar__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.my-events-calendar__nav:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.my-events-calendar__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.my-events-calendar__weekdays span {
+  padding: 0.35rem 0;
+}
+
+.my-events-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  min-height: 320px;
+}
+
+.my-events-calendar__day {
+  min-height: 4.5rem;
+  padding: 0.35rem;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.my-events-calendar__day.other-month {
+  background: #f1f5f9;
+  opacity: 0.7;
+}
+
+.my-events-calendar__day.today {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
+
+.my-events-calendar__day-num {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.my-events-calendar__day.today .my-events-calendar__day-num {
+  color: #dc2626;
+}
+
+.my-events-calendar__event {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(220, 38, 38, 0.1));
+  color: #b91c1c;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: right;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.2s, color 0.2s;
+}
+
+.my-events-calendar__event:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
 @media (max-width: 768px) {
+  .my-events-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .my-events-view-toggle {
+    justify-content: center;
+  }
+
+  .my-events-calendar__grid {
+    min-height: 260px;
+  }
+
+  .my-events-calendar__day {
+    min-height: 3.5rem;
+    padding: 0.25rem;
+  }
+
+  .my-events-calendar__event {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.3rem;
+  }
+
   .my-events-hero {
     min-height: 300px;
   }
