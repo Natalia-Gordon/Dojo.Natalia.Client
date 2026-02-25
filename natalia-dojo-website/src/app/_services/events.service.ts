@@ -45,6 +45,7 @@ export interface Instructor {
   username: string | null;
   displayName: string | null;
   email: string | null;
+  phone: string | null;
   rank: string | null;
   yearsOfExperience: number | null;
   specialization: string[] | null;
@@ -399,6 +400,30 @@ export class EventsService {
         if (error.status !== 0 && error.status !== 503) {
           console.error('Get instructor by ID error:', error);
         }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Update instructor bank details (admin only)
+   */
+  updateInstructorBankDetails(
+    instructorId: number,
+    bankDetails: {
+      accountHolderName?: string | null;
+      bankName?: string | null;
+      bankId?: string | null;
+      branchNumber?: string | null;
+      accountNumber?: string | null;
+      bankAddress?: string | null;
+    }
+  ): Observable<Instructor> {
+    return this.http.patch<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, bankDetails, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(error => {
+        console.error('Update instructor bank details error:', error);
         return throwError(() => error);
       })
     );

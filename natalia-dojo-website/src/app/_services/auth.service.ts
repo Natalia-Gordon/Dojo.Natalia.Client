@@ -111,6 +111,7 @@ export interface UpdateUserRequest {
   dateOfBirth?: string | null; // Format: YYYY-MM-DD
   isActive?: boolean;
   currentRankId?: number | null;
+  userType?: string | null;
 }
 
 @Injectable({
@@ -337,6 +338,23 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  /**
+   * Check if the access token is expired (or missing).
+   * Uses JWT exp claim with 60s buffer to avoid edge cases.
+   */
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload?.exp;
+      if (!exp || typeof exp !== 'number') return true;
+      return Date.now() / 1000 >= exp - 60;
+    } catch {
+      return true;
+    }
   }
 
   /**
@@ -665,6 +683,30 @@ export class AuthService {
       }),
       catchError((error: any) => {
         console.error('Update user error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Delete a user
+   * @param userId User ID to delete
+   * @returns Observable that completes when delete succeeds
+   */
+  deleteUser(userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/users/${userId}`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(() => {
+        const currentUserInfo = this.getUserInfo();
+        if (currentUserInfo && currentUserInfo.userId === userId) {
+          this.logout().subscribe();
+        } else {
+          this.usersRefreshSubject.next();
+        }
+      }),
+      catchError((error: any) => {
+        console.error('Delete user error:', error);
         return throwError(() => error);
       })
     );

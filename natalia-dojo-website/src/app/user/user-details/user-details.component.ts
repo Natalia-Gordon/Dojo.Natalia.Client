@@ -84,6 +84,15 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
 
     this.loadUserDetails(userInfo.userId);
+
+    this.loginModalService.reconnectSuccess$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        const info = this.authService.getUserInfo();
+        if (info) {
+          this.loadUserDetails(info.userId);
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -383,7 +392,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   openLoginModal(): void {
-    this.loginModalService.open();
+    this.loginModalService.openForReconnect(this.user?.username ?? this.authService.getUserInfo()?.username);
   }
 
   isInstructor(): boolean {

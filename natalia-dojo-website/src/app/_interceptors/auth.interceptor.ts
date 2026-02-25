@@ -59,8 +59,7 @@ export class AuthInterceptor implements HttpInterceptor {
           error.status === 401 &&
           !isPublicEventsListRequest &&
           !isRefreshTokenRequest &&
-          isBrowser &&
-          this.authDialogService
+          isBrowser
         ) {
           // Dialog already open: another request got 401 while user is choosing or we're refreshing.
           // Don't propagate to component — avoid page error; global logout/redirect will happen from the first request's flow.

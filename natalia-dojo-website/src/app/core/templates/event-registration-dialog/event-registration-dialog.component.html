@@ -78,6 +78,7 @@
                   <select
                     class="form-select form-select-lg"
                     [(ngModel)]="selectedPaymentMethod"
+                    (ngModelChange)="onPaymentMethodChange()"
                     [disabled]="isEnrolling"
                     required>
                     @for (method of paymentMethods; track method) {
@@ -86,6 +87,94 @@
                       </option>
                     }
                   </select>
+                  <!-- Bit Transfer Details -->
+                  @if (selectedPaymentMethod === 'bit') {
+                    <div class="bit-transfer-details mt-3">
+                      <div class="alert alert-info">
+                        <h6 class="alert-heading mb-2">
+                          <i class="bi bi-phone me-2"></i>
+                          פרטי מספר טלפון להעברת ביט
+                        </h6>
+                        @if (isLoadingInstructor) {
+                          <div class="text-center py-2">
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            טוען פרטי טלפון...
+                          </div>
+                        }
+                        @if (!isLoadingInstructor && instructor?.phone) {
+                          <div class="detail-item">
+                            <strong>מספר טלפון:</strong>
+                            <span dir="ltr">{{ instructor?.phone }}</span>
+                          </div>
+                          <hr>
+                          <p class="mb-2 small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            אנא שלח/י הוכחת העברה לאחר ביצוע התשלום
+                          </p>
+                          <!-- File Upload for Payment Proof -->
+                          <div class="file-upload-section">
+                            <label class="form-label fw-bold small mb-2">
+                              <i class="bi bi-paperclip me-1"></i>
+                              צרף קובץ להוכחת תשלום
+                            </label>
+                            <div class="file-input-wrapper">
+                              <input
+                                type="file"
+                                class="form-control form-control-sm"
+                                id="paymentProofFileBit"
+                                accept="image/*,.pdf"
+                                (change)="onFileSelected($event)"
+                                [disabled]="isEnrolling">
+                              <label for="paymentProofFileBit" class="file-input-label">
+                                <i class="bi bi-cloud-upload me-1"></i>
+                                בחר קובץ
+                              </label>
+                            </div>
+                            @if (paymentProofFileName) {
+                              <div class="file-info mt-2">
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-link text-danger p-0"
+                                  (click)="removeFile()"
+                                  [disabled]="isEnrolling">
+                                  <i class="bi bi-x-circle"></i>
+                                </button>
+                                <i class="bi bi-file-check text-success me-1"></i>
+                                <span class="small">{{ paymentProofFileName }}</span>
+                              </div>
+                            }
+                            <small class="text-muted d-block mt-1">
+                              ניתן להעלות תמונה (JPG, PNG) או קובץ PDF
+                            </small>
+                          </div>
+                        }
+                        @if (!isLoadingInstructor && instructor && !instructor.phone) {
+                          <div class="alert alert-warning mt-2 mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            פרטי טלפון להעברת ביט לא זמינים עבור מארגן האירוע.
+                          </div>
+                        }
+                        @if (!isLoadingInstructor && !instructor) {
+                          @if (instructorLoadErrorStatus === 401) {
+                            <div class="alert alert-warning mt-2">
+                              <i class="bi bi-exclamation-triangle me-2"></i>
+                              ההתחברות פגה או שאין הרשאה. להתחבר מחדש?
+                              <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-primary" (click)="goToLogin()">
+                                  התחבר מחדש
+                                </button>
+                              </div>
+                            </div>
+                          } @else {
+                            <div class="alert alert-warning mt-2">
+                              <i class="bi bi-exclamation-triangle me-2"></i>
+                              פרטי טלפון לא זמינים עבור מארגן האירוע.
+                            </div>
+                          }
+                        }
+                      </div>
+                    </div>
+                  }
                   <!-- Bank Transfer Details -->
                   @if (selectedPaymentMethod === 'bank_transfer') {
                     <div class="bank-transfer-details mt-3">

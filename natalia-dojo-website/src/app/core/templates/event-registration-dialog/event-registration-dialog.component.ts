@@ -31,7 +31,8 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
 
   paymentMethods: { value: PaymentMethod; label: string }[] = [
     { value: 'cash', label: 'מזומן' },
-    { value: 'bank_transfer', label: 'העברה בנקאית' }
+    { value: 'bank_transfer', label: 'העברה בנקאית' },
+    { value: 'bit', label: 'העברה ביט' }
   ];
 
   /** First/default bank method from instructor.paymentMethods for display; fallback to top-level fields. */
@@ -216,6 +217,12 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Validate payment proof file when Bit transfer is selected and instructor phone is shown
+    if (this.selectedPaymentMethod === 'bit' && this.hasInstructorBitPhone() && !this.paymentProofFile) {
+      this.errorMessage = 'בהעברת ביט יש לצרף קובץ להוכחת תשלום.';
+      return;
+    }
+
     if (this.isEnrolling) {
       return;
     }
@@ -308,6 +315,10 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
     return deadline > new Date();
   }
 
+  onPaymentMethodChange(): void {
+    this.removeFile();
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -319,12 +330,12 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
   removeFile(): void {
     this.paymentProofFile = null;
     this.paymentProofFileName = '';
-    // Reset the file input
+    // Reset the file input (bank transfer and Bit use different ids, only one in DOM at a time)
     if (isPlatformBrowser(this.platformId)) {
-      const fileInput = document.getElementById('paymentProofFile') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = '';
-      }
+      const bankInput = document.getElementById('paymentProofFile') as HTMLInputElement;
+      const bitInput = document.getElementById('paymentProofFileBit') as HTMLInputElement;
+      if (bankInput) bankInput.value = '';
+      if (bitInput) bitInput.value = '';
     }
   }
 
