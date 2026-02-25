@@ -359,6 +359,105 @@
                                   </div>
                                 </div>
                               }
+                              <!-- Payment methods (instructors only) -->
+                              @if (user && isInstructor()) {
+                                <div class="bg-light rounded p-4 mb-4">
+                                  <h5 class="fw-bold mb-3 text-secondary">
+                                    <i class="bi bi-credit-card me-2"></i>
+                                    שיטות תשלום שלי
+                                  </h5>
+                                  @if (paymentMethodError) {
+                                    <div class="alert alert-danger py-2 mb-3">{{ paymentMethodError }}</div>
+                                  }
+                                  @if (isLoadingPaymentMethods) {
+                                    <p class="text-muted small"><span class="spinner-border spinner-border-sm me-2"></span>טוען שיטות תשלום...</p>
+                                  }
+                                  @if (!isLoadingPaymentMethods) {
+                                    <ul class="list-group list-group-flush mb-3">
+                                      @for (pm of paymentMethods; track pm.id) {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-white rounded mb-2">
+                                          <div>
+                                            <span class="badge me-2" [ngClass]="pm.paymentType === 'bit' ? 'bg-info' : 'bg-secondary'">
+                                              {{ pm.paymentType === 'bit' ? 'ביט' : 'העברה בנקאית' }}
+                                            </span>
+                                            @if (pm.isDefault) {
+                                              <span class="badge bg-danger small">ברירת מחדל</span>
+                                            }
+                                            <span class="ms-2">{{ getPaymentMethodDisplayText(pm) }}</span>
+                                          </div>
+                                          <div>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary me-1" (click)="openEditPaymentMethod(pm)" title="עריכה">
+                                              <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" (click)="deletePaymentMethod(pm.id)" title="מחיקה">
+                                              <i class="bi bi-trash"></i>
+                                            </button>
+                                          </div>
+                                        </li>
+                                      }
+                                    </ul>
+                                    @if (paymentMethods.length === 0 && !showPaymentMethodForm) {
+                                      <p class="text-muted small mb-3">אין שיטות תשלום. הוסף ביט או העברה בנקאית כדי שמשתתפים יוכלו לשלם.</p>
+                                    }
+                                    @if (!showPaymentMethodForm) {
+                                      <button type="button" class="btn btn-outline-danger btn-sm" (click)="openAddPaymentMethod()">
+                                        <i class="bi bi-plus-lg me-1"></i>
+                                        הוסף שיטת תשלום
+                                      </button>
+                                    }
+                                    @if (showPaymentMethodForm) {
+                                      <div class="border rounded p-3 bg-white mb-3">
+                                        <h6 class="mb-3">{{ paymentMethodFormTitle }}</h6>
+                                        <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm">
+                                          <div class="row g-2 mb-2">
+                                            <div class="col-12 col-md-6">
+                                              <label class="form-label small fw-bold">סוג</label>
+                                              <select class="form-control form-control-sm" formControlName="paymentType">
+                                                <option value="bank_transfer">העברה בנקאית</option>
+                                                <option value="bit">ביט (Bit)</option>
+                                              </select>
+                                            </div>
+                                            <div class="col-12 col-md-6 d-flex align-items-end">
+                                              <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefault">
+                                                <label class="form-check-label small" for="pmDefault">ברירת מחדל</label>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          @if (paymentTypeFormValue === 'bit') {
+                                            <div class="mb-2">
+                                              <label class="form-label small fw-bold">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                                              <input type="tel" class="form-control form-control-sm" formControlName="phoneNumber" placeholder="למשל 050-1234567">
+                                            </div>
+                                          }
+                                          @if (paymentTypeFormValue === 'bank_transfer') {
+                                            <div class="row g-2 small">
+                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">שם הבנק</label><input type="text" class="form-control form-control-sm" formControlName="bankName"></div>
+                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">מספר בנק</label><input type="text" class="form-control form-control-sm" formControlName="bankNumber"></div>
+                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">סניף / שם סניף</label><input type="text" class="form-control form-control-sm" formControlName="branchName"></div>
+                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">מספר סניף</label><input type="text" class="form-control form-control-sm" formControlName="branchNumber"></div>
+                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">מספר חשבון</label><input type="text" class="form-control form-control-sm" formControlName="accountNumber"></div>
+                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">שם בעל החשבון</label><input type="text" class="form-control form-control-sm" formControlName="accountHolderName"></div>
+                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">IBAN</label><input type="text" class="form-control form-control-sm" formControlName="iban"></div>
+                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">SWIFT/BIC</label><input type="text" class="form-control form-control-sm" formControlName="swiftBic"></div>
+                                              <div class="col-12"><label class="form-label fw-bold">כתובת הבנק</label><input type="text" class="form-control form-control-sm" formControlName="bankAddress"></div>
+                                            </div>
+                                          }
+                                          <div class="mt-3 d-flex gap-2">
+                                            <button type="submit" class="btn btn-danger btn-sm" [disabled]="isSavingPaymentMethod">
+                                              @if (isSavingPaymentMethod) {
+                                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                              }
+                                              שמור
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="closePaymentMethodForm()">ביטול</button>
+                                          </div>
+                                        </form>
+                                      </div>
+                                    }
+                                  }
+                                </div>
+                              }
                               <!-- Submit Button -->
                               @if (isEditMode) {
                                 <div class="d-flex justify-content-end">

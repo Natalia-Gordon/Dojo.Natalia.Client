@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { EventsService, Event as EventModel, PaymentMethod, EventRegistrationResponse, Instructor } from '../../../_services/events.service';
+import { EventsService, Event as EventModel, PaymentMethod, EventRegistrationResponse, Instructor, InstructorPaymentMethodDto } from '../../../_services/events.service';
 import { AuthService, UserInfo } from '../../../_services/auth.service';
 import { LoginModalService } from '../../../_services/login-modal.service';
 
@@ -34,6 +34,25 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
     { value: 'bank_transfer', label: 'העברה בנקאית' },
     { value: 'bit', label: 'העברה ביט' }
   ];
+
+  /** First/default bank method from instructor.paymentMethods for display; fallback to top-level fields. */
+  get defaultBankMethod(): InstructorPaymentMethodDto | null {
+    if (!this.instructor?.paymentMethods?.length) return null;
+    const def = this.instructor.paymentMethods.find(m => m.paymentType === 'bank_transfer' && m.isDefault);
+    return def || this.instructor.paymentMethods.find(m => m.paymentType === 'bank_transfer') || null;
+  }
+
+  /** First/default Bit method from instructor.paymentMethods. */
+  get defaultBitMethod(): InstructorPaymentMethodDto | null {
+    if (!this.instructor?.paymentMethods?.length) return null;
+    const def = this.instructor.paymentMethods.find(m => m.paymentType === 'bit' && m.isDefault);
+    return def || this.instructor.paymentMethods.find(m => m.paymentType === 'bit') || null;
+  }
+
+  /** True when Bit is selected and we have a Bit phone number to display. */
+  get showBitDetails(): boolean {
+    return this.selectedPaymentMethod === 'bit' && !!this.defaultBitMethod?.phoneNumber;
+  }
 
   private subscription?: Subscription;
 
@@ -85,6 +104,7 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
         this.instructor = instructor;
         this.instructorLoadErrorStatus = null;
         this.isLoadingInstructor = false;
+        this.buildPaymentMethodsOptions();
       },
       error: (error) => {
         // Only log non-network and non-404 errors
@@ -98,25 +118,66 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** True when instructor was loaded and has at least one bank detail (for showing payment proof upload). */
+  /** Build payment method dropdown from instructor.paymentMethods (Bit + bank transfer) plus cash. */
+  private buildPaymentMethodsOptions(): void {
+    const options: { value: PaymentMethod; label: string }[] = [{ value: 'cash', label: 'מזומן' }];
+    if (this.instructor?.paymentMethods?.length) {
+      const hasBit = this.instructor.paymentMethods.some(m => m.paymentType === 'bit');
+      const hasBank = this.instructor.paymentMethods.some(m => m.paymentType === 'bank_transfer') || this.hasLegacyBankFields();
+      if (hasBit) options.push({ value: 'bit', label: 'ביט (Bit)' });
+      if (hasBank) options.push({ value: 'bank_transfer', label: 'העברה בנקאית' });
+    } else {
+      options.push({ value: 'bank_transfer', label: 'העברה בנקאית' });
+    }
+    this.paymentMethods = options;
+  }
+
+  private hasLegacyBankFields(): boolean {
+    const i = this.instructor;
+    if (!i) return false;
+    return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankId || i.bankNumber || i.branchName || i.branchNumber);
+  }
+
+  /**
+   * True when instructor has at least one payment method requiring details (bank or Bit).
+   * Uses paymentMethods first, then top-level bank fields.
+   */
   hasInstructorBankDetails(): boolean {
     if (!this.instructor) return false;
+    if (this.instructor.paymentMethods?.length) {
+      return this.instructor.paymentMethods.some(m =>
+        (m.paymentType === 'bank_transfer' && (m.bankName || m.accountHolderName || m.accountNumber || m.iban || m.bankNumber || m.branchName)) ||
+        (m.paymentType === 'bit' && m.phoneNumber)
+      );
+    }
     const i = this.instructor;
-    return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankId || i.branchNumber);
+    return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankId || i.bankNumber || i.branchName || i.branchNumber);
   }
 
-  /** True when instructor has phone (for Bit transfer payment proof upload). */
-  hasInstructorBitPhone(): boolean {
-    return !!(this.instructor?.phone);
+  /** True when instructor has bank transfer details (for requiring proof when bank_transfer is selected). */
+  private hasInstructorBankTransferDetails(): boolean {
+    if (!this.instructor) return false;
+    if (this.defaultBankMethod) return true;
+    return this.hasLegacyBankFields();
   }
 
-  /** True when submit should be disabled: missing payment method, or bank/bit transfer without proof file. */
+  /** True when selected method is bank_transfer and instructor has bank details, or Bit and instructor has Bit phone (proof file required). */
+  requiresPaymentProof(): boolean {
+    if (this.selectedPaymentMethod === 'bank_transfer') {
+      return this.hasInstructorBankTransferDetails();
+    }
+    if (this.selectedPaymentMethod === 'bit') {
+      return !!this.defaultBitMethod?.phoneNumber;
+    }
+    return false;
+  }
+
+  /** True when submit should be disabled: missing payment method, or (bank transfer or Bit) without proof file when required. */
   isEnrollDisabled(): boolean {
     if (this.isEnrolling) return true;
     if (!this.event) return true;
     if (this.event.price > 0 && !this.selectedPaymentMethod) return true;
-    if (this.selectedPaymentMethod === 'bank_transfer' && this.hasInstructorBankDetails() && !this.paymentProofFile) return true;
-    if (this.selectedPaymentMethod === 'bit' && this.hasInstructorBitPhone() && !this.paymentProofFile) return true;
+    if (this.requiresPaymentProof() && !this.paymentProofFile) return true;
     return false;
   }
 
@@ -150,9 +211,9 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validate payment proof file when bank transfer is selected and bank details are shown
-    if (this.selectedPaymentMethod === 'bank_transfer' && this.hasInstructorBankDetails() && !this.paymentProofFile) {
-      this.errorMessage = 'בהעברה בנקאית יש לצרף קובץ להוכחת תשלום.';
+    // Validate payment proof file when required (bank transfer or Bit with details)
+    if (this.requiresPaymentProof() && !this.paymentProofFile) {
+      this.errorMessage = 'יש לצרף קובץ להוכחת תשלום.';
       return;
     }
 

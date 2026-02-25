@@ -19,6 +19,8 @@ export class EventDetailHeroComponent {
   @Input() earlyBirdDeadline: string | null = null;
   /** When true, breadcrumb shows "ניהול אירועים" link back to admin events instead of "סמינרים". */
   @Input() fromEventsManagement: boolean = false;
+  /** When true, breadcrumb shows "אירועים שלי" link back to my-events. */
+  @Input() fromMyEvents: boolean = false;
 
   /**
    * Generate a compelling martial arts marketing summary

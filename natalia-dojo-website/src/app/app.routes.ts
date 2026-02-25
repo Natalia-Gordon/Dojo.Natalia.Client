@@ -47,6 +47,8 @@ import { LoginComponent } from './login/login.component';
 import { UserDetailsComponent } from './user/user-details/user-details.component';
 import { EventsComponent } from './events/events.component';
 import { EventDetailComponent } from './events/event-detail/event-detail.component';
+import { EventCreateComponent } from './events/event-create/event-create.component';
+import { adminOrInstructorGuard } from './_guards/admin-or-instructor.guard';
 import { UserManagementComponent } from './core/templates/user-management/user-management.component';
 import { EventsManagementComponent } from './core/templates/events-management/events-management.component';
 import { EventRegistrationsComponent } from './core/templates/event-registrations/event-registrations.component';
@@ -69,6 +71,7 @@ export const routes: Routes = [
       { path: 'admin/events', component: EventsManagementComponent, data: { skipPrerender: true } },
       { path: 'my-events', component: MyEventsComponent, data: { skipPrerender: true } },
       { path: 'events', component: EventsComponent, data: { skipPrerender: true } },
+      { path: 'events/create', component: EventCreateComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
       { path: 'events/:eventId/registrations/:registrationId/approve', component: RegistrationApproveComponent, data: { skipPrerender: true } },
       { path: 'events/:id', component: EventDetailComponent, data: { skipPrerender: true } },
       { path: 'profile', redirectTo: 'home', pathMatch: 'full' },

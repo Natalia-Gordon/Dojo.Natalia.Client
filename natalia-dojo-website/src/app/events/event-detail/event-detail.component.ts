@@ -31,6 +31,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   instructorName: string | null = null;
   /** When true, event detail hero shows "ניהול אירועים" in breadcrumb (from query param from=admin-events). */
   fromEventsManagement = false;
+  /** When true, breadcrumb shows "אירועים שלי" link back to my-events (from query param from=my-events). */
+  fromMyEvents = false;
 
   private routeSubscription?: Subscription;
   private queryParamSubscription?: Subscription;
@@ -86,8 +88,10 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
     this.queryParamSubscription = this.route.queryParams.subscribe(q => {
       this.fromEventsManagement = q['from'] === 'admin-events';
+      this.fromMyEvents = q['from'] === 'my-events';
     });
     this.fromEventsManagement = this.route.snapshot.queryParams['from'] === 'admin-events';
+    this.fromMyEvents = this.route.snapshot.queryParams['from'] === 'my-events';
   }
 
   ngOnDestroy(): void {
@@ -239,55 +243,34 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle image load error - try alternative Google Drive URL formats
+   * Handle image load error - try alternative Google Drive URL formats for <img> (no iframe).
+   * CSP "Framing ogs.google.com" was caused by the iframe we no longer use; img src fallbacks are safe.
    */
   onImageError(event: ErrorEvent): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    
+
     const imgElement = event.target as HTMLImageElement;
     if (!imgElement) return;
 
-    const currentSrc = imgElement.src;
-    
-    // Try alternative formats if we have a file ID
-    if (this.imageId && this.imageLoadAttempt < 3) {
+    if (this.imageId && this.imageLoadAttempt < 2) {
       this.imageLoadAttempt++;
-      let fallbackUrl = '';
-      
-      switch (this.imageLoadAttempt) {
-        case 1:
-          // Try uc?export=view (may be blocked by Google)
-          fallbackUrl = `https://drive.google.com/uc?export=view&id=${this.imageId}`;
-          break;
-        case 2:
-          // Try export=download format
-          fallbackUrl = `https://drive.google.com/uc?export=download&id=${this.imageId}`;
-          break;
-        case 3:
-          // Last resort: show Drive preview iframe so image is still visible
-          this.showDrivePreviewWithLink(imgElement);
-          return;
-      }
-      
-      if (fallbackUrl) {
-        console.log(`Trying alternative format ${this.imageLoadAttempt}:`, fallbackUrl);
-        imgElement.src = fallbackUrl;
-        return;
-      }
+      const fallbackUrl =
+        this.imageLoadAttempt === 1
+          ? `https://drive.google.com/uc?export=view&id=${this.imageId}`
+          : `https://drive.google.com/uc?export=download&id=${this.imageId}`;
+      imgElement.src = fallbackUrl;
+      return;
     }
-    
-    // All attempts failed - show error message with link
-    console.error('All image load attempts failed:', currentSrc);
-    this.showErrorMessageWithLink(imgElement);
+
+    this.showDriveLinkOnly(imgElement);
   }
 
   /**
-   * When direct image URLs fail, show Google Drive preview iframe so the image is still visible,
-   * plus a link to open in Drive.
+   * Show link to open image in Google Drive. Do not embed iframe (Drive CSP: frame-ancestors https://drive.google.com).
    */
-  private showDrivePreviewWithLink(imgElement: HTMLImageElement): void {
+  private showDriveLinkOnly(imgElement: HTMLImageElement): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    
+
     if (!this.imageId) {
       this.showErrorMessage(imgElement);
       return;
@@ -297,41 +280,19 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (!container) return;
 
     imgElement.style.display = 'none';
-    if (container.querySelector('.drive-iframe-embed')) return;
-
-    const previewUrl = `https://drive.google.com/file/d/${this.imageId}/preview`;
-    const iframeWrap = document.createElement('div');
-    iframeWrap.className = 'drive-iframe-embed';
-    const iframe = document.createElement('iframe');
-    iframe.src = previewUrl;
-    iframe.title = 'תצוגה מקדימה של התמונה';
-    iframeWrap.appendChild(iframe);
-    container.appendChild(iframeWrap);
+    if (container.querySelector('.drive-image-error')) return;
 
     const linkWrap = document.createElement('div');
     linkWrap.className = 'drive-image-error';
-    linkWrap.style.cssText = 'padding: 0.75rem 0; text-align: center;';
+    linkWrap.style.cssText = 'padding: 1.5rem; text-align: center; background: #f8f9fa; border-radius: 8px;';
     const driveLink = document.createElement('a');
     driveLink.href = `https://drive.google.com/file/d/${this.imageId}/view`;
     driveLink.target = '_blank';
     driveLink.rel = 'noopener noreferrer';
     driveLink.textContent = 'לצפייה בתמונה ב-Google Drive';
-    driveLink.className = 'btn btn-outline-primary btn-sm';
+    driveLink.className = 'btn btn-outline-primary';
     linkWrap.appendChild(driveLink);
     container.appendChild(linkWrap);
-  }
-
-  /**
-   * Show error message with link when we have no image ID (non-Drive URL failed).
-   */
-  private showErrorMessageWithLink(imgElement: HTMLImageElement): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    
-    if (!this.imageId) {
-      this.showErrorMessage(imgElement);
-      return;
-    }
-    this.showDrivePreviewWithLink(imgElement);
   }
 
   /**

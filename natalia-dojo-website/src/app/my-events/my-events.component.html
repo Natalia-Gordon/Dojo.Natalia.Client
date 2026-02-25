@@ -55,6 +55,24 @@
           }
 
           @if (!isLoading && !errorMessage && registrations.length > 0) {
+            <div class="my-events-toolbar">
+              <div class="my-events-view-toggle">
+                <button type="button" class="my-events-view-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'" aria-pressed="viewMode === 'list'">
+                  <i class="bi bi-list-ul"></i>
+                  <span>רשימה</span>
+                </button>
+                <button type="button" class="my-events-view-btn" [class.active]="viewMode === 'calendar'" (click)="viewMode = 'calendar'" aria-pressed="viewMode === 'calendar'">
+                  <i class="bi bi-calendar3"></i>
+                  <span>לוח שנה</span>
+                </button>
+              </div>
+              <button type="button" class="my-events-download-btn" (click)="downloadUpcomingEvents()" [disabled]="upcomingCount === 0">
+                <i class="bi bi-download"></i>
+                <span>הורד אירועים קרובים ({{ upcomingCount }})</span>
+              </button>
+            </div>
+
+            @if (viewMode === 'list') {
             <div class="my-events-list">
               @for (r of registrations; track trackByRegistrationId($index, r)) {
                 <article class="event-card" [attr.aria-label]="'הרשמה: ' + (r.eventTitle || 'אירוע')">
@@ -108,6 +126,36 @@
                 </article>
               }
             </div>
+            }
+
+            @if (viewMode === 'calendar') {
+            <div class="my-events-calendar">
+              <div class="my-events-calendar__header">
+                <button type="button" class="my-events-calendar__nav" (click)="calendarPrevMonth()" aria-label="חודש קודם">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+                <h3 class="my-events-calendar__title">{{ calendarTitle }}</h3>
+                <button type="button" class="my-events-calendar__nav" (click)="calendarNextMonth()" aria-label="חודש הבא">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+              </div>
+              <div class="my-events-calendar__weekdays">
+                <span>א'</span><span>ב'</span><span>ג'</span><span>ד'</span><span>ה'</span><span>ו'</span><span>ש'</span>
+              </div>
+              <div class="my-events-calendar__grid">
+                @for (day of calendarDays; track day.key) {
+                  <div class="my-events-calendar__day" [class.other-month]="day.isOtherMonth" [class.today]="day.isToday">
+                    <span class="my-events-calendar__day-num">{{ day.date.getDate() }}</span>
+                    @for (ev of day.events; track ev.registrationId) {
+                      <button type="button" class="my-events-calendar__event" (click)="goToEvent(ev.eventId)" [title]="ev.eventTitle || 'אירוע'">
+                        {{ ev.eventTitle || 'אירוע' }}
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            }
           }
         }
       </div>

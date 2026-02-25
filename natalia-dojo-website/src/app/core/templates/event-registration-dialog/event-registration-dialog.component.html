@@ -191,53 +191,56 @@
                         }
                         @if (!isLoadingInstructor && instructor) {
                           <div class="bank-details">
-                            @if (instructor.bankName) {
-                              <div class="detail-item">
-                                <strong>שם הבנק:</strong>
-                                <span>{{ instructor.bankName }}</span>
-                              </div>
-                            }
-                            @if (instructor.branchNumber) {
-                              <div class="detail-item">
-                                <strong>מספר סניף:</strong>
-                                <span>{{ instructor.branchNumber }}</span>
-                              </div>
-                            }
-                            @if (instructor.accountNumber) {
-                              <div class="detail-item">
-                                <strong>מספר חשבון:</strong>
-                                <span>{{ instructor.accountNumber }}</span>
-                              </div>
-                            }
-                            @if (instructor.accountHolderName) {
-                              <div class="detail-item">
-                                <strong>שם החשבון:</strong>
-                                <span>{{ instructor.accountHolderName }}</span>
-                              </div>
-                            }
-                            @if (instructor.iban) {
-                              <div class="detail-item">
-                                <strong>IBAN:</strong>
-                                <span>{{ instructor.iban }}</span>
-                              </div>
-                            }
-                            @if (instructor.swiftBic) {
-                              <div class="detail-item">
-                                <strong>SWIFT/BIC:</strong>
-                                <span>{{ instructor.swiftBic }}</span>
-                              </div>
-                            }
-                            @if (instructor.bankId) {
-                              <div class="detail-item">
-                                <strong>מספר בנק:</strong>
-                                <span>{{ instructor.bankId }}</span>
-                              </div>
-                            }
-                            @if (instructor.bankAddress) {
-                              <div class="detail-item">
-                                <strong>כתובת הבנק:</strong>
-                                <span>{{ instructor.bankAddress }}</span>
-                              </div>
+                            @if (defaultBankMethod) {
+                              @if (defaultBankMethod.bankName) {
+                                <div class="detail-item"><strong>שם הבנק:</strong><span>{{ defaultBankMethod.bankName }}</span></div>
+                              }
+                              @if (defaultBankMethod.bankNumber) {
+                                <div class="detail-item"><strong>מספר בנק:</strong><span>{{ defaultBankMethod.bankNumber }}</span></div>
+                              }
+                              @if (defaultBankMethod.branchName || defaultBankMethod.branchNumber) {
+                                <div class="detail-item"><strong>סניף:</strong><span>{{ defaultBankMethod.branchName || defaultBankMethod.branchNumber }}</span></div>
+                              }
+                              @if (defaultBankMethod.accountNumber) {
+                                <div class="detail-item"><strong>מספר חשבון:</strong><span>{{ defaultBankMethod.accountNumber }}</span></div>
+                              }
+                              @if (defaultBankMethod.accountHolderName) {
+                                <div class="detail-item"><strong>שם החשבון:</strong><span>{{ defaultBankMethod.accountHolderName }}</span></div>
+                              }
+                              @if (defaultBankMethod.iban) {
+                                <div class="detail-item"><strong>IBAN:</strong><span>{{ defaultBankMethod.iban }}</span></div>
+                              }
+                              @if (defaultBankMethod.swiftBic) {
+                                <div class="detail-item"><strong>SWIFT/BIC:</strong><span>{{ defaultBankMethod.swiftBic }}</span></div>
+                              }
+                              @if (defaultBankMethod.bankAddress) {
+                                <div class="detail-item"><strong>כתובת הבנק:</strong><span>{{ defaultBankMethod.bankAddress }}</span></div>
+                              }
+                            } @else {
+                              @if (instructor.bankName) {
+                                <div class="detail-item"><strong>שם הבנק:</strong><span>{{ instructor.bankName }}</span></div>
+                              }
+                              @if (instructor.bankNumber || instructor.bankId) {
+                                <div class="detail-item"><strong>מספר בנק:</strong><span>{{ instructor.bankNumber || instructor.bankId }}</span></div>
+                              }
+                              @if (instructor.branchName || instructor.branchNumber) {
+                                <div class="detail-item"><strong>סניף:</strong><span>{{ instructor.branchName || instructor.branchNumber }}</span></div>
+                              }
+                              @if (instructor.accountNumber) {
+                                <div class="detail-item"><strong>מספר חשבון:</strong><span>{{ instructor.accountNumber }}</span></div>
+                              }
+                              @if (instructor.accountHolderName) {
+                                <div class="detail-item"><strong>שם החשבון:</strong><span>{{ instructor.accountHolderName }}</span></div>
+                              }
+                              @if (instructor.iban) {
+                                <div class="detail-item"><strong>IBAN:</strong><span>{{ instructor.iban }}</span></div>
+                              }
+                              @if (instructor.swiftBic) {
+                                <div class="detail-item"><strong>SWIFT/BIC:</strong><span>{{ instructor.swiftBic }}</span></div>
+                              }
+                              @if (instructor.bankAddress) {
+                                <div class="detail-item"><strong>כתובת הבנק:</strong><span>{{ instructor.bankAddress }}</span></div>
+                              }
                             }
                           </div>
                         }
@@ -259,49 +262,67 @@
                             </div>
                           }
                         }
-                        @if (hasInstructorBankDetails()) {
-                          <hr>
-                          <p class="mb-2 small">
-                            <i class="bi bi-info-circle me-1"></i>
-                            אנא שלח/י הוכחת העברה לאחר ביצוע התשלום
-                          </p>
-                          <!-- File Upload for Payment Proof -->
-                          <div class="file-upload-section">
-                            <label class="form-label fw-bold small mb-2">
-                              <i class="bi bi-paperclip me-1"></i>
-                              צרף קובץ להוכחת תשלום
-                            </label>
-                            <div class="file-input-wrapper">
-                              <input
-                                type="file"
-                                class="form-control form-control-sm"
-                                id="paymentProofFile"
-                                accept="image/*,.pdf"
-                                (change)="onFileSelected($event)"
-                                [disabled]="isEnrolling">
-                              <label for="paymentProofFile" class="file-input-label">
-                                <i class="bi bi-cloud-upload me-1"></i>
-                                בחר קובץ
-                              </label>
-                            </div>
-                            @if (paymentProofFileName) {
-                              <div class="file-info mt-2">
-                                <button
-                                  type="button"
-                                  class="btn btn-sm btn-link text-danger p-0"
-                                  (click)="removeFile()"
-                                  [disabled]="isEnrolling">
-                                  <i class="bi bi-x-circle"></i>
-                                </button>
-                                <i class="bi bi-file-check text-success me-1"></i>
-                                <span class="small">{{ paymentProofFileName }}</span>
-                              </div>
-                            }
-                            <small class="text-muted d-block mt-1">
-                              ניתן להעלות תמונה (JPG, PNG) או קובץ PDF
-                            </small>
+                      </div>
+                    </div>
+                  }
+                  @if (showBitDetails) {
+                    <div class="bit-details mt-3">
+                      <div class="alert alert-info">
+                        <h6 class="alert-heading mb-2">
+                          <i class="bi bi-phone me-2"></i>
+                          העברה בביט (Bit)
+                        </h6>
+                        @if (defaultBitMethod?.phoneNumber) {
+                          <div class="detail-item">
+                            <strong>מספר טלפון להעברה:</strong>
+                            <span dir="ltr">{{ defaultBitMethod?.phoneNumber }}</span>
                           </div>
                         }
+                      </div>
+                    </div>
+                  }
+                  @if (requiresPaymentProof()) {
+                    <div class="payment-proof-section mt-3">
+                      <div class="alert alert-info">
+                        <p class="mb-2 small">
+                          <i class="bi bi-info-circle me-1"></i>
+                          אנא שלח/י הוכחת העברה לאחר ביצוע התשלום
+                        </p>
+                        <div class="file-upload-section">
+                          <label class="form-label fw-bold small mb-2">
+                            <i class="bi bi-paperclip me-1"></i>
+                            צרף קובץ להוכחת תשלום
+                          </label>
+                          <div class="file-input-wrapper">
+                            <input
+                              type="file"
+                              class="form-control form-control-sm"
+                              id="paymentProofFile"
+                              accept="image/*,.pdf"
+                              (change)="onFileSelected($event)"
+                              [disabled]="isEnrolling">
+                            <label for="paymentProofFile" class="file-input-label">
+                              <i class="bi bi-cloud-upload me-1"></i>
+                              בחר קובץ
+                            </label>
+                          </div>
+                          @if (paymentProofFileName) {
+                            <div class="file-info mt-2">
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-link text-danger p-0"
+                                (click)="removeFile()"
+                                [disabled]="isEnrolling">
+                                <i class="bi bi-x-circle"></i>
+                              </button>
+                              <i class="bi bi-file-check text-success me-1"></i>
+                              <span class="small">{{ paymentProofFileName }}</span>
+                            </div>
+                          }
+                          <small class="text-muted d-block mt-1">
+                            ניתן להעלות תמונה (JPG, PNG) או קובץ PDF
+                          </small>
+                        </div>
                       </div>
                     </div>
                   }
