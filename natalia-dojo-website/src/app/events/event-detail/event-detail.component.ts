@@ -8,6 +8,7 @@ import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { EventDetailHeroComponent } from './event-detail-hero/event-detail-hero.component';
 import { EventRegistrationDialogComponent } from '../../core/templates/event-registration-dialog/event-registration-dialog.component';
+import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
 
 @Component({
   selector: 'app-event-detail',
@@ -119,9 +120,12 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       next: (event) => {
         this.event = event;
         this.instructorName = null;
-        // Compute image URL only in browser to avoid SSR issues
+        // Compute image URL only in browser; use shared Drive URL conversion so event picture displays
         if (isPlatformBrowser(this.platformId) && event.imageUrl) {
-          this.displayImageUrl = this.getImageUrl(event.imageUrl);
+          this.imageLoadAttempt = 0;
+          this.imageId = getDriveFileId(event.imageUrl);
+          const directUrl = getProfileImageUrlForAttempt(event.imageUrl, 0, 'w1920');
+          this.displayImageUrl = directUrl || event.imageUrl.trim();
         } else {
           this.displayImageUrl = event.imageUrl || '';
         }
@@ -188,46 +192,17 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Convert Google Drive file link to direct image URL
-   * Extracts IMAGE_ID from: https://drive.google.com/file/d/IMAGE_ID/view?usp=sharing
-   * Tries multiple URL formats for better compatibility
+   * Resolve display URL for event image. Uses shared Drive conversion so Google Drive links work in <img>.
    */
   getImageUrl(imageUrl: string | null | undefined): string {
     if (!imageUrl) return '';
-    
-    // During SSR, return empty string to avoid issues
-    if (!isPlatformBrowser(this.platformId)) {
-      return '';
-    }
-    
-    // Clean the URL - remove any extra whitespace
-    const cleanUrl = imageUrl.trim();
-    
-    // Extract IMAGE_ID from Google Drive file link
-    // Pattern: https://drive.google.com/file/d/IMAGE_ID/view?usp=sharing
-    const driveFileMatch = cleanUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (driveFileMatch) {
-      this.imageId = driveFileMatch[1];
-      this.imageLoadAttempt = 0;
-      // Prefer thumbnail API first (uc?export=view was disabled by Google in 2024)
-      const thumbnailUrl = `https://drive.google.com/thumbnail?id=${this.imageId}&sz=w1920`;
-      return thumbnailUrl;
-    }
-    
-    // If it's already in a direct format, extract the ID for fallbacks
-    const idMatch = cleanUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    if (idMatch && cleanUrl.includes('drive.google.com')) {
-      this.imageId = idMatch[1];
-      this.imageLoadAttempt = 0;
-      return `https://drive.google.com/thumbnail?id=${this.imageId}&sz=w1920`;
-    }
-    if (idMatch) {
-      this.imageId = idMatch[1];
-      this.imageLoadAttempt = 0;
-    }
-    
-    // For other URLs (including non-Drive), return as is
-    return cleanUrl;
+    if (!isPlatformBrowser(this.platformId)) return '';
+    const trimmed = imageUrl.trim();
+    if (!trimmed) return '';
+    this.imageId = getDriveFileId(trimmed);
+    this.imageLoadAttempt = 0;
+    const direct = getProfileImageUrlForAttempt(trimmed, 0, 'w1920');
+    return direct || trimmed;
   }
 
   /**
@@ -243,22 +218,21 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle image load error - try alternative Google Drive URL formats for <img> (no iframe).
-   * CSP "Framing ogs.google.com" was caused by the iframe we no longer use; img src fallbacks are safe.
+   * Handle image load error - try alternative Google Drive URL formats (same as profile images).
    */
   onImageError(event: ErrorEvent): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
     const imgElement = event.target as HTMLImageElement;
-    if (!imgElement) return;
+    if (!imgElement || !this.event?.imageUrl) return;
 
-    if (this.imageId && this.imageLoadAttempt < 2) {
-      this.imageLoadAttempt++;
-      const fallbackUrl =
-        this.imageLoadAttempt === 1
-          ? `https://drive.google.com/uc?export=view&id=${this.imageId}`
-          : `https://drive.google.com/uc?export=download&id=${this.imageId}`;
-      imgElement.src = fallbackUrl;
+    const rawUrl = this.event.imageUrl.trim();
+    const nextAttempt = this.imageLoadAttempt + 1;
+    const nextUrl = getProfileImageUrlForAttempt(rawUrl, nextAttempt, 'w1920');
+
+    if (nextUrl) {
+      this.imageLoadAttempt = nextAttempt;
+      imgElement.src = nextUrl;
       return;
     }
 

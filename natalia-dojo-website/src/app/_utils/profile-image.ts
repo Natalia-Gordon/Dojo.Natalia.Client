@@ -1,4 +1,4 @@
-export type DriveThumbSize = 'w256' | 'w800';
+export type DriveThumbSize = 'w256' | 'w800' | 'w1920';
 
 export function getDriveFileId(url?: string | null): string | null {
   if (!url) return null;
