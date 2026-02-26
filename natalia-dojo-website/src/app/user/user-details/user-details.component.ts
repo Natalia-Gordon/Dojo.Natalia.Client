@@ -56,6 +56,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       displayName: [''],
       phone: [''], // Use 'phone' to match API
       dateOfBirth: [''],
+      profileImageUrl: [''],
       bio: [''],
       password: ['', [Validators.minLength(6)]],
       confirmPassword: ['']
@@ -148,6 +149,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       displayName: user.displayName || '',
       phone: phoneValue,
       dateOfBirth: user.dateOfBirth ? user.dateOfBirth.split('T')[0] : '',
+      profileImageUrl: user.profileImageUrl || '',
       bio: user.bio || '',
       password: '',
       confirmPassword: ''
@@ -165,6 +167,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.profileForm.get('displayName')?.disable({ onlySelf: true });
       this.profileForm.get('phone')?.disable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.disable({ onlySelf: true });
+      this.profileForm.get('profileImageUrl')?.disable({ onlySelf: true });
       this.profileForm.get('bio')?.disable({ onlySelf: true });
     } else {
       // Enable form controls in edit mode (username stays disabled)
@@ -174,6 +177,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.profileForm.get('displayName')?.enable({ onlySelf: true });
       this.profileForm.get('phone')?.enable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.enable({ onlySelf: true });
+      this.profileForm.get('profileImageUrl')?.enable({ onlySelf: true });
       this.profileForm.get('bio')?.enable({ onlySelf: true });
     }
   }
@@ -214,6 +218,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.profileForm.get('displayName')?.disable({ onlySelf: true });
       this.profileForm.get('phone')?.disable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.disable({ onlySelf: true });
+      this.profileForm.get('profileImageUrl')?.disable({ onlySelf: true });
       this.profileForm.get('bio')?.disable({ onlySelf: true });
     } else {
       // Enable form controls for editing (username remains disabled)
@@ -223,6 +228,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.profileForm.get('displayName')?.enable({ onlySelf: true });
       this.profileForm.get('phone')?.enable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.enable({ onlySelf: true });
+      this.profileForm.get('profileImageUrl')?.enable({ onlySelf: true });
       this.profileForm.get('bio')?.enable({ onlySelf: true });
     }
     this.isEditMode = !this.isEditMode;
@@ -251,7 +257,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       lastName: formValue.lastName || null,
       displayName: formValue.displayName || null,
       phone: formValue.phone || null,
-      profileImageUrl: this.user?.profileImageUrl || null,
+      profileImageUrl: (formValue.profileImageUrl && formValue.profileImageUrl.trim()) ? formValue.profileImageUrl.trim() : null,
       bio: formValue.bio || null,
       dateOfBirth: formValue.dateOfBirth ? formValue.dateOfBirth.trim() || null : null,
       isActive: this.user?.isActive !== undefined ? this.user.isActive : true
@@ -272,11 +278,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           this.successMessage = 'הפרופיל עודכן בהצלחה';
           this.isEditMode = false;
           this.isLoading = false;
-          
+          // Reset avatar state so the new profile image URL is shown immediately
+          this.avatarImageError = false;
+          this.avatarAttempt = 0;
+          this.avatarSrcOverride = null;
           // Clear password fields
           this.profileForm.get('password')?.setValue('');
           this.profileForm.get('confirmPassword')?.setValue('');
-          
           // Reload form with updated data
           this.populateForm(updatedUser);
         },
