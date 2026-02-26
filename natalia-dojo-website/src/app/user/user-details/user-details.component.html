@@ -190,297 +190,293 @@
 
         <!-- User Details Form -->
         @if (user && !isLoading) {
-          <div>
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h3 class="fw-bold mb-0">{{ isEditMode ? 'עריכת פרטים' : 'פרטי משתמש' }}</h3>
+          <section class="user-details-card">
+            <header class="user-details-card__header">
+              <div class="user-details-card__header-text">
+                <i class="bi bi-person-circle"></i>
+                <h3 class="user-details-card__title">{{ isEditMode ? 'עריכת פרטים' : 'פרטי משתמש' }}</h3>
+              </div>
               <button
                 type="button"
-                class="btn btn-outline-danger"
+                class="user-details-card__btn-edit"
                 (click)="toggleEditMode()">
                 <i class="bi" [class.bi-pencil]="!isEditMode" [class.bi-x]="isEditMode"></i>
-                &nbsp;
                 {{ isEditMode ? 'ביטול' : 'עריכה' }}
               </button>
-            </div>
-            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-              <div class="bg-light rounded p-4 mb-4">
-                <h5 class="fw-bold mb-3 text-secondary">
-                  <i class="bi bi-person-circle me-2"></i>
-                  פרטים אישיים
-                </h5>
-                <div class="row g-3">
-                  <!-- Username -->
-                  <div class="col-12 col-md-6">
-                    <label class="form-label text-secondary fw-bold">
-                      שם משתמש
-                      <span class="text-muted small ms-2">
-                        <i class="bi bi-info-circle" title="לא ניתן לשנות שם משתמש לאחר יצירת החשבון"></i>
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control bg-white border-0 shadow-sm"
-                      formControlName="username"
-                      [readonly]="true"
-                      style="height: 45px; cursor: not-allowed; opacity: 0.7;">
-                      <small class="text-muted d-block mt-1">
-                        <i class="bi bi-lock me-1"></i>
+            </header>
+            <div class="user-details-card__body">
+              <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+                <div class="user-details-card__section">
+                  <h5 class="user-details-card__section-title">
+                    <i class="bi bi-person-vcard"></i>
+                    פרטים אישיים
+                  </h5>
+                  <div class="user-details-form__grid">
+                    <!-- Username -->
+                    <div class="user-details-form__field">
+                      <label class="user-details-form__label">
+                        שם משתמש
+                        <span class="user-details-form__hint" title="לא ניתן לשנות שם משתמש לאחר יצירת החשבון">
+                          <i class="bi bi-info-circle"></i>
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        class="user-details-form__input"
+                        formControlName="username"
+                        readonly>
+                      <small class="user-details-form__note">
+                        <i class="bi bi-lock"></i>
                         שם משתמש לא ניתן לשינוי
                       </small>
                       @if (getFieldError('username')) {
-                        <div class="text-danger small mt-1">
-                          {{ getFieldError('username') }}
-                        </div>
+                        <div class="user-details-form__error">{{ getFieldError('username') }}</div>
                       }
                     </div>
                     <!-- Email -->
-                    <div class="col-12 col-md-6">
-                      <label class="form-label text-secondary fw-bold">כתובת דוא"ל <span class="text-danger">*</span></label>
+                    <div class="user-details-form__field">
+                      <label class="user-details-form__label">כתובת דוא"ל <span class="text-danger">*</span></label>
                       <input
                         type="email"
-                        class="form-control bg-white border-0 shadow-sm"
+                        class="user-details-form__input"
                         formControlName="email"
+                        [readonly]="!isEditMode">
+                      @if (getFieldError('email')) {
+                        <div class="user-details-form__error">{{ getFieldError('email') }}</div>
+                      }
+                    </div>
+                    <!-- First Name -->
+                    <div class="user-details-form__field">
+                      <label class="user-details-form__label">שם פרטי</label>
+                      <input
+                        type="text"
+                        class="user-details-form__input"
+                        formControlName="firstName"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <!-- Last Name -->
+                    <div class="user-details-form__field">
+                      <label class="user-details-form__label">שם משפחה</label>
+                      <input
+                        type="text"
+                        class="user-details-form__input"
+                        formControlName="lastName"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <!-- Display Name -->
+                    <div class="user-details-form__field">
+                      <label class="user-details-form__label">שם תצוגה</label>
+                      <input
+                        type="text"
+                        class="user-details-form__input"
+                        formControlName="displayName"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <!-- Phone Number -->
+                    <div class="user-details-form__field">
+                      <label class="user-details-form__label">מספר טלפון</label>
+                      <input
+                        type="tel"
+                        class="user-details-form__input"
+                        formControlName="phone"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <!-- Date of Birth -->
+                    <div class="user-details-form__field">
+                      <label class="user-details-form__label">תאריך לידה</label>
+                      @if (isEditMode) {
+                        <input
+                          type="date"
+                          class="user-details-form__input"
+                          formControlName="dateOfBirth">
+                      }
+                      @if (!isEditMode && user) {
+                        <div class="user-details-form__input user-details-form__input--readonly">
+                          {{ formatDate(user.dateOfBirth) || 'לא הוגדר' }}
+                        </div>
+                      }
+                    </div>
+                    <!-- Bio -->
+                    <div class="user-details-form__field user-details-form__field--full">
+                      <label class="user-details-form__label">אודות</label>
+                      <textarea
+                        class="user-details-form__input user-details-form__input--textarea"
+                        formControlName="bio"
                         [readonly]="!isEditMode"
-                        style="height: 45px;">
-                        @if (getFieldError('email')) {
-                          <div class="text-danger small mt-1">
-                            {{ getFieldError('email') }}
-                          </div>
+                        rows="4"
+                        placeholder="ספר על עצמך..."></textarea>
+                    </div>
+                  </div>
+                </div>
+                <!-- Password Section (only in edit mode) -->
+                @if (isEditMode) {
+                  <div class="user-details-card__section">
+                    <h5 class="user-details-card__section-title">
+                      <i class="bi bi-lock"></i>
+                      שינוי סיסמה
+                    </h5>
+                    <p class="user-details-card__section-note">
+                      <i class="bi bi-info-circle"></i>
+                      השאר את השדות הבאים ריקים אם אינך רוצה לשנות את הסיסמה
+                    </p>
+                    <div class="user-details-form__grid">
+                      <div class="user-details-form__field">
+                        <label class="user-details-form__label">סיסמה חדשה</label>
+                        <input
+                          type="password"
+                          class="user-details-form__input"
+                          formControlName="password"
+                          placeholder="הזן סיסמה חדשה">
+                        @if (getFieldError('password')) {
+                          <div class="user-details-form__error">{{ getFieldError('password') }}</div>
                         }
                       </div>
-                      <!-- First Name -->
-                      <div class="col-12 col-md-6">
-                        <label class="form-label text-secondary fw-bold">שם פרטי</label>
+                      <div class="user-details-form__field">
+                        <label class="user-details-form__label">אישור סיסמה</label>
                         <input
-                          type="text"
-                          class="form-control bg-white border-0 shadow-sm"
-                          formControlName="firstName"
-                          [readonly]="!isEditMode"
-                          style="height: 45px;">
-                        </div>
-                        <!-- Last Name -->
-                        <div class="col-12 col-md-6">
-                          <label class="form-label text-secondary fw-bold">שם משפחה</label>
-                          <input
-                            type="text"
-                            class="form-control bg-white border-0 shadow-sm"
-                            formControlName="lastName"
-                            [readonly]="!isEditMode"
-                            style="height: 45px;">
-                          </div>
-                          <!-- Display Name -->
-                          <div class="col-12 col-md-6">
-                            <label class="form-label text-secondary fw-bold">שם תצוגה</label>
-                            <input
-                              type="text"
-                              class="form-control bg-white border-0 shadow-sm"
-                              formControlName="displayName"
-                              [readonly]="!isEditMode"
-                              style="height: 45px;">
-                            </div>
-                            <!-- Phone Number -->
-                            <div class="col-12 col-md-6">
-                              <label class="form-label text-secondary fw-bold">מספר טלפון</label>
-                              <input
-                                type="tel"
-                                class="form-control bg-white border-0 shadow-sm"
-                                formControlName="phone"
-                                [readonly]="!isEditMode"
-                                style="height: 45px;">
-                              </div>
-                              <!-- Date of Birth -->
-                              <div class="col-12 col-md-6">
-                                <label class="form-label text-secondary fw-bold">תאריך לידה</label>
-                                @if (isEditMode) {
-                                  <input
-                                    type="date"
-                                    class="form-control bg-white border-0 shadow-sm"
-                                    formControlName="dateOfBirth"
-                                    style="height: 45px;">
-                                }
-                                @if (!isEditMode && user) {
-                                  <div class="form-control bg-white border-0 shadow-sm d-flex align-items-center" style="height: 45px; min-height: 45px;">
-                                    {{ formatDate(user.dateOfBirth) || 'לא הוגדר' }}
-                                  </div>
-                                }
-                              </div>
-                              <!-- Bio -->
-                              <div class="col-12">
-                                <label class="form-label text-secondary fw-bold">אודות</label>
-                                <textarea
-                                  class="form-control bg-white border-0 shadow-sm"
-                                  formControlName="bio"
-                                  [readonly]="!isEditMode"
-                                  rows="4"
-                                placeholder="ספר על עצמך..."></textarea>
-                              </div>
-                            </div>
-                          </div>
-                          <!-- Password Section (only in edit mode) -->
-                          @if (isEditMode) {
-                            <div class="bg-light rounded p-4 mb-4">
-                              <h5 class="fw-bold mb-3 text-secondary">
-                                <i class="bi bi-lock me-2"></i>
-                                שינוי סיסמה
-                              </h5>
-                              <p class="text-secondary small mb-3">
-                                <i class="bi bi-info-circle me-1"></i>
-                                השאר את השדות הבאים ריקים אם אינך רוצה לשנות את הסיסמה
-                              </p>
-                              <div class="row g-3">
-                                <div class="col-12 col-md-6">
-                                  <label class="form-label text-secondary fw-bold">סיסמה חדשה</label>
-                                  <input
-                                    type="password"
-                                    class="form-control bg-white border-0 shadow-sm"
-                                    formControlName="password"
-                                    placeholder="הזן סיסמה חדשה"
-                                    style="height: 45px;">
-                                    @if (getFieldError('password')) {
-                                      <div class="text-danger small mt-1">
-                                        {{ getFieldError('password') }}
+                          type="password"
+                          class="user-details-form__input"
+                          formControlName="confirmPassword"
+                          placeholder="הזן שוב את הסיסמה">
+                        @if (getFieldError('confirmPassword')) {
+                          <div class="user-details-form__error">{{ getFieldError('confirmPassword') }}</div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+                <!-- Submit Button -->
+                @if (isEditMode) {
+                  <div class="user-details-card__actions">
+                    <button
+                      type="submit"
+                      class="btn btn-danger user-details-card__btn-submit"
+                      [disabled]="isLoading || profileForm.invalid">
+                      @if (isLoading) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                      }
+                      @if (!isLoading) {
+                        <i class="bi bi-check-lg me-2"></i>
+                      }
+                      שמור שינויים
+                    </button>
+                  </div>
+                }
+              </form>
+              <!-- Payment methods (instructors only) -->
+              @if (user && isInstructor()) {
+                <section class="payment-methods-card">
+                                  <header class="payment-methods-card__header">
+                                    <div class="payment-methods-card__header-text">
+                                      <i class="bi bi-credit-card-2-front"></i>
+                                      <h5 class="payment-methods-card__title">שיטות תשלום שלי</h5>
+                                    </div>
+                                    <button type="button" class="payment-methods-card__btn-add payment-methods-card__btn-add--header" (click)="openAddPaymentMethod()">
+                                      <i class="bi bi-plus-lg"></i>
+                                      הוסף שיטת תשלום
+                                    </button>
+                                  </header>
+                                  <div class="payment-methods-card__body">
+                                    @if (paymentMethodError) {
+                                      <div class="payment-methods-card__alert payment-methods-card__alert--error">{{ paymentMethodError }}</div>
+                                    }
+                                    @if (isLoadingPaymentMethods) {
+                                      <div class="payment-methods-card__loading">
+                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        <span>טוען שיטות תשלום...</span>
                                       </div>
                                     }
-                                  </div>
-                                  <div class="col-12 col-md-6">
-                                    <label class="form-label text-secondary fw-bold">אישור סיסמה</label>
-                                    <input
-                                      type="password"
-                                      class="form-control bg-white border-0 shadow-sm"
-                                      formControlName="confirmPassword"
-                                      placeholder="הזן שוב את הסיסמה"
-                                      style="height: 45px;">
-                                      @if (getFieldError('confirmPassword')) {
-                                        <div class="text-danger small mt-1">
-                                          {{ getFieldError('confirmPassword') }}
+                                    @if (!isLoadingPaymentMethods) {
+                                      @if (paymentMethods.length === 0 && !showPaymentMethodForm) {
+                                        <div class="payment-methods-card__empty">
+                                          <i class="bi bi-wallet2"></i>
+                                          <p class="payment-methods-card__empty-text">אין שיטות תשלום. הוסף ביט או העברה בנקאית כדי שמשתתפים יוכלו לשלם.</p>
                                         </div>
                                       }
-                                    </div>
-                                  </div>
-                                </div>
-                              }
-                              <!-- Payment methods (instructors only) -->
-                              @if (user && isInstructor()) {
-                                <div class="bg-light rounded p-4 mb-4">
-                                  <h5 class="fw-bold mb-3 text-secondary">
-                                    <i class="bi bi-credit-card me-2"></i>
-                                    שיטות תשלום שלי
-                                  </h5>
-                                  @if (paymentMethodError) {
-                                    <div class="alert alert-danger py-2 mb-3">{{ paymentMethodError }}</div>
-                                  }
-                                  @if (isLoadingPaymentMethods) {
-                                    <p class="text-muted small"><span class="spinner-border spinner-border-sm me-2"></span>טוען שיטות תשלום...</p>
-                                  }
-                                  @if (!isLoadingPaymentMethods) {
-                                    <ul class="list-group list-group-flush mb-3">
-                                      @for (pm of paymentMethods; track pm.id) {
-                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-white rounded mb-2">
-                                          <div>
-                                            <span class="badge me-2" [ngClass]="pm.paymentType === 'bit' ? 'bg-info' : 'bg-secondary'">
-                                              {{ pm.paymentType === 'bit' ? 'ביט' : 'העברה בנקאית' }}
-                                            </span>
-                                            @if (pm.isDefault) {
-                                              <span class="badge bg-danger small">ברירת מחדל</span>
-                                            }
-                                            <span class="ms-2">{{ getPaymentMethodDisplayText(pm) }}</span>
-                                          </div>
-                                          <div>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary me-1" (click)="openEditPaymentMethod(pm)" title="עריכה">
-                                              <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" (click)="deletePaymentMethod(pm.id)" title="מחיקה">
-                                              <i class="bi bi-trash"></i>
-                                            </button>
-                                          </div>
-                                        </li>
-                                      }
-                                    </ul>
-                                    @if (paymentMethods.length === 0 && !showPaymentMethodForm) {
-                                      <p class="text-muted small mb-3">אין שיטות תשלום. הוסף ביט או העברה בנקאית כדי שמשתתפים יוכלו לשלם.</p>
-                                    }
-                                    @if (!showPaymentMethodForm) {
-                                      <button type="button" class="btn btn-outline-danger btn-sm" (click)="openAddPaymentMethod()">
-                                        <i class="bi bi-plus-lg me-1"></i>
-                                        הוסף שיטת תשלום
-                                      </button>
-                                    }
-                                    @if (showPaymentMethodForm) {
-                                      <div class="border rounded p-3 bg-white mb-3">
-                                        <h6 class="mb-3">{{ paymentMethodFormTitle }}</h6>
-                                        <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm">
-                                          <div class="row g-2 mb-2">
-                                            <div class="col-12 col-md-6">
-                                              <label class="form-label small fw-bold">סוג</label>
-                                              <select class="form-control form-control-sm" formControlName="paymentType">
-                                                <option value="bank_transfer">העברה בנקאית</option>
-                                                <option value="bit">ביט (Bit)</option>
-                                              </select>
-                                            </div>
-                                            <div class="col-12 col-md-6 d-flex align-items-end">
-                                              <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefault">
-                                                <label class="form-check-label small" for="pmDefault">ברירת מחדל</label>
+                                      @if (paymentMethods.length > 0 || showPaymentMethodForm) {
+                                        <div class="payment-methods-list">
+                                          @for (pm of paymentMethods; track pm.id) {
+                                            <article class="payment-method-item">
+                                              <div class="payment-method-item__main">
+                                                <span class="payment-method-item__badge" [ngClass]="pm.paymentType === 'bit' ? 'payment-method-item__badge--bit' : 'payment-method-item__badge--bank'">
+                                                  {{ pm.paymentType === 'bit' ? 'ביט' : 'העברה בנקאית' }}
+                                                </span>
+                                                @if (pm.isDefault) {
+                                                  <span class="payment-method-item__default">ברירת מחדל</span>
+                                                }
+                                                <p class="payment-method-item__details">{{ getPaymentMethodDisplayText(pm) }}</p>
                                               </div>
-                                            </div>
-                                          </div>
-                                          @if (paymentTypeFormValue === 'bit') {
-                                            <div class="mb-2">
-                                              <label class="form-label small fw-bold">מספר טלפון (ביט) <span class="text-danger">*</span></label>
-                                              <input type="tel" class="form-control form-control-sm" formControlName="phoneNumber" placeholder="למשל 050-1234567">
-                                            </div>
+                                              <div class="payment-method-item__actions">
+                                                <button type="button" class="payment-method-item__btn payment-method-item__btn--edit" (click)="openEditPaymentMethod(pm)" title="עריכה" aria-label="עריכה">
+                                                  <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button type="button" class="payment-method-item__btn payment-method-item__btn--delete" (click)="deletePaymentMethod(pm.id)" title="מחיקה" aria-label="מחיקה">
+                                                  <i class="bi bi-trash"></i>
+                                                </button>
+                                              </div>
+                                            </article>
                                           }
-                                          @if (paymentTypeFormValue === 'bank_transfer') {
-                                            <div class="row g-2 small">
-                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">שם הבנק</label><input type="text" class="form-control form-control-sm" formControlName="bankName"></div>
-                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">מספר בנק</label><input type="text" class="form-control form-control-sm" formControlName="bankNumber"></div>
-                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">סניף / שם סניף</label><input type="text" class="form-control form-control-sm" formControlName="branchName"></div>
-                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">מספר סניף</label><input type="text" class="form-control form-control-sm" formControlName="branchNumber"></div>
-                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">מספר חשבון</label><input type="text" class="form-control form-control-sm" formControlName="accountNumber"></div>
-                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">שם בעל החשבון</label><input type="text" class="form-control form-control-sm" formControlName="accountHolderName"></div>
-                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">IBAN</label><input type="text" class="form-control form-control-sm" formControlName="iban"></div>
-                                              <div class="col-12 col-md-6"><label class="form-label fw-bold">SWIFT/BIC</label><input type="text" class="form-control form-control-sm" formControlName="swiftBic"></div>
-                                              <div class="col-12"><label class="form-label fw-bold">כתובת הבנק</label><input type="text" class="form-control form-control-sm" formControlName="bankAddress"></div>
-                                            </div>
-                                          }
-                                          <div class="mt-3 d-flex gap-2">
-                                            <button type="submit" class="btn btn-danger btn-sm" [disabled]="isSavingPaymentMethod">
-                                              @if (isSavingPaymentMethod) {
-                                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                        </div>
+                                        @if (showPaymentMethodForm) {
+                                          <div class="payment-method-form-card">
+                                            <h6 class="payment-method-form-card__title">{{ paymentMethodFormTitle }}</h6>
+                                            <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
+                                              <div class="payment-method-form__row">
+                                                <div class="payment-method-form__field">
+                                                  <label class="payment-method-form__label">סוג</label>
+                                                  <select class="payment-method-form__input form-select" formControlName="paymentType">
+                                                    <option value="bank_transfer">העברה בנקאית</option>
+                                                    <option value="bit">ביט (Bit)</option>
+                                                  </select>
+                                                </div>
+                                                <div class="payment-method-form__field payment-method-form__field--checkbox">
+                                                  <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefault">
+                                                    <label class="form-check-label" for="pmDefault">ברירת מחדל</label>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              @if (paymentTypeFormValue === 'bit') {
+                                                <div class="payment-method-form__field">
+                                                  <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                                                  <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
+                                                </div>
                                               }
-                                              שמור
-                                            </button>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="closePaymentMethodForm()">ביטול</button>
+                                              @if (paymentTypeFormValue === 'bank_transfer') {
+                                                <div class="payment-method-form__grid">
+                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
+                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
+                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
+                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
+                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
+                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
+                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
+                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
+                                                  <div class="payment-method-form__field payment-method-form__field--full"><label class="payment-method-form__label">כתובת הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankAddress"></div>
+                                                </div>
+                                              }
+                                              <div class="payment-method-form__actions">
+                                                <button type="submit" class="btn btn-danger" [disabled]="isSavingPaymentMethod">
+                                                  @if (isSavingPaymentMethod) {
+                                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                                  }
+                                                  שמור
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary" (click)="closePaymentMethodForm()">ביטול</button>
+                                              </div>
+                                            </form>
                                           </div>
-                                        </form>
-                                      </div>
+                                        }
+                                      }
                                     }
-                                  }
-                                </div>
+                                  </div>
+                                </section>
                               }
-                              <!-- Submit Button -->
-                              @if (isEditMode) {
-                                <div class="d-flex justify-content-end">
-                                  <button
-                                    type="submit"
-                                    class="btn btn-danger px-5 py-3"
-                                    [disabled]="isLoading || profileForm.invalid">
-                                    @if (isLoading) {
-                                      <span class="spinner-border spinner-border-sm me-2"></span>
-                                    }
-                                    @if (!isLoading) {
-                                      <i class="bi bi-check-lg me-2"></i>
-                                    }
-                                    שמור שינויים
-                                  </button>
-                                </div>
-                              }
-                            </form>
-                          </div>
+                            </div>
+                          </section>
                         }
                       </div>
-                      <!-- User Details End -->
-                    </div>
+                    <!-- User Details End -->
                     <!-- Main Content End -->
                   </div>
                 </div>
