@@ -354,6 +354,20 @@ export class EventsService {
     );
   }
 
+  /** DELETE /api/events/{eventId} — admin only. Use only when event has no registrations. */
+  deleteEvent(eventId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/events/${eventId}`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(error => {
+        if (error.status !== 0 && error.status !== 503) {
+          console.error('Delete event error:', error);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
   getInstructors(includeUnavailable: boolean = false): Observable<Instructor[]> {
     const params = new HttpParams().set('includeUnavailable', includeUnavailable.toString());
     

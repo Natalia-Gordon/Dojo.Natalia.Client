@@ -67,6 +67,10 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
   pageSize = PAGE_SIZE;
   totalPages = 0;
 
+  /** Row selection in table (for delete action). */
+  selectedTableEvent: Event | null = null;
+  deleteEventLoading = false;
+
   /** Resend-email modal */
   selectedEvent: Event | null = null;
   eventRegistrations: EventRegistrationDetailsResponse[] = [];
@@ -292,6 +296,38 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
 
   goToEvent(id: number): void {
     this.router.navigate(['/events', id], { queryParams: { from: 'admin-events' } });
+  }
+
+  selectTableEvent(ev: Event): void {
+    this.selectedTableEvent = this.selectedTableEvent?.id === ev.id ? null : ev;
+  }
+
+  get canDeleteSelectedEvent(): boolean {
+    if (!this.selectedTableEvent) return false;
+    return this.getRegisteredCount(this.selectedTableEvent.id) === 0;
+  }
+
+  deleteSelectedEvent(): void {
+    if (!this.selectedTableEvent || !this.canDeleteSelectedEvent) return;
+    this.deleteEventLoading = true;
+    this.errorMessage = '';
+    this.eventsService.deleteEvent(this.selectedTableEvent.id).subscribe({
+      next: () => {
+        this.selectedTableEvent = null;
+        this.deleteEventLoading = false;
+        this.loadEvents();
+      },
+      error: (err) => {
+        this.deleteEventLoading = false;
+        if (err?.status === 403 || err?.status === 401) {
+          this.errorMessage = 'אין הרשאה למחוק אירוע.';
+        } else if (err?.status === 400 || err?.error?.message) {
+          this.errorMessage = err?.error?.message ?? 'לא ניתן למחוק אירוע עם משתתפים.';
+        } else {
+          this.errorMessage = 'שגיאה במחיקת האירוע. נסו שוב מאוחר יותר.';
+        }
+      },
+    });
   }
 
   openResendModal(ev: Event): void {

@@ -77,6 +77,19 @@
               <div class="events-management-summary">
                 <i class="bi bi-calendar-event"></i>
                 <span>{{ totalCount }} אירועים</span>
+                <button
+                  type="button"
+                  class="events-management-btn events-management-btn--danger ms-3"
+                  [disabled]="!canDeleteSelectedEvent || deleteEventLoading"
+                  (click)="deleteSelectedEvent()"
+                >
+                  <i class="bi bi-trash" *ngIf="!deleteEventLoading"></i>
+                  <span *ngIf="deleteEventLoading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                  מחיקת אירוע
+                </button>
+                <span *ngIf="selectedTableEvent && !canDeleteSelectedEvent" class="text-muted small me-2" style="font-size: 0.9rem;">
+                  (מחיקה אפשרית רק כאשר כמות משתתפים = 0)
+                </span>
               </div>
 
               <div class="events-management-table-wrapper">
@@ -127,7 +140,12 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let ev of pagedEvents; trackBy: trackByEventId">
+                  <tr
+                    *ngFor="let ev of pagedEvents; trackBy: trackByEventId"
+                    [class.events-management-row--selected]="selectedTableEvent?.id === ev.id"
+                    (click)="selectTableEvent(ev)"
+                    class="events-management-row-clickable"
+                  >
                     <td>{{ ev.id }}</td>
                     <td class="events-management-td-title">{{ ev.title || '—' }}</td>
                     <td><span class="events-management-badge events-management-badge--type">{{ getTypeLabel(ev.eventType) }}</span></td>
@@ -142,7 +160,7 @@
                     </td>
                     <td>{{ getRegisteredCount(ev.id) }}</td>
                     <td>{{ getPriceDisplay(ev) }}</td>
-                    <td class="events-management-td-actions">
+                    <td class="events-management-td-actions" (click)="$event.stopPropagation()">
                       <div class="events-management-actions">
                         <button type="button" class="events-management-btn events-management-btn--primary" (click)="goToEvent(ev.id)">
                           <i class="bi bi-eye"></i> לצפייה
