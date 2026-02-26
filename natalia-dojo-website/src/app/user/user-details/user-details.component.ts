@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, finalize } from 'rxjs';
 import { AuthService, User, UpdateUserRequest } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { Title, Meta } from '@angular/platform-browser';
@@ -23,7 +23,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
-  isUnauthorized = false;
   profileForm: FormGroup;
   private destroy$ = new Subject<void>();
 
@@ -103,16 +102,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   loadUserDetails(userId: number): void {
     this.isLoading = true;
     this.errorMessage = null;
-    this.isUnauthorized = false;
     
     this.authService.getUserDetails(userId)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => { this.isLoading = false; })
+      )
       .subscribe({
         next: (user: User) => {
           this.user = user;
           this.populateForm(user);
-          this.isLoading = false;
-          this.isUnauthorized = false;
           if (this.isInstructor()) {
             this.loadPaymentMethods();
           }
@@ -120,14 +119,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         error: (error: any) => {
           console.error('Error loading user details:', error);
           if (error.status === 401 || error.status === 403) {
-            // Unauthorized or Forbidden
-            this.isUnauthorized = true;
-            this.errorMessage = 'הגישה נדחתה. יש להתחבר מחדש';
-          } else {
-            this.errorMessage = 'שגיאה בטעינת פרטי המשתמש';
-            this.isUnauthorized = false;
+            // Handled globally by auth interceptor (redirect + login). No page message.
+            this.errorMessage = null;
+            return;
           }
-          this.isLoading = false;
+          this.errorMessage = 'שגיאה בטעינת פרטי המשתמש';
         }
       });
   }
@@ -279,12 +275,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         error: (error: any) => {
           console.error('Error updating user:', error);
           if (error.status === 401 || error.status === 403) {
-            // Unauthorized or Forbidden
-            this.isUnauthorized = true;
-            this.errorMessage = 'הגישה נדחתה. יש להתחבר מחדש';
+            // Handled globally by auth interceptor (redirect + login). No page message.
+            this.errorMessage = null;
           } else {
             this.errorMessage = error.error?.message || 'שגיאה בעדכון הפרופיל';
-            this.isUnauthorized = false;
           }
           this.isLoading = false;
         }
@@ -546,5 +540,52 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   get paymentMethodFormTitle(): string {
     return this.editingPaymentMethod ? 'עריכת שיטת תשלום' : 'הוספת שיטת תשלום';
+  }
+
+  // ---------- Certificates (file list: PDF, TIFF, JPEG, PNG) ----------
+  certificateFiles: File[] = [];
+  certificateFileError: string | null = null;
+
+  private readonly certificateAllowedExtensions = ['.pdf', '.tiff', '.tif', '.jpeg', '.jpg', '.png'];
+  private readonly certificateAllowedTypes = ['application/pdf', 'image/tiff', 'image/jpeg', 'image/png'];
+
+  private isCertificateFileAllowed(file: File): boolean {
+    const name = (file.name || '').toLowerCase();
+    const ext = this.certificateAllowedExtensions.some(e => name.endsWith(e));
+    const type = this.certificateAllowedTypes.includes(file.type || '');
+    return ext || type;
+  }
+
+  onCertificatesSelected(event: Event): void {
+    this.certificateFileError = null;
+    const input = event.target as HTMLInputElement;
+    if (!input?.files?.length) return;
+    const toAdd: File[] = [];
+    for (let i = 0; i < input.files.length; i++) {
+      const file = input.files[i];
+      if (!this.isCertificateFileAllowed(file)) {
+        this.certificateFileError = `סוג קובץ לא נתמך: ${file.name}. יש להעלות רק PDF, TIFF, JPEG או PNG.`;
+        return;
+      }
+      toAdd.push(file);
+    }
+    this.certificateFiles.push(...toAdd);
+  }
+
+  removeCertificateFile(index: number): void {
+    this.certificateFiles.splice(index, 1);
+    this.certificateFileError = null;
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  getCertificateFileIcon(file: File): 'pdf' | 'image' {
+    const name = (file.name || '').toLowerCase();
+    if (name.endsWith('.pdf') || (file.type || '').includes('pdf')) return 'pdf';
+    return 'image';
   }
 }
