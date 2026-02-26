@@ -5,6 +5,7 @@ import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { UserMenuComponent } from '../../user-menu/user-menu.component';
 import { Subscription } from 'rxjs';
+import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
 
 @Component({
   selector: 'app-nav',
@@ -18,6 +19,10 @@ export class NavComponent implements OnInit, OnDestroy {
   userInfo: UserInfo | null = null;
   isMobileMenuOpen = false;
   isBrowser = false;
+  /** When true, profile image failed to load – show initials instead. */
+  avatarImageError = false;
+  private avatarAttempt = 0;
+  private avatarSrcOverride: string | null = null;
   private authSubscription?: Subscription;
   private userInfoSubscription?: Subscription;
 
@@ -80,6 +85,33 @@ export class NavComponent implements OnInit, OnDestroy {
     return `${first}${last}`;
   }
 
+  getAvatarSrc(): string | null {
+    if (this.avatarSrcOverride) return this.avatarSrcOverride;
+    return getProfileImageUrlForAttempt(this.userInfo?.profileImageUrl ?? null, this.avatarAttempt, 'w256');
+  }
+
+  onAvatarError(event: Event): void {
+    const url = this.userInfo?.profileImageUrl ?? null;
+    const fileId = getDriveFileId(url);
+    if (!fileId) {
+      this.avatarImageError = true;
+      return;
+    }
+
+    const imgElement = (event.target as HTMLImageElement) ?? (event as unknown as { target?: HTMLImageElement })?.target;
+    const nextAttempt = this.avatarAttempt + 1;
+    const nextUrl = getProfileImageUrlForAttempt(url, nextAttempt, 'w256');
+    if (!nextUrl) {
+      this.avatarImageError = true;
+      return;
+    }
+
+    this.avatarAttempt = nextAttempt;
+    this.avatarSrcOverride = nextUrl;
+    this.avatarImageError = false;
+    if (imgElement) imgElement.src = nextUrl;
+  }
+
   formatLastLogin(lastLoginAt: string | null | undefined): string {
     if (!lastLoginAt) return '';
     try {
@@ -118,6 +150,9 @@ export class NavComponent implements OnInit, OnDestroy {
     // Subscribe to user info changes
     this.userInfoSubscription = this.authService.userInfo$.subscribe(userInfo => {
       this.userInfo = userInfo;
+      this.avatarImageError = false;
+      this.avatarAttempt = 0;
+      this.avatarSrcOverride = null;
     });
   }
 

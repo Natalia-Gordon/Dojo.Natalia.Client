@@ -13,7 +13,17 @@
           <!-- Avatar Section -->
           <div class="user-info-card__header">
             <div class="user-avatar-large">
-              <span class="avatar-initial-large">{{ getUserInitials() }}</span>
+              @let avatarSrc = getAvatarSrc();
+              @if (avatarSrc && !avatarImageError) {
+                <img
+                  [src]="avatarSrc"
+                  alt=""
+                  class="user-avatar-large__img"
+                  (error)="onAvatarError($event)">
+              }
+              @if (!avatarSrc || avatarImageError) {
+                <span class="avatar-initial-large">{{ getUserInitials() }}</span>
+              }
             </div>
             <h4 class="user-info-card__name">
               {{ getDisplayName() }}

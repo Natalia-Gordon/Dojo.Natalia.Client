@@ -1,5 +1,6 @@
 @if (userInfo && isBrowser) {
   <div class="user-menu-container">
+    @let avatarSrc = getAvatarSrc();
     <!-- User Avatar Button -->
     <button
       type="button"
@@ -7,7 +8,16 @@
       (click)="onAvatarClick()"
       [class.active]="isMenuOpen">
       <div class="user-avatar">
-        <span class="avatar-initial">{{ getInitials() }}</span>
+        @if (avatarSrc && !avatarImageError) {
+          <img
+            [src]="avatarSrc"
+            alt=""
+            class="user-avatar__img"
+            (error)="onAvatarError($event)">
+        }
+        @if (!avatarSrc || avatarImageError) {
+          <span class="avatar-initial">{{ getInitials() }}</span>
+        }
       </div>
     </button>
     <!-- Dropdown Menu -->
@@ -21,7 +31,16 @@
             (click)="onMenuAvatarClick()"
             title="פרטי משתמש">
             <div class="user-avatar-large">
-              <span class="avatar-initial-large">{{ getInitials() }}</span>
+              @if (avatarSrc && !avatarImageError) {
+                <img
+                  [src]="avatarSrc"
+                  alt=""
+                  class="user-avatar-large__img"
+                  (error)="onAvatarError($event)">
+              }
+              @if (!avatarSrc || avatarImageError) {
+                <span class="avatar-initial-large">{{ getInitials() }}</span>
+              }
             </div>
           </button>
           <div class="user-info">

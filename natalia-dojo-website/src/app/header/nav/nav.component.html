@@ -16,12 +16,22 @@
     @if (isAuthenticated && userInfo && isBrowser) {
       <div class="mobile-user-section d-lg-none">
         <div class="mobile-user-header">
+          @let avatarSrc = getAvatarSrc();
           <button
             type="button"
             class="mobile-user-avatar"
             (click)="openUserDetails(); closeMobileMenu()"
             title="פרטי משתמש">
-            <span class="mobile-avatar-initial">{{ getUserInitials() }}</span>
+            @if (avatarSrc && !avatarImageError) {
+              <img
+                [src]="avatarSrc"
+                alt=""
+                class="mobile-user-avatar__img"
+                (error)="onAvatarError($event)">
+            }
+            @if (!avatarSrc || avatarImageError) {
+              <span class="mobile-avatar-initial">{{ getUserInitials() }}</span>
+            }
           </button>
           <div class="mobile-user-details">
             <div class="mobile-user-name">{{ userInfo.displayName || userInfo.username }}</div>

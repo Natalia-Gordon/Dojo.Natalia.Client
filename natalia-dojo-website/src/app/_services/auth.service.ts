@@ -72,6 +72,7 @@ export interface UserInfo {
   role: string | null;
   level: string | null;
   lastLoginAt?: string | null;
+  profileImageUrl?: string | null;
 }
 
 export interface User {
@@ -179,6 +180,8 @@ export class AuthService {
       const userInfo = this.getStoredUserInfo();
       if (userInfo) {
         this.userInfoSubject.next(userInfo);
+        // Fetch full user details so profileImageUrl is available in the menu (e.g. after refresh)
+        this.getUserDetails(userInfo.userId).subscribe();
       }
       const expiresAt = this.getStoredAccessTokenExpiresAt();
       if (expiresAt && this.getStoredToken()) {
@@ -236,6 +239,8 @@ export class AuthService {
           lastLoginAt: response.lastLoginAt || null
         };
         this.setUserInfo(userInfo);
+        // Fetch full user details so profileImageUrl is available in the menu without visiting profile page
+        this.getUserDetails(response.userId).subscribe();
       }),
       catchError(error => {
         console.error('Login error:', error);
@@ -633,6 +638,12 @@ export class AuthService {
     return this.http.get<User>(`${this.apiUrl}/users/${userId}`, {
       headers: this.getAuthHeaders()
     }).pipe(
+      tap((user: User) => {
+        const current = this.getUserInfo();
+        if (current && current.userId === userId) {
+          this.setUserInfo({ ...current, profileImageUrl: user.profileImageUrl ?? null });
+        }
+      }),
       catchError((error: any) => {
         console.error('Get user details error:', error);
         return throwError(() => error);
@@ -676,7 +687,8 @@ export class AuthService {
             displayName: updatedUser.displayName,
             role: updatedUser.role,
             level: updatedUser.level,
-            lastLoginAt: updatedUser.lastLoginAt || null
+            lastLoginAt: updatedUser.lastLoginAt || null,
+            profileImageUrl: updatedUser.profileImageUrl ?? currentUserInfo.profileImageUrl ?? null
           };
           this.setUserInfo(updatedUserInfo);
         }
@@ -740,8 +752,9 @@ export class AuthService {
         if (response.refreshTokenExpiresAt) {
           this.setRefreshTokenExpiresAt(response.refreshTokenExpiresAt);
         }
-        // Update user info if provided
+        // Update user info if provided (preserve profileImageUrl; refresh endpoint may not return it)
         if (response.userId) {
+          const current = this.getUserInfo();
           const userInfo: UserInfo = {
             userId: response.userId,
             username: response.username,
@@ -749,7 +762,8 @@ export class AuthService {
             displayName: response.displayName,
             role: response.role,
             level: response.level,
-            lastLoginAt: response.lastLoginAt || null
+            lastLoginAt: response.lastLoginAt || null,
+            profileImageUrl: (response as TokenResponse & { profileImageUrl?: string | null }).profileImageUrl ?? current?.profileImageUrl ?? null
           };
           this.setUserInfo(userInfo);
         }

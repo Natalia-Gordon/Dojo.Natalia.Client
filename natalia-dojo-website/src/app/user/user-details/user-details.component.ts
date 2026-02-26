@@ -9,6 +9,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { UserDetailsHeroComponent } from '../user-details-hero/user-details-hero.component';
 import { PaymentMethodsService, CreateOrUpdatePaymentMethodRequest } from '../../_services/payment-methods.service';
 import { InstructorPaymentMethodDto } from '../../_services/events.service';
+import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
 
 @Component({
   selector: 'app-user-details',
@@ -24,6 +25,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
   successMessage: string | null = null;
   profileForm: FormGroup;
+  /** When true, profile image failed to load – show initials instead. */
+  avatarImageError = false;
+  private avatarAttempt = 0;
+  private avatarSrcOverride: string | null = null;
   private destroy$ = new Subject<void>();
 
   paymentMethods: InstructorPaymentMethodDto[] = [];
@@ -111,6 +116,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (user: User) => {
           this.user = user;
+          this.avatarImageError = false;
+          this.avatarAttempt = 0;
+          this.avatarSrcOverride = null;
           this.populateForm(user);
           if (this.isInstructor()) {
             this.loadPaymentMethods();
@@ -334,6 +342,33 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       return this.user.username.charAt(0).toUpperCase();
     }
     return '?';
+  }
+
+  getAvatarSrc(): string | null {
+    if (this.avatarSrcOverride) return this.avatarSrcOverride;
+    return getProfileImageUrlForAttempt(this.user?.profileImageUrl ?? null, this.avatarAttempt, 'w256');
+  }
+
+  onAvatarError(event: Event): void {
+    const url = this.user?.profileImageUrl ?? null;
+    const fileId = getDriveFileId(url);
+    if (!fileId) {
+      this.avatarImageError = true;
+      return;
+    }
+
+    const imgElement = (event.target as HTMLImageElement) ?? (event as unknown as { target?: HTMLImageElement })?.target;
+    const nextAttempt = this.avatarAttempt + 1;
+    const nextUrl = getProfileImageUrlForAttempt(url, nextAttempt, 'w256');
+    if (!nextUrl) {
+      this.avatarImageError = true;
+      return;
+    }
+
+    this.avatarAttempt = nextAttempt;
+    this.avatarSrcOverride = nextUrl;
+    this.avatarImageError = false;
+    if (imgElement) imgElement.src = nextUrl;
   }
 
   getLevelColor(level: string | null): string {
