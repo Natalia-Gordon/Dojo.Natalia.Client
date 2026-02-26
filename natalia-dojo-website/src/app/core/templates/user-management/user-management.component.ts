@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { AuthService, User, UserInfo } from '../../../_services/auth.service';
 import { LoginModalService } from '../../../_services/login-modal.service';
 import { Rank, RanksService } from '../../../_services/ranks.service';
-import { EventsService, Instructor } from '../../../_services/events.service';
+import { EventsService, Instructor, InstructorPaymentMethodDto } from '../../../_services/events.service';
 
 @Component({
   selector: 'app-user-management',
@@ -55,17 +55,21 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   /** User for bank details form; null when dialog closed */
   bankDetailsUser: User | null = null;
+  /** Instructor ID for selected user's bank details (when available) */
+  bankDetailsInstructorId: number | null = null;
   bankForm: {
     accountHolderName: string;
     bankName: string;
-    bankId: string;
+    bankNumber: string;
+    branchName: string;
     branchNumber: string;
     accountNumber: string;
     bankAddress: string;
   } = {
     accountHolderName: '',
     bankName: '',
-    bankId: '',
+    bankNumber: '',
+    branchName: '',
     branchNumber: '',
     accountNumber: '',
     bankAddress: ''
@@ -540,83 +544,113 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     const user = this.getSelectedUser();
     if (!user || !isPlatformBrowser(this.platformId)) return;
     this.bankDetailsUser = user;
+    this.bankDetailsInstructorId = null;
     this.bankFormError = '';
+
+    const resetForm = () => {
+      this.bankForm = {
+        accountHolderName: '',
+        bankName: '',
+        bankNumber: '',
+        branchName: '',
+        branchNumber: '',
+        accountNumber: '',
+        bankAddress: ''
+      };
+    };
+
+    // Load selected user's instructor record (including payment methods) to prefill form
     this.eventsService.getInstructors(true).subscribe({
       next: (instructors) => {
         const inst = (instructors || []).find(i => i.userId === user.id);
-        if (inst) {
+        if (!inst) {
+          resetForm();
+          return;
+        }
+
+        this.bankDetailsInstructorId = inst.instructorId ?? null;
+
+        const paymentMethods = inst.paymentMethods || [];
+        const bankMethod: InstructorPaymentMethodDto | undefined =
+          paymentMethods.find(m => m.paymentType === 'bank_transfer' && m.isDefault) ||
+          paymentMethods.find(m => m.paymentType === 'bank_transfer');
+
+        if (bankMethod) {
+          this.bankForm = {
+            accountHolderName: bankMethod.accountHolderName || '',
+            bankName: bankMethod.bankName || '',
+            bankNumber: bankMethod.bankNumber || '',
+            branchName: bankMethod.branchName || '',
+            branchNumber: bankMethod.branchNumber || '',
+            accountNumber: bankMethod.accountNumber || '',
+            bankAddress: bankMethod.bankAddress || ''
+          };
+        } else {
           this.bankForm = {
             accountHolderName: inst.accountHolderName || '',
             bankName: inst.bankName || '',
-            bankId: inst.bankId || '',
+            bankNumber: inst.bankNumber || '',
+            branchName: inst.branchName || '',
             branchNumber: inst.branchNumber || '',
             accountNumber: inst.accountNumber || '',
             bankAddress: inst.bankAddress || ''
           };
-        } else {
-          this.bankForm = {
-            accountHolderName: '',
-            bankName: '',
-            bankId: '',
-            branchNumber: '',
-            accountNumber: '',
-            bankAddress: ''
-          };
         }
       },
-      error: () => {
-        this.bankForm = {
-          accountHolderName: '',
-          bankName: '',
-          bankId: '',
-          branchNumber: '',
-          accountNumber: '',
-          bankAddress: ''
-        };
-      }
+      error: () => resetForm()
     });
   }
 
   closeBankDetailsForm(): void {
     this.bankDetailsUser = null;
+    this.bankDetailsInstructorId = null;
     this.bankFormError = '';
   }
 
   saveBankDetails(): void {
     const user = this.bankDetailsUser;
-    if (!user) return;
+    const instructorId = this.bankDetailsInstructorId;
+    if (!user || instructorId == null) {
+      this.bankFormError = 'לא ניתן לשמור פרטי בנק עבור משתמש זה.';
+      return;
+    }
     this.isBankFormLoading = true;
     this.bankFormError = '';
 
-    this.eventsService.getInstructors(true).subscribe({
-      next: (instructors) => {
-        const inst = (instructors || []).find((i: Instructor) => i.userId === user.id);
-        if (!inst) {
-          this.isBankFormLoading = false;
-          this.bankFormError = 'לא נמצא רשומת מדריך עבור משתמש זה.';
-          return;
-        }
-        this.eventsService.updateInstructorBankDetails(inst.instructorId, {
-          accountHolderName: this.bankForm.accountHolderName.trim() || null,
-          bankName: this.bankForm.bankName.trim() || null,
-          bankId: this.bankForm.bankId.trim() || null,
-          branchNumber: this.bankForm.branchNumber.trim() || null,
-          accountNumber: this.bankForm.accountNumber.trim() || null,
-          bankAddress: this.bankForm.bankAddress.trim() || null
-        }).subscribe({
-          next: () => {
-            this.isBankFormLoading = false;
-            this.closeBankDetailsForm();
-          },
-          error: (err) => {
-            this.isBankFormLoading = false;
-            this.bankFormError = err.error?.message ?? 'שגיאה בשמירת פרטי הבנק. נסה שוב.';
-          }
-        });
-      },
-      error: () => {
+    const trim = (val: string) => (val || '').trim();
+
+    const payload = {
+      bankName: trim(this.bankForm.bankName) || null,
+      accountHolderName: trim(this.bankForm.accountHolderName) || null,
+      accountNumber: trim(this.bankForm.accountNumber) || null,
+      bankAddress: trim(this.bankForm.bankAddress) || null,
+      bankNumber: trim(this.bankForm.bankNumber) || null,
+      branchName: trim(this.bankForm.branchName) || null,
+      branchNumber: trim(this.bankForm.branchNumber) || null
+    };
+
+    const hasBank =
+      !!(payload.bankName ||
+        payload.accountHolderName ||
+        payload.accountNumber ||
+        payload.bankNumber ||
+        payload.branchName ||
+        payload.branchNumber);
+
+    if (!hasBank) {
+      this.isBankFormLoading = false;
+      this.bankFormError = 'יש למלא לפחות שדה אחד של פרטי בנק.';
+      return;
+    }
+
+    this.eventsService.updateInstructorBankDetails(instructorId, payload).subscribe({
+      next: () => {
         this.isBankFormLoading = false;
-        this.bankFormError = 'לא ניתן לטעון רשימת מדריכים. נסה שוב.';
+        this.closeBankDetailsForm();
+      },
+      error: (err) => {
+        this.isBankFormLoading = false;
+        this.bankFormError = err?.error?.message ?? 'שגיאה בשמירת פרטי הבנק. נסה שוב.';
       }
     });
   }

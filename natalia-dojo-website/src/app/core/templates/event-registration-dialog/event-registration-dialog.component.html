@@ -132,8 +132,8 @@
                               @if (instructor.bankName) {
                                 <div class="detail-item"><strong>שם הבנק:</strong><span>{{ instructor.bankName }}</span></div>
                               }
-                              @if (instructor.bankNumber || instructor.bankId) {
-                                <div class="detail-item"><strong>מספר בנק:</strong><span>{{ instructor.bankNumber || instructor.bankId }}</span></div>
+                              @if (instructor.bankNumber) {
+                                <div class="detail-item"><strong>מספר בנק:</strong><span>{{ instructor.bankNumber }}</span></div>
                               }
                               @if (instructor.branchName || instructor.branchNumber) {
                                 <div class="detail-item"><strong>סניף:</strong><span>{{ instructor.branchName || instructor.branchNumber }}</span></div>

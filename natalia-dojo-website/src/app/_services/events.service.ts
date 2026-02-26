@@ -58,8 +58,6 @@ export interface Instructor {
   iban: string | null;
   swiftBic: string | null;
   bankAddress: string | null;
-  /** @deprecated Prefer bankNumber + branchName */
-  bankId: string | null;
   bankNumber: string | null;
   branchName: string | null;
   branchNumber: string | null;
@@ -413,13 +411,14 @@ export class EventsService {
     bankDetails: {
       accountHolderName?: string | null;
       bankName?: string | null;
-      bankId?: string | null;
+      bankNumber?: string | null;
+      branchName?: string | null;
       branchNumber?: string | null;
       accountNumber?: string | null;
       bankAddress?: string | null;
     }
   ): Observable<Instructor> {
-    return this.http.patch<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, bankDetails, {
+    return this.http.put<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, bankDetails, {
       headers: this.getAuthHeaders()
     }).pipe(
       catchError(error => {

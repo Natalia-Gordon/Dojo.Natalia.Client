@@ -135,7 +135,7 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
   private hasLegacyBankFields(): boolean {
     const i = this.instructor;
     if (!i) return false;
-    return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankId || i.bankNumber || i.branchName || i.branchNumber);
+    return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankNumber || i.branchName || i.branchNumber);
   }
 
   /**
@@ -151,7 +151,7 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
       );
     }
     const i = this.instructor;
-    return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankId || i.bankNumber || i.branchName || i.branchNumber);
+    return !!(i.bankName || i.accountHolderName || i.accountNumber || i.iban || i.swiftBic || i.bankAddress || i.bankNumber || i.branchName || i.branchNumber);
   }
 
   /** True when instructor has bank transfer details (for requiring proof when bank_transfer is selected). */
