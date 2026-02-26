@@ -435,6 +435,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       phoneNumber: '',
       bankName: '', accountHolderName: '', accountNumber: '', iban: '', swiftBic: '', bankAddress: '', bankNumber: '', branchName: '', branchNumber: ''
     });
+    this.paymentMethodForm.get('paymentType')?.enable();
     this.showPaymentMethodForm = true;
     this.paymentMethodError = null;
   }
@@ -455,6 +456,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       branchName: pm.branchName || '',
       branchNumber: pm.branchNumber || ''
     });
+    this.paymentMethodForm.get('paymentType')?.disable();
     this.showPaymentMethodForm = true;
     this.paymentMethodError = null;
   }
@@ -462,12 +464,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   closePaymentMethodForm(): void {
     this.showPaymentMethodForm = false;
     this.editingPaymentMethod = null;
+    this.paymentMethodForm.get('paymentType')?.enable();
     this.paymentMethodError = null;
   }
 
   buildPaymentMethodRequest(): CreateOrUpdatePaymentMethodRequest | null {
     const v = this.paymentMethodForm.value;
-    const paymentType = v.paymentType as 'bit' | 'bank_transfer';
+    const paymentType = (this.editingPaymentMethod?.paymentType ?? v.paymentType) as 'bit' | 'bank_transfer';
     if (paymentType === 'bit') {
       const phone = (v.phoneNumber || '').trim();
       if (!phone) return null;
@@ -499,7 +502,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   savePaymentMethod(): void {
     const request = this.buildPaymentMethodRequest();
     if (!request) {
-      this.paymentMethodError = this.paymentMethodForm.value.paymentType === 'bit'
+      const pt = this.editingPaymentMethod?.paymentType ?? this.paymentMethodForm.value.paymentType;
+      this.paymentMethodError = pt === 'bit'
         ? 'יש להזין מספר טלפון לביט'
         : 'יש למלא לפחות שדה אחד של פרטי בנק';
       return;
@@ -570,6 +574,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       toAdd.push(file);
     }
     this.certificateFiles.push(...toAdd);
+    input.value = '';
   }
 
   removeCertificateFile(index: number): void {
@@ -587,5 +592,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     const name = (file.name || '').toLowerCase();
     if (name.endsWith('.pdf') || (file.type || '').includes('pdf')) return 'pdf';
     return 'image';
+  }
+
+  /** Used in template to avoid string literal in @if. */
+  isPdfFile(file: File): boolean {
+    return this.getCertificateFileIcon(file) === 'pdf';
   }
 }

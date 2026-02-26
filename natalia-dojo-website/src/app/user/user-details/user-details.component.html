@@ -111,7 +111,7 @@
                   <i class="bi" [class.bi-check-circle-fill]="user.isEmailVerified" [class.bi-x-circle-fill]="!user.isEmailVerified" [ngClass]="user.isEmailVerified ? 'text-success' : 'text-warning'"></i>
                 </div>
                 <div class="info-item__content">
-                  <div class="info-item__label">אימות דוא"ל</div>
+                  <div class="info-item__label">אימות דוא&quot;ל</div>
                   <div class="info-item__value">
                     <span class="badge" [ngClass]="user.isEmailVerified ? 'bg-success' : 'bg-warning'">
                       {{ user.isEmailVerified ? 'מאומת' : 'לא מאומת' }}
@@ -227,7 +227,7 @@
                     </div>
                     <!-- Email -->
                     <div class="user-details-form__field">
-                      <label class="user-details-form__label">כתובת דוא"ל <span class="text-danger">*</span></label>
+                      <label class="user-details-form__label">כתובת דוא&quot;ל <span class="text-danger">*</span></label>
                       <input
                         type="email"
                         class="user-details-form__input"
@@ -376,7 +376,7 @@
                         class="certificates-upload__input"
                         accept=".pdf,.tiff,.tif,.jpeg,.jpg,.png,application/pdf,image/tiff,image/jpeg,image/png"
                         multiple
-                        (change)="onCertificatesSelected($event); certificatesInput.value = ''">
+                        (change)="onCertificatesSelected($event)">
                       <button type="button" class="certificates-upload__btn" (click)="certificatesInput.click()">
                         <i class="bi bi-cloud-upload"></i>
                         בחר קבצים להעלאה
@@ -386,14 +386,14 @@
                   @if (certificateFileError) {
                     <div class="certificates-card__alert certificates-card__alert--error">{{ certificateFileError }}</div>
                   }
-                  @if (certificateFiles.length > 0) {
+                  <ng-container *ngIf="certificateFiles.length > 0">
                     <div class="certificates-list-wrap">
-                      <h6 class="certificates-list__title">קבצים שנבחרו ({{ certificateFiles.length }})</h6>
+                      <h6 class="certificates-list__title">קבצים שנבחרו: {{ certificateFiles.length }}</h6>
                       <ul class="certificates-list">
                         @for (file of certificateFiles; track $index) {
                           <li class="certificate-item">
                             <span class="certificate-item__icon">
-                              @if (getCertificateFileIcon(file) === 'pdf') {
+                              @if (isPdfFile(file)) {
                                 <i class="bi bi-file-pdf"></i>
                               } @else {
                                 <i class="bi bi-file-image"></i>
@@ -413,12 +413,13 @@
                         }
                       </ul>
                     </div>
-                  } @else {
+                  </ng-container>
+                  <ng-container *ngIf="certificateFiles.length === 0">
                     <div class="certificates-card__empty">
                       <i class="bi bi-folder2-open"></i>
                       <span>לא הועלו תעודות</span>
                     </div>
-                  }
+                  </ng-container>
                 </div>
               </section>
               <!-- Payment methods (instructors only) -->
@@ -473,9 +474,59 @@
                                                 </button>
                                               </div>
                                             </article>
+                                            @if (showPaymentMethodForm && editingPaymentMethod?.id === pm.id) {
+                                              <div class="payment-method-form-card">
+                                                <h6 class="payment-method-form-card__title">{{ paymentMethodFormTitle }}</h6>
+                                                <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
+                                                  <div class="payment-method-form__row">
+                                                    <div class="payment-method-form__field">
+                                                      <label class="payment-method-form__label">סוג</label>
+                                                      <select class="payment-method-form__input form-select" formControlName="paymentType">
+                                                        <option value="bank_transfer">העברה בנקאית</option>
+                                                        <option value="bit">ביט (Bit)</option>
+                                                      </select>
+                                                    </div>
+                                                    <div class="payment-method-form__field payment-method-form__field--checkbox">
+                                                      <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefaultEdit">
+                                                        <label class="form-check-label" for="pmDefaultEdit">ברירת מחדל</label>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                  @if (paymentTypeFormValue === 'bit') {
+                                                    <div class="payment-method-form__field">
+                                                      <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                                                      <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
+                                                    </div>
+                                                  }
+                                                  @if (paymentTypeFormValue === 'bank_transfer') {
+                                                    <div class="payment-method-form__grid">
+                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
+                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
+                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
+                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
+                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
+                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
+                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
+                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
+                                                      <div class="payment-method-form__field payment-method-form__field--full"><label class="payment-method-form__label">כתובת הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankAddress"></div>
+                                                    </div>
+                                                  }
+                                                  <div class="payment-method-form__actions">
+                                                    <button type="submit" class="btn btn-danger" [disabled]="isSavingPaymentMethod">
+                                                      @if (isSavingPaymentMethod) {
+                                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                                      }
+                                                      שמור
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary" (click)="closePaymentMethodForm()">ביטול</button>
+                                                  </div>
+                                                </form>
+                                              </div>
+                                            }
                                           }
                                         </div>
-                                        @if (showPaymentMethodForm) {
+                                        @if (showPaymentMethodForm && !editingPaymentMethod) {
                                           <div class="payment-method-form-card">
                                             <h6 class="payment-method-form-card__title">{{ paymentMethodFormTitle }}</h6>
                                             <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
