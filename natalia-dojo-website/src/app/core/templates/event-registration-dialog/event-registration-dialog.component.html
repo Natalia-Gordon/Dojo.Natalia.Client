@@ -178,11 +178,11 @@
                     </div>
                   }
                   @if (selectedPaymentMethod === 'bit') {
-                    <div class="bit-details mt-3">
+                    <div class="bank-transfer-details mt-3">
                       <div class="alert alert-info">
                         <h6 class="alert-heading mb-2">
                           <i class="bi bi-phone me-2"></i>
-                          העברה בביט (Bit)
+                          פרטי העברה בביט (Bit)
                         </h6>
                         @if (isLoadingInstructor) {
                           <div class="text-center py-2">
@@ -190,14 +190,13 @@
                             טוען פרטי טלפון...
                           </div>
                         }
-                        @if (!isLoadingInstructor && defaultBitMethod?.phoneNumber) {
-                          <div class="detail-item">
-                            <strong>מספר טלפון להעברה:</strong>
-                            <span dir="ltr">{{ defaultBitMethod?.phoneNumber }}</span>
+                        @if (!isLoadingInstructor && instructor && defaultBitMethod?.phoneNumber) {
+                          <div class="bank-details">
+                            <div class="detail-item detail-item-phone"><strong>מספר טלפון להעברה:</strong><span dir="ltr">{{ defaultBitMethod?.phoneNumber }}</span></div>
                           </div>
                         }
                         @if (!isLoadingInstructor && instructor && !defaultBitMethod?.phoneNumber) {
-                          <div class="alert alert-warning mt-2 mb-0">
+                          <div class="alert alert-warning mt-2">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             פרטי טלפון להעברת ביט לא זמינים עבור מארגן האירוע.
                           </div>
