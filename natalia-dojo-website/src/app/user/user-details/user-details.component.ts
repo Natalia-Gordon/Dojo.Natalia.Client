@@ -8,7 +8,7 @@ import { LoginModalService } from '../../_services/login-modal.service';
 import { Title, Meta } from '@angular/platform-browser';
 import { UserDetailsHeroComponent } from '../user-details-hero/user-details-hero.component';
 import { PaymentMethodsService, CreateOrUpdatePaymentMethodRequest } from '../../_services/payment-methods.service';
-import { InstructorPaymentMethodDto } from '../../_services/events.service';
+import { EventsService, InstructorCertificate, InstructorPaymentMethodDto } from '../../_services/events.service';
 import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
 
 @Component({
@@ -39,6 +39,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   isSavingPaymentMethod = false;
   paymentMethodForm!: FormGroup;
 
+  /** Instructor ID for current user (when role is instructor). Used for certificate upload. */
+  instructorId: number | null = null;
+  /** Certificates from GET /api/instructors (by userId). */
+  instructorCertificates: InstructorCertificate[] = [];
+  isLoadingCertificates = false;
+  isUploadingCertificates = false;
+
   constructor(
     private authService: AuthService,
     private fb: FormBuilder,
@@ -46,7 +53,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private title: Title,
     private meta: Meta,
     private loginModalService: LoginModalService,
-    private paymentMethodsService: PaymentMethodsService
+    private paymentMethodsService: PaymentMethodsService,
+    private eventsService: EventsService
   ) {
     this.profileForm = this.fb.group({
       username: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(3)]],
@@ -123,6 +131,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           this.populateForm(user);
           if (this.isInstructor()) {
             this.loadPaymentMethods();
+            this.loadInstructorCertificates();
           }
         },
         error: (error: any) => {
@@ -456,6 +465,46 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
+  loadInstructorCertificates(): void {
+    if (!this.isInstructor() || !this.user?.id) return;
+    this.isLoadingCertificates = true;
+    this.eventsService.getInstructors(true)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (instructors) => {
+          const inst = (instructors || []).find(i => i.userId === this.user!.id);
+          this.instructorId = inst?.instructorId ?? null;
+          this.instructorCertificates = inst?.certificates ?? [];
+          this.isLoadingCertificates = false;
+        },
+        error: () => {
+          this.instructorId = null;
+          this.instructorCertificates = [];
+          this.isLoadingCertificates = false;
+        }
+      });
+  }
+
+  uploadCertificates(): void {
+    if (!this.instructorId || this.certificateFiles.length === 0 || this.isUploadingCertificates) return;
+    this.certificateFileError = null;
+    this.isUploadingCertificates = true;
+    const files = [...this.certificateFiles];
+    this.eventsService.uploadInstructorCertificates(this.instructorId, files)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (instructor) => {
+          this.instructorCertificates = instructor.certificates ?? [];
+          this.certificateFiles = [];
+          this.isUploadingCertificates = false;
+        },
+        error: (err) => {
+          this.certificateFileError = err?.error?.message ?? 'שגיאה בהעלאת תעודות';
+          this.isUploadingCertificates = false;
+        }
+      });
+  }
+
   getPaymentMethodDisplayText(pm: InstructorPaymentMethodDto): string {
     if (pm.paymentType === 'bit') {
       return pm.phoneNumber ? `ביט – ${pm.phoneNumber}` : 'ביט';
@@ -468,6 +517,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     if (pm.accountNumber) parts.push(`חשבון ${pm.accountNumber}`);
     if (pm.accountHolderName) parts.push(pm.accountHolderName);
     return parts.length ? parts.join(' · ') : 'העברה בנקאית';
+  }
+
+  getPaymentTypeLabel(pm: InstructorPaymentMethodDto): string {
+    return pm.paymentType === 'bit' ? 'ביט' : 'העברה בנקאית';
+  }
+
+  paymentMethodTrackBy(_index: number, pm: InstructorPaymentMethodDto): number {
+    return pm.id;
   }
 
   openAddPaymentMethod(): void {
@@ -589,9 +646,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     return this.editingPaymentMethod ? 'עריכת שיטת תשלום' : 'הוספת שיטת תשלום';
   }
 
-  // ---------- Certificates (file list: PDF, TIFF, JPEG, PNG) ----------
+  // ---------- Certificates (instructors only: list from API + upload) ----------
   certificateFiles: File[] = [];
   certificateFileError: string | null = null;
+  certificatesDragOver = false;
 
   private readonly certificateAllowedExtensions = ['.pdf', '.tiff', '.tif', '.jpeg', '.jpg', '.png'];
   private readonly certificateAllowedTypes = ['application/pdf', 'image/tiff', 'image/jpeg', 'image/png'];
@@ -603,13 +661,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     return ext || type;
   }
 
-  onCertificatesSelected(event: Event): void {
-    this.certificateFileError = null;
-    const input = event.target as HTMLInputElement;
-    if (!input?.files?.length) return;
+  private addCertificateFilesFromList(files: FileList | File[]): void {
+    const list = Array.isArray(files) ? files : Array.from(files);
     const toAdd: File[] = [];
-    for (let i = 0; i < input.files.length; i++) {
-      const file = input.files[i];
+    for (const file of list) {
       if (!this.isCertificateFileAllowed(file)) {
         this.certificateFileError = `סוג קובץ לא נתמך: ${file.name}. יש להעלות רק PDF, TIFF, JPEG או PNG.`;
         return;
@@ -617,7 +672,38 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       toAdd.push(file);
     }
     this.certificateFiles.push(...toAdd);
+  }
+
+  onCertificatesSelected(event: Event): void {
+    this.certificateFileError = null;
+    const input = event.target as HTMLInputElement;
+    if (!input?.files?.length) return;
+    this.addCertificateFilesFromList(input.files);
     input.value = '';
+  }
+
+  onCertificatesDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer?.types?.includes('Files')) {
+      this.certificatesDragOver = true;
+    }
+  }
+
+  onCertificatesDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.certificatesDragOver = false;
+  }
+
+  onCertificatesDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.certificatesDragOver = false;
+    this.certificateFileError = null;
+    const files = event.dataTransfer?.files;
+    if (!files?.length) return;
+    this.addCertificateFilesFromList(files);
   }
 
   removeCertificateFile(index: number): void {
@@ -637,8 +723,15 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     return 'image';
   }
 
-  /** Used in template to avoid string literal in @if. */
   isPdfFile(file: File): boolean {
     return this.getCertificateFileIcon(file) === 'pdf';
+  }
+
+  certificateTrackBy(_index: number, cert: InstructorCertificate): string {
+    return cert.downloadUrl;
+  }
+
+  certificateFileTrackBy(index: number): number {
+    return index;
   }
 }

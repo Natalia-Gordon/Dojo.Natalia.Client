@@ -542,6 +542,28 @@ hr.border-secondary {
   flex-shrink: 0;
 }
 
+.certificates-drop-zone {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  background: #fafafa;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.certificates-drop-zone--over {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+.certificates-drop-zone__hint {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
 .certificates-upload__input {
   position: absolute;
   width: 0.1px;
@@ -583,6 +605,19 @@ hr.border-secondary {
   background: #fef2f2;
   color: #b91c1c;
   border: 1px solid #fecaca;
+}
+
+.certificates-card__loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.certificates-card__upload-actions {
+  margin-top: 0.75rem;
 }
 
 .certificates-list-wrap {
@@ -637,6 +672,15 @@ hr.border-secondary {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #374151;
+}
+
+.certificate-item__link {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.certificate-item__link:hover {
+  text-decoration: underline;
 }
 
 .certificate-item__size {

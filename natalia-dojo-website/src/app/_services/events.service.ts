@@ -63,6 +63,14 @@ export interface Instructor {
   branchNumber: string | null;
   /** Source of truth for instructor payment methods (Bit + bank transfer). */
   paymentMethods?: InstructorPaymentMethodDto[];
+  /** Certificates stored in GCS; downloadUrl is GET /api/instructors/{id}/certificates/download?path=... */
+  certificates?: InstructorCertificate[];
+}
+
+/** Certificate item returned by GET /api/instructors and GET /api/instructors/{id}. */
+export interface InstructorCertificate {
+  fileName: string;
+  downloadUrl: string;
 }
 
 /** One payment method on InstructorResponse (bit or bank_transfer). */
@@ -437,6 +445,29 @@ export class EventsService {
     }).pipe(
       catchError(error => {
         console.error('Update instructor bank details error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Upload certificate files for an instructor.
+   * POST /api/instructors/{id}/certificates — body: multipart form with key "files" (one or more files).
+   * Auth: admin or the instructor (same user as instructor.UserId).
+   * Returns the updated instructor (including Certificates with downloadUrls).
+   */
+  uploadInstructorCertificates(instructorId: number, files: File[]): Observable<Instructor> {
+    const formData = new FormData();
+    files.forEach(f => formData.append('files', f, f.name));
+    const token = this.authService.getToken();
+    const headers = token
+      ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      : new HttpHeaders();
+    return this.http.post<Instructor>(`${this.apiUrl}/instructors/${instructorId}/certificates`, formData, {
+      headers
+    }).pipe(
+      catchError(error => {
+        console.error('Upload instructor certificates error:', error);
         return throwError(() => error);
       })
     );
