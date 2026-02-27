@@ -8,7 +8,8 @@ import { LoginModalService } from '../../_services/login-modal.service';
 import { Title, Meta } from '@angular/platform-browser';
 import { UserDetailsHeroComponent } from '../user-details-hero/user-details-hero.component';
 import { PaymentMethodsService, CreateOrUpdatePaymentMethodRequest } from '../../_services/payment-methods.service';
-import { EventsService, InstructorCertificate, InstructorPaymentMethodDto } from '../../_services/events.service';
+import { InstructorCertificate, InstructorPaymentMethodDto } from '../../_services/instructors.service';
+import { InstructorsService } from '../../_services/instructors.service';
 import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
 
 @Component({
@@ -54,7 +55,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private meta: Meta,
     private loginModalService: LoginModalService,
     private paymentMethodsService: PaymentMethodsService,
-    private eventsService: EventsService
+    private instructorsService: InstructorsService
   ) {
     this.profileForm = this.fb.group({
       username: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(3)]],
@@ -141,7 +142,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
             this.errorMessage = null;
             return;
           }
-          this.errorMessage = 'שגיאה בטעינת פרטי המשתמש';
+          this.errorMessage = error?.error?.message || 'שגיאה בטעינת פרטי המשתמש';
         }
       });
   }
@@ -468,7 +469,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   loadInstructorCertificates(): void {
     if (!this.isInstructor() || !this.user?.id) return;
     this.isLoadingCertificates = true;
-    this.eventsService.getInstructors(true)
+    this.instructorsService.getInstructors(true)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (instructors) => {
@@ -490,7 +491,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.certificateFileError = null;
     this.isUploadingCertificates = true;
     const files = [...this.certificateFiles];
-    this.eventsService.uploadInstructorCertificates(this.instructorId, files)
+    this.instructorsService.uploadInstructorCertificates(this.instructorId, files)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (instructor) => {
@@ -729,6 +730,28 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   certificateTrackBy(_index: number, cert: InstructorCertificate): string {
     return cert.downloadUrl;
+  }
+
+  /** Download certificate via authenticated request (sends Bearer token; direct link causes 401). */
+  downloadCertificate(cert: InstructorCertificate): void {
+    this.certificateFileError = null;
+    this.instructorsService.downloadInstructorCertificate(cert.downloadUrl).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = cert.fileName || 'certificate';
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.certificateFileError = err?.status === 401
+          ? 'יש להתחבר מחדש כדי להוריד את הקובץ.'
+          : (err?.error?.message || 'שגיאה בהורדת הקובץ. נסה שוב.');
+      }
+    });
   }
 
   certificateFileTrackBy(index: number): number {

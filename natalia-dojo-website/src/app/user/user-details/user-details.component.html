@@ -397,26 +397,26 @@
                       <i class="bi bi-info-circle"></i>
                       ניתן להעלות קבצי תעודות בפורמטים: PDF, TIFF, JPEG, PNG
                     </p>
+                    <div class="certificates-upload certificates-upload--above">
+                      <input
+                        type="file"
+                        #certificatesInput
+                        class="certificates-upload__input"
+                        accept=".pdf,.tiff,.tif,.jpeg,.jpg,.png,application/pdf,image/tiff,image/jpeg,image/png"
+                        multiple
+                        (change)="onCertificatesSelected($event)">
+                      <button type="button" class="certificates-upload__btn" (click)="certificatesInput.click()">
+                        <i class="bi bi-cloud-upload"></i>
+                        בחר קבצים להעלאה
+                      </button>
+                    </div>
                     <div
                       class="certificates-drop-zone"
                       [class.certificates-drop-zone--over]="certificatesDragOver"
                       (dragover)="onCertificatesDragOver($event)"
                       (dragleave)="onCertificatesDragLeave($event)"
                       (drop)="onCertificatesDrop($event)">
-                      <div class="certificates-upload">
-                        <input
-                          type="file"
-                          #certificatesInput
-                          class="certificates-upload__input"
-                          accept=".pdf,.tiff,.tif,.jpeg,.jpg,.png,application/pdf,image/tiff,image/jpeg,image/png"
-                          multiple
-                          (change)="onCertificatesSelected($event)">
-                        <button type="button" class="certificates-upload__btn" (click)="certificatesInput.click()">
-                          <i class="bi bi-cloud-upload"></i>
-                          בחר קבצים להעלאה
-                        </button>
-                        <span class="certificates-drop-zone__hint">או גרור קבצים לכאן</span>
-                      </div>
+                      <span class="certificates-drop-zone__hint">או גרור קבצים לכאן</span>
                     </div>
                   </div>
                   <ng-container *ngIf="certificateFileError">
@@ -429,8 +429,8 @@
                         <ng-container *ngFor="let cert of instructorCertificates; trackBy: certificateTrackBy">
                           <li class="certificate-item">
                             <span class="certificate-item__icon"><i class="bi bi-file-earmark-arrow-down"></i></span>
-                            <a [href]="cert.downloadUrl" target="_blank" rel="noopener noreferrer" class="certificate-item__name certificate-item__link" [textContent]="cert.fileName"></a>
-                            <span class="certificate-item__size">הורדה</span>
+                            <span class="certificate-item__name" [textContent]="cert.fileName" [title]="cert.fileName"></span>
+                            <button type="button" class="certificate-item__link" (click)="downloadCertificate(cert)" title="הורדה">הורדה</button>
                           </li>
                         </ng-container>
                       </ul>

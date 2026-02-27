@@ -4,7 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService, UserInfo } from '../../_services/auth.service';
-import { EventsService, Instructor } from '../../_services/events.service';
+import { EventsService } from '../../_services/events.service';
+import { InstructorsService, Instructor } from '../../_services/instructors.service';
 import { EventsHeroComponent } from '../events-hero/events-hero.component';
 import { EventCreateHeroComponent } from './event-create-hero/event-create-hero.component';
 
@@ -29,6 +30,7 @@ export class EventCreateComponent implements OnInit, OnDestroy {
 
   constructor(
     private eventsService: EventsService,
+    private instructorsService: InstructorsService,
     private authService: AuthService,
     private fb: FormBuilder,
     private router: Router,
@@ -93,7 +95,7 @@ export class EventCreateComponent implements OnInit, OnDestroy {
 
     this.isLoadingInstructors = true;
     try {
-      this.eventsService.getInstructors(false).subscribe({
+      this.instructorsService.getInstructors(false).subscribe({
         next: (instructors) => {
           this.instructors = instructors || [];
           this.isLoadingInstructors = false;

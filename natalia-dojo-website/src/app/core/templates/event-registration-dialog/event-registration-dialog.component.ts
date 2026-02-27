@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { EventsService, Event as EventModel, PaymentMethod, EventRegistrationResponse, Instructor, InstructorPaymentMethodDto } from '../../../_services/events.service';
+import { EventsService, Event as EventModel, PaymentMethod, EventRegistrationResponse } from '../../../_services/events.service';
+import { InstructorsService, Instructor, InstructorPaymentMethodDto } from '../../../_services/instructors.service';
 import { AuthService, UserInfo } from '../../../_services/auth.service';
 import { LoginModalService } from '../../../_services/login-modal.service';
 
@@ -58,6 +59,7 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
 
   constructor(
     private eventsService: EventsService,
+    private instructorsService: InstructorsService,
     private authService: AuthService,
     private loginModalService: LoginModalService,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -99,7 +101,7 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
   loadInstructor(instructorId: number): void {
     this.isLoadingInstructor = true;
     this.instructorLoadErrorStatus = null;
-    this.eventsService.getInstructorById(instructorId).subscribe({
+    this.instructorsService.getInstructorById(instructorId).subscribe({
       next: (instructor) => {
         this.instructor = instructor;
         this.instructorLoadErrorStatus = null;

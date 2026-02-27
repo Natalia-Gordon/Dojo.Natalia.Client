@@ -6,6 +6,9 @@ import { forkJoin } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
+// Re-export instructor types for backward compatibility (instructor APIs moved to InstructorsService)
+export { Instructor, InstructorCertificate, InstructorPaymentMethodDto } from './instructors.service';
+
 export interface RegistrationDialogState {
   isOpen: boolean;
   event: Event | null;
@@ -37,57 +40,6 @@ export interface Event {
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface Instructor {
-  instructorId: number;
-  userId: number;
-  username: string | null;
-  displayName: string | null;
-  email: string | null;
-  phone: string | null;
-  rank: string | null;
-  yearsOfExperience: number | null;
-  specialization: string[] | null;
-  hourlyRate: number | null;
-  isAvailable: boolean;
-  /** Top-level bank fields for backward compatibility; prefer paymentMethods when present. */
-  bankName: string | null;
-  accountHolderName: string | null;
-  accountNumber: string | null;
-  iban: string | null;
-  swiftBic: string | null;
-  bankAddress: string | null;
-  bankNumber: string | null;
-  branchName: string | null;
-  branchNumber: string | null;
-  /** Source of truth for instructor payment methods (Bit + bank transfer). */
-  paymentMethods?: InstructorPaymentMethodDto[];
-  /** Certificates stored in GCS; downloadUrl is GET /api/instructors/{id}/certificates/download?path=... */
-  certificates?: InstructorCertificate[];
-}
-
-/** Certificate item returned by GET /api/instructors and GET /api/instructors/{id}. */
-export interface InstructorCertificate {
-  fileName: string;
-  downloadUrl: string;
-}
-
-/** One payment method on InstructorResponse (bit or bank_transfer). */
-export interface InstructorPaymentMethodDto {
-  id: number;
-  paymentType: 'bit' | 'bank_transfer';
-  isDefault: boolean;
-  phoneNumber?: string | null;
-  bankName?: string | null;
-  accountHolderName?: string | null;
-  accountNumber?: string | null;
-  iban?: string | null;
-  swiftBic?: string | null;
-  bankAddress?: string | null;
-  bankNumber?: string | null;
-  branchName?: string | null;
-  branchNumber?: string | null;
 }
 
 export interface CreateEventRequest {
@@ -371,103 +323,6 @@ export class EventsService {
         if (error.status !== 0 && error.status !== 503) {
           console.error('Delete event error:', error);
         }
-        return throwError(() => error);
-      })
-    );
-  }
-
-  getInstructors(includeUnavailable: boolean = false): Observable<Instructor[]> {
-    const params = new HttpParams().set('includeUnavailable', includeUnavailable.toString());
-    
-    return this.http.get<Instructor[]>(`${this.apiUrl}/instructors`, {
-      headers: this.getAuthHeaders(),
-      params: params
-    }).pipe(
-      catchError(error => {
-        // Handle 503 Service Unavailable (database connection issues) - return empty array silently
-        if (error.status === 503) {
-          // Don't log 503 errors - they're backend database issues, not frontend problems
-          return of([]);
-        }
-        // Only log non-network errors to reduce console noise
-        if (error.status !== 0 && error.status !== 503) {
-          console.error('Get instructors error:', error);
-        }
-        
-        // For network errors (status 0), return empty array to prevent UI crashes
-        if (error.status === 0) {
-          return of([]);
-        }
-        
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Get a specific instructor by ID
-   */
-  getInstructorById(instructorId: number): Observable<Instructor> {
-    return this.http.get<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, {
-      headers: this.getAuthHeaders()
-    }).pipe(
-      catchError(error => {
-        // Handle 503 Service Unavailable (database connection issues)
-        if (error.status === 503) {
-          return throwError(() => new Error('Service temporarily unavailable'));
-        }
-        // Only log non-network errors to reduce console noise
-        if (error.status !== 0 && error.status !== 503) {
-          console.error('Get instructor by ID error:', error);
-        }
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Update instructor bank details (admin only)
-   */
-  updateInstructorBankDetails(
-    instructorId: number,
-    bankDetails: {
-      accountHolderName?: string | null;
-      bankName?: string | null;
-      bankNumber?: string | null;
-      branchName?: string | null;
-      branchNumber?: string | null;
-      accountNumber?: string | null;
-      bankAddress?: string | null;
-    }
-  ): Observable<Instructor> {
-    return this.http.put<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, bankDetails, {
-      headers: this.getAuthHeaders()
-    }).pipe(
-      catchError(error => {
-        console.error('Update instructor bank details error:', error);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Upload certificate files for an instructor.
-   * POST /api/instructors/{id}/certificates — body: multipart form with key "files" (one or more files).
-   * Auth: admin or the instructor (same user as instructor.UserId).
-   * Returns the updated instructor (including Certificates with downloadUrls).
-   */
-  uploadInstructorCertificates(instructorId: number, files: File[]): Observable<Instructor> {
-    const formData = new FormData();
-    files.forEach(f => formData.append('files', f, f.name));
-    const token = this.authService.getToken();
-    const headers = token
-      ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
-      : new HttpHeaders();
-    return this.http.post<Instructor>(`${this.apiUrl}/instructors/${instructorId}/certificates`, formData, {
-      headers
-    }).pipe(
-      catchError(error => {
-        console.error('Upload instructor certificates error:', error);
         return throwError(() => error);
       })
     );

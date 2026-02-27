@@ -542,6 +542,10 @@ hr.border-secondary {
   flex-shrink: 0;
 }
 
+.certificates-upload--above {
+  margin-bottom: 0.75rem;
+}
+
 .certificates-drop-zone {
   display: flex;
   align-items: center;
@@ -552,6 +556,9 @@ hr.border-secondary {
   border-radius: 10px;
   background: #fafafa;
   transition: border-color 0.2s ease, background-color 0.2s ease;
+  width: 100%;
+  flex-basis: 100%;
+  box-sizing: border-box;
 }
 
 .certificates-drop-zone--over {
@@ -560,8 +567,11 @@ hr.border-secondary {
 }
 
 .certificates-drop-zone__hint {
+  flex-basis: 100%;
+  width: 100%;
   font-size: 0.9rem;
   color: #6b7280;
+  text-align: center;
 }
 
 .certificates-upload__input {
@@ -681,6 +691,16 @@ hr.border-secondary {
 
 .certificate-item__link:hover {
   text-decoration: underline;
+}
+
+/* When the link is a button (authenticated download), reset button styles so it looks like a link */
+button.certificate-item__link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-align: inherit;
 }
 
 .certificate-item__size {

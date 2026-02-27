@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { EventsService, Event } from '../../_services/events.service';
+import { InstructorsService } from '../../_services/instructors.service';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { EventDetailHeroComponent } from './event-detail-hero/event-detail-hero.component';
@@ -44,6 +45,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private eventsService: EventsService,
+    private instructorsService: InstructorsService,
     private authService: AuthService,
     private loginModalService: LoginModalService,
     private sanitizer: DomSanitizer,
@@ -130,7 +132,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
           this.displayImageUrl = event.imageUrl || '';
         }
         if (event.instructorId) {
-          this.eventsService.getInstructorById(event.instructorId).subscribe({
+          this.instructorsService.getInstructorById(event.instructorId).subscribe({
             next: (instructor) => {
               this.instructorName = instructor.displayName || instructor.username || null;
             },

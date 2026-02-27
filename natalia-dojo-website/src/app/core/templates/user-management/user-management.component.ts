@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { AuthService, User, UserInfo } from '../../../_services/auth.service';
 import { LoginModalService } from '../../../_services/login-modal.service';
 import { Rank, RanksService } from '../../../_services/ranks.service';
-import { EventsService, Instructor, InstructorPaymentMethodDto } from '../../../_services/events.service';
+import { InstructorsService, Instructor, InstructorPaymentMethodDto } from '../../../_services/instructors.service';
 
 @Component({
   selector: 'app-user-management',
@@ -98,7 +98,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private loginModalService: LoginModalService,
     private ranksService: RanksService,
-    private eventsService: EventsService,
+    private instructorsService: InstructorsService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -560,7 +560,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     };
 
     // Load selected user's instructor record (including payment methods) to prefill form
-    this.eventsService.getInstructors(true).subscribe({
+    this.instructorsService.getInstructors(true).subscribe({
       next: (instructors) => {
         const inst = (instructors || []).find(i => i.userId === user.id);
         if (!inst) {
@@ -643,7 +643,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.eventsService.updateInstructorBankDetails(instructorId, payload).subscribe({
+    this.instructorsService.updateInstructorBankDetails(instructorId, payload).subscribe({
       next: () => {
         this.isBankFormLoading = false;
         this.closeBankDetailsForm();

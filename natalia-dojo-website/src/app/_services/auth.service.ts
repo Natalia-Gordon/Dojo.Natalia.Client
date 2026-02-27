@@ -645,6 +645,14 @@ export class AuthService {
         }
       }),
       catchError((error: any) => {
+        // status 200 but ok: false = server returned 200 but body was not valid JSON (e.g. HTML after backend restart)
+        if (error?.status === 200 && error?.ok === false) {
+          console.error('Get user details: server returned 200 but response was not valid JSON. Backend may have returned HTML or wrong Content-Type.', error);
+          return throwError(() => ({
+            ...error,
+            error: { message: 'השרת החזיר תשובה לא תקינה. אם הרגע הפעלת מחדש את השרת, נסה לרענן את הדף.' }
+          }));
+        }
         console.error('Get user details error:', error);
         return throwError(() => error);
       })
