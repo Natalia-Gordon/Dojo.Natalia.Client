@@ -312,10 +312,22 @@
                     <input
                       id="bank-number"
                       type="text"
-                      [(ngModel)]="bankForm.bankId"
-                      name="bankId"
+                      [(ngModel)]="bankForm.bankNumber"
+                      name="bankNumber"
                       class="form-input"
                       placeholder="מס' בנק">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="branch-name" class="form-label">שם הסניף</label>
+                  <div class="input-wrapper">
+                    <input
+                      id="branch-name"
+                      type="text"
+                      [(ngModel)]="bankForm.branchName"
+                      name="branchName"
+                      class="form-input"
+                      placeholder="שם סניף">
                   </div>
                 </div>
                 <div class="form-group">

@@ -4,15 +4,17 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { EventsService, Event } from '../../_services/events.service';
+import { InstructorsService } from '../../_services/instructors.service';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { EventDetailHeroComponent } from './event-detail-hero/event-detail-hero.component';
-import { RegistrationDialogComponent } from './registration-dialog/registration-dialog.component';
+import { EventRegistrationDialogComponent } from '../../core/templates/event-registration-dialog/event-registration-dialog.component';
+import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, EventDetailHeroComponent, RegistrationDialogComponent],
+  imports: [CommonModule, RouterModule, EventDetailHeroComponent, EventRegistrationDialogComponent],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.css'
 })
@@ -28,8 +30,14 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   private imageId: string | null = null;
   displayImageUrl: string = ''; // Pre-computed image URL for SSR safety
   isBrowser = false; // Platform check for template
+  instructorName: string | null = null;
+  /** When true, event detail hero shows "ניהול אירועים" in breadcrumb (from query param from=admin-events). */
+  fromEventsManagement = false;
+  /** When true, breadcrumb shows "אירועים שלי" link back to my-events (from query param from=my-events). */
+  fromMyEvents = false;
 
   private routeSubscription?: Subscription;
+  private queryParamSubscription?: Subscription;
   private authSubscription?: Subscription;
   private userInfoSubscription?: Subscription;
 
@@ -37,6 +45,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private eventsService: EventsService,
+    private instructorsService: InstructorsService,
     private authService: AuthService,
     private loginModalService: LoginModalService,
     private sanitizer: DomSanitizer,
@@ -79,10 +88,18 @@ export class EventDetailComponent implements OnInit, OnDestroy {
         this.loadEvent(eventId);
       }
     });
+
+    this.queryParamSubscription = this.route.queryParams.subscribe(q => {
+      this.fromEventsManagement = q['from'] === 'admin-events';
+      this.fromMyEvents = q['from'] === 'my-events';
+    });
+    this.fromEventsManagement = this.route.snapshot.queryParams['from'] === 'admin-events';
+    this.fromMyEvents = this.route.snapshot.queryParams['from'] === 'my-events';
   }
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
+    this.queryParamSubscription?.unsubscribe();
     this.authSubscription?.unsubscribe();
     this.userInfoSubscription?.unsubscribe();
   }
@@ -104,11 +121,25 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       this.eventsService.getEventById(eventId, requireAuth).subscribe({
       next: (event) => {
         this.event = event;
-        // Compute image URL only in browser to avoid SSR issues
+        this.instructorName = null;
+        // Compute image URL only in browser; use shared Drive URL conversion so event picture displays
         if (isPlatformBrowser(this.platformId) && event.imageUrl) {
-          this.displayImageUrl = this.getImageUrl(event.imageUrl);
+          this.imageLoadAttempt = 0;
+          this.imageId = getDriveFileId(event.imageUrl);
+          const directUrl = getProfileImageUrlForAttempt(event.imageUrl, 0, 'w1920');
+          this.displayImageUrl = directUrl || event.imageUrl.trim();
         } else {
           this.displayImageUrl = event.imageUrl || '';
+        }
+        if (event.instructorId) {
+          this.instructorsService.getInstructorById(event.instructorId).subscribe({
+            next: (instructor) => {
+              this.instructorName = instructor.displayName || instructor.username || null;
+            },
+            error: () => {
+              this.instructorName = null;
+            }
+          });
         }
         this.isLoading = false;
         this.errorMessage = '';
@@ -148,7 +179,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (!this.event) return;
 
     if (!this.isAuthenticated || !this.userInfo?.userId) {
-      this.loginModalService.open();
+      this.authService.clearSessionLocally();
+      this.loginModalService.open('login');
       this.errorMessage = 'יש להתחבר או להירשם כאורח כדי להירשם לסמינר.';
       return;
     }
@@ -162,46 +194,17 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Convert Google Drive file link to direct image URL
-   * Extracts IMAGE_ID from: https://drive.google.com/file/d/IMAGE_ID/view?usp=sharing
-   * Tries multiple URL formats for better compatibility
+   * Resolve display URL for event image. Uses shared Drive conversion so Google Drive links work in <img>.
    */
   getImageUrl(imageUrl: string | null | undefined): string {
     if (!imageUrl) return '';
-    
-    // During SSR, return empty string to avoid issues
-    if (!isPlatformBrowser(this.platformId)) {
-      return '';
-    }
-    
-    // Clean the URL - remove any extra whitespace
-    const cleanUrl = imageUrl.trim();
-    
-    // Extract IMAGE_ID from Google Drive file link
-    // Pattern: https://drive.google.com/file/d/IMAGE_ID/view?usp=sharing
-    const driveFileMatch = cleanUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (driveFileMatch) {
-      this.imageId = driveFileMatch[1];
-      this.imageLoadAttempt = 0;
-      // Convert to direct view URL - this format works best for shared images
-      const convertedUrl = `https://drive.google.com/uc?export=view&id=${this.imageId}`;
-      return convertedUrl;
-    }
-    
-    // If it's already in a direct format, extract the ID for fallbacks
-    const idMatch = cleanUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    if (idMatch) {
-      this.imageId = idMatch[1];
-      this.imageLoadAttempt = 0;
-    }
-    
-    // If it's already in the direct format, return as is
-    if (cleanUrl.includes('drive.google.com/uc?export=')) {
-      return cleanUrl;
-    }
-    
-    // For other URLs (including Google CDN), return as is
-    return cleanUrl;
+    if (!isPlatformBrowser(this.platformId)) return '';
+    const trimmed = imageUrl.trim();
+    if (!trimmed) return '';
+    this.imageId = getDriveFileId(trimmed);
+    this.imageLoadAttempt = 0;
+    const direct = getProfileImageUrlForAttempt(trimmed, 0, 'w1920');
+    return direct || trimmed;
   }
 
   /**
@@ -217,55 +220,33 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle image load error - try alternative Google Drive URL formats
+   * Handle image load error - try alternative Google Drive URL formats (same as profile images).
    */
   onImageError(event: ErrorEvent): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    
-    const imgElement = event.target as HTMLImageElement;
-    if (!imgElement) return;
 
-    const currentSrc = imgElement.src;
-    
-    // Try alternative formats if we have a file ID
-    if (this.imageId && this.imageLoadAttempt < 3) {
-      this.imageLoadAttempt++;
-      let fallbackUrl = '';
-      
-      switch (this.imageLoadAttempt) {
-        case 1:
-          // Try thumbnail API
-          fallbackUrl = `https://drive.google.com/thumbnail?id=${this.imageId}&sz=w1920`;
-          break;
-        case 2:
-          // Try export=download format
-          fallbackUrl = `https://drive.google.com/uc?export=download&id=${this.imageId}`;
-          break;
-        case 3:
-          // Last resort: show error message with link to view on Google Drive
-          this.showErrorMessageWithLink(imgElement);
-          return;
-      }
-      
-      if (fallbackUrl) {
-        console.log(`Trying alternative format ${this.imageLoadAttempt}:`, fallbackUrl);
-        imgElement.src = fallbackUrl;
-        return;
-      }
+    const imgElement = event.target as HTMLImageElement;
+    if (!imgElement || !this.event?.imageUrl) return;
+
+    const rawUrl = this.event.imageUrl.trim();
+    const nextAttempt = this.imageLoadAttempt + 1;
+    const nextUrl = getProfileImageUrlForAttempt(rawUrl, nextAttempt, 'w1920');
+
+    if (nextUrl) {
+      this.imageLoadAttempt = nextAttempt;
+      imgElement.src = nextUrl;
+      return;
     }
-    
-    // All attempts failed - show error message with link
-    console.error('All image load attempts failed:', currentSrc);
-    this.showErrorMessageWithLink(imgElement);
+
+    this.showDriveLinkOnly(imgElement);
   }
 
   /**
-   * Show error message with link to view image on Google Drive
-   * (iframe embedding is blocked by Google Drive's CSP)
+   * Show link to open image in Google Drive. Do not embed iframe (Drive CSP: frame-ancestors https://drive.google.com).
    */
-  private showErrorMessageWithLink(imgElement: HTMLImageElement): void {
+  private showDriveLinkOnly(imgElement: HTMLImageElement): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    
+
     if (!this.imageId) {
       this.showErrorMessage(imgElement);
       return;
@@ -274,37 +255,20 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     const container = imgElement.parentElement;
     if (!container) return;
 
-    // Hide the image
     imgElement.style.display = 'none';
-
-    // Check if error message already exists
     if (container.querySelector('.drive-image-error')) return;
 
-    // Create error message with link
-    const errorWrapper = document.createElement('div');
-    errorWrapper.className = 'drive-image-error';
-    errorWrapper.style.cssText = 'padding: 2rem; text-align: center; color: #6b7280; background: #f8f9fa; border-radius: 8px; margin-top: 1rem;';
-    
-    const errorIcon = document.createElement('i');
-    errorIcon.className = 'bi bi-exclamation-triangle';
-    errorIcon.style.cssText = 'font-size: 2rem; color: #f59e0b; margin-bottom: 1rem; display: block;';
-    
-    const errorText = document.createElement('p');
-    errorText.textContent = 'לא ניתן לטעון את התמונה ישירות.';
-    errorText.style.cssText = 'margin-bottom: 1rem;';
-    
+    const linkWrap = document.createElement('div');
+    linkWrap.className = 'drive-image-error';
+    linkWrap.style.cssText = 'padding: 1.5rem; text-align: center; background: #f8f9fa; border-radius: 8px;';
     const driveLink = document.createElement('a');
     driveLink.href = `https://drive.google.com/file/d/${this.imageId}/view`;
     driveLink.target = '_blank';
     driveLink.rel = 'noopener noreferrer';
     driveLink.textContent = 'לצפייה בתמונה ב-Google Drive';
-    driveLink.className = 'btn btn-primary';
-    driveLink.style.cssText = 'margin-top: 0.5rem;';
-    
-    errorWrapper.appendChild(errorIcon);
-    errorWrapper.appendChild(errorText);
-    errorWrapper.appendChild(driveLink);
-    container.appendChild(errorWrapper);
+    driveLink.className = 'btn btn-outline-primary';
+    linkWrap.appendChild(driveLink);
+    container.appendChild(linkWrap);
   }
 
   /**
@@ -375,6 +339,28 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (!this.event?.earlyBirdDeadline) return false;
     const deadline = new Date(this.event.earlyBirdDeadline);
     return deadline > new Date();
+  }
+
+  /** Formatted price for display (avoids ICU/pipe parsing issues in template). */
+  getFormattedPrice(amount: number): string {
+    return amount == null ? '' : new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+  }
+
+  /** Registration status label for display. */
+  getRegistrationStatusLabel(): string {
+    return this.event?.registrationOpen ? 'פתוח להרשמה' : 'הרשמה סגורה';
+  }
+
+  /** Early bird deadline label for display. */
+  getEarlyBirdDeadlineLabel(): string {
+    return this.isEarlyBirdAvailable() ? 'זמין עד' : 'פג תוקף';
+  }
+
+  /** Formatted registration deadline (avoids ICU parsing of date format in template). */
+  getFormattedRegistrationDeadline(): string {
+    if (!this.event?.registrationDeadline) return '';
+    const d = new Date(this.event.registrationDeadline);
+    return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {

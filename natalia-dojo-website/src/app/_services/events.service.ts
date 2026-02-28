@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError, of, BehaviorSubject } from 'rxjs';
-import { catchError, map } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
+
+// Re-export instructor types for backward compatibility (instructor APIs moved to InstructorsService)
+export { Instructor, InstructorCertificate, InstructorPaymentMethodDto } from './instructors.service';
 
 export interface RegistrationDialogState {
   isOpen: boolean;
@@ -11,7 +15,7 @@ export interface RegistrationDialogState {
 }
 
 export type EventStatus = 'draft' | 'published' | 'closed';
-export type EventType = 'seminar' | 'workshop' | 'grading' | 'social' | 'special_training' | 'online_session';
+export type EventType = 'seminar' | 'workshop' | 'grading' | 'social' | 'special_training' | 'online_session' | 'retreat' | 'zen_session';
 export type PaymentStatus = 'free' | 'pending' | 'paid' | 'refunded' | 'cancelled';
 export type PaymentMethod = 'bit' | 'credit_card' | 'cash' | 'bank_transfer' | 'google_pay' | 'apple_pay' | 'paypal';
 
@@ -36,27 +40,6 @@ export interface Event {
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface Instructor {
-  instructorId: number;
-  userId: number;
-  username: string | null;
-  displayName: string | null;
-  email: string | null;
-  rank: string | null;
-  yearsOfExperience: number | null;
-  specialization: string[] | null;
-  hourlyRate: number | null;
-  isAvailable: boolean;
-  bankName: string | null;
-  accountHolderName: string | null;
-  accountNumber: string | null;
-  iban: string | null;
-  swiftBic: string | null;
-  bankAddress: string | null;
-  bankId: string | null;
-  branchNumber: string | null;
 }
 
 export interface CreateEventRequest {
@@ -85,6 +68,26 @@ export interface CreateEventRegistrationRequest {
   paymentMethod?: PaymentMethod | string | null;
 }
 
+/** PATCH /api/events/{eventId}/registrations/{registrationId}/attendance */
+export interface UpdateEventAttendanceRequest {
+  attended?: boolean;
+  checkedInAt?: string | null;
+}
+
+/**
+ * POST /api/events/{eventId}/registrations/{registrationId}/resend-email
+ * Type: "confirmation" (to registrant), "payment_approval" (to event creator), or "both" (default when omitted).
+ */
+export interface ResendRegistrationEmailRequest {
+  type?: string | null;
+}
+
+/** POST approve-payment body. approved: true = set to paid, false = reject (failed). */
+export interface ApprovePaymentRequest {
+  approved: boolean;
+  approvalNotes?: string | null;
+}
+
 export interface EventRegistration {
   id: number;
   eventId: number;
@@ -108,12 +111,29 @@ export interface EventRegistrationDetailsResponse {
   userId: number;
   username: string | null;
   email: string | null;
+  /** User first name (from user profile). */
+  firstName?: string | null;
+  /** User last name (from user profile). */
+  lastName?: string | null;
+  /** User phone (from user profile). */
+  phone?: string | null;
   status: string | null;
   paymentStatus: string | null;
   attended: boolean;
   checkedInAt: string | null;
   registeredAt: string;
   notes: string | null;
+  /** When the confirmation email was last sent to the registrant (null = not sent). */
+  confirmationEmailSentAt?: string | null;
+  /** When the payment approval email was last sent to the event creator (null = not sent). */
+  paymentApprovalEmailSentAt?: string | null;
+}
+
+/** Optional query filters for GET /api/events/{id}/registrations (case-insensitive substring where applicable). */
+export interface EventRegistrationsFilters {
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
 }
 
 export interface EventRegistrationHistoryResponse {
@@ -127,6 +147,25 @@ export interface EventRegistrationHistoryResponse {
   paymentStatus: string | null;
   attended: boolean;
   registeredAt: string;
+  /** When the confirmation email was last sent (null = not sent). */
+  confirmationEmailSentAt?: string | null;
+  /** When the payment approval email was last sent (null = not sent). */
+  paymentApprovalEmailSentAt?: string | null;
+}
+
+/** Admin events list: GET /api/events/admin (sorting, filtering, paging). registeredCountByEventId has string keys (e.g. "1", "2"). */
+export interface PagedEventsResponse {
+  items: Event[] | null;
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  registeredCountByEventId?: Record<string, number>;
+}
+
+/** One registration with its event (for admin pending-payments list). */
+export interface PendingPaymentItem {
+  event: Event;
+  registration: EventRegistrationDetailsResponse;
 }
 
 export interface EventRegistrationResponse {
@@ -275,74 +314,15 @@ export class EventsService {
     );
   }
 
-  getInstructors(includeUnavailable: boolean = false): Observable<Instructor[]> {
-    const params = new HttpParams().set('includeUnavailable', includeUnavailable.toString());
-    
-    return this.http.get<Instructor[]>(`${this.apiUrl}/instructors`, {
-      headers: this.getAuthHeaders(),
-      params: params
-    }).pipe(
-      catchError(error => {
-        // Handle 503 Service Unavailable (database connection issues) - return empty array silently
-        if (error.status === 503) {
-          // Don't log 503 errors - they're backend database issues, not frontend problems
-          return of([]);
-        }
-        // Only log non-network errors to reduce console noise
-        if (error.status !== 0 && error.status !== 503) {
-          console.error('Get instructors error:', error);
-        }
-        
-        // For network errors (status 0), return empty array to prevent UI crashes
-        if (error.status === 0) {
-          return of([]);
-        }
-        
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Get a specific instructor by ID
-   */
-  getInstructorById(instructorId: number): Observable<Instructor> {
-    return this.http.get<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, {
+  /** DELETE /api/events/{eventId} — admin only. Use only when event has no registrations. */
+  deleteEvent(eventId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/events/${eventId}`, {
       headers: this.getAuthHeaders()
     }).pipe(
       catchError(error => {
-        // Handle 503 Service Unavailable (database connection issues)
-        if (error.status === 503) {
-          return throwError(() => new Error('Service temporarily unavailable'));
-        }
-        // Only log non-network errors to reduce console noise
         if (error.status !== 0 && error.status !== 503) {
-          console.error('Get instructor by ID error:', error);
+          console.error('Delete event error:', error);
         }
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Update instructor bank details (admin only)
-   */
-  updateInstructorBankDetails(
-    instructorId: number,
-    bankDetails: {
-      accountHolderName?: string | null;
-      bankName?: string | null;
-      bankId?: string | null;
-      branchNumber?: string | null;
-      accountNumber?: string | null;
-      bankAddress?: string | null;
-    }
-  ): Observable<Instructor> {
-    return this.http.patch<Instructor>(`${this.apiUrl}/instructors/${instructorId}`, bankDetails, {
-      headers: this.getAuthHeaders()
-    }).pipe(
-      catchError(error => {
-        console.error('Update instructor bank details error:', error);
         return throwError(() => error);
       })
     );
@@ -412,6 +392,250 @@ export class EventsService {
         })
       );
     }
+  }
+
+  /**
+   * Admin-only: list all events with server-side sorting, filtering, and paging.
+   * GET /api/events/admin — sortBy: id | title | type | status | startDate | price
+   */
+  getAdminEvents(params: {
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    search?: string;
+    type?: string;
+    status?: string;
+    page?: number;
+    pageSize?: number;
+  }): Observable<PagedEventsResponse> {
+    let httpParams = new HttpParams();
+    if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
+    if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
+    if (params.search?.trim()) httpParams = httpParams.set('search', params.search.trim());
+    if (params.type) httpParams = httpParams.set('type', params.type);
+    if (params.status) httpParams = httpParams.set('status', params.status);
+    if (params.page != null) httpParams = httpParams.set('page', params.page.toString());
+    if (params.pageSize != null) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+
+    return this.http
+      .get<PagedEventsResponse>(`${this.apiUrl}/events/admin`, {
+        headers: this.getAuthHeaders(),
+        params: httpParams
+      })
+      .pipe(
+        map((res) => ({
+          items: res?.items ?? [],
+          totalCount: res?.totalCount ?? 0,
+          page: res?.page ?? 1,
+          pageSize: res?.pageSize ?? 10,
+          registeredCountByEventId: res?.registeredCountByEventId ?? {}
+        })),
+        catchError((error) => {
+          if (error.status === 503) {
+            return of({ items: [], totalCount: 0, page: 1, pageSize: 10, registeredCountByEventId: {} });
+          }
+          if (error.status !== 0 && error.status !== 503) {
+            console.error('Get admin events error:', error);
+          }
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Admin/instructor: list registrations for an event.
+   * GET /api/events/{eventId}/registrations
+   * Optional query filters: firstName, lastName, phone (substring, case-insensitive for names).
+   */
+  getEventRegistrations(eventId: number, filters?: EventRegistrationsFilters | null): Observable<EventRegistrationDetailsResponse[]> {
+    let params = new HttpParams();
+    if (filters) {
+      const f = filters;
+      if (f.firstName != null && String(f.firstName).trim() !== '') params = params.set('firstName', String(f.firstName).trim());
+      if (f.lastName != null && String(f.lastName).trim() !== '') params = params.set('lastName', String(f.lastName).trim());
+      if (f.phone != null && String(f.phone).trim() !== '') params = params.set('phone', String(f.phone).trim());
+    }
+    return this.http
+      .get<EventRegistrationDetailsResponse[]>(`${this.apiUrl}/events/${eventId}/registrations`, {
+        headers: this.getAuthHeaders(),
+        params
+      })
+      .pipe(
+        map((data) => (Array.isArray(data) ? data : [])),
+        catchError((error) => {
+          if (error.status === 503) return of([]);
+          if (error.status === 404) return of([]);
+          if (error.status !== 0 && error.status !== 503) {
+            console.error('Get event registrations error:', error);
+          }
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Admin/instructor: export event registrations as CSV.
+   * GET /api/events/{id}/registrations/csv
+   * Returns blob (text/csv or application/octet-stream).
+   */
+  getEventRegistrationsCsv(eventId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/events/${eventId}/registrations/csv`, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob',
+    }).pipe(
+      catchError((error) => {
+        if (error.status !== 0 && error.status !== 503) {
+          console.error('Get event registrations CSV error:', error);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Admin/instructor: list registrations with payment status pending for a single event.
+   * GET /api/events/{id}/registrations then filter to pending.
+   */
+  getPendingPaymentRegistrationsForEvent(eventId: number): Observable<PendingPaymentItem[]> {
+    return this.getEventById(eventId, true).pipe(
+      switchMap((event) =>
+        this.getEventRegistrations(eventId).pipe(
+          map((regs) =>
+            regs
+              .filter((r) => (r.paymentStatus ?? '').toLowerCase() === 'pending')
+              .map((registration) => ({ event, registration }))
+          )
+        )
+      ),
+      catchError(() => of([]))
+    );
+  }
+
+  /**
+   * Admin: list all registrations with payment status pending (across events).
+   * Uses getAdminEvents then getEventRegistrations per event and flattens. Optional backend: GET /api/admin/registrations?paymentStatus=pending
+   */
+  getPendingPaymentRegistrations(): Observable<PendingPaymentItem[]> {
+    const pageSize = 100;
+    return this.getAdminEvents({
+      sortBy: 'startDate',
+      sortOrder: 'desc',
+      status: '', // all statuses to include published/closed events with pending payments
+      page: 1,
+      pageSize
+    }).pipe(
+      switchMap((paged) => {
+        const items = paged.items ?? [];
+        if (items.length === 0) return of([]);
+        return forkJoin(
+          items.map((ev) =>
+            this.getEventRegistrations(ev.id).pipe(
+              map((regs) =>
+                regs
+                  .filter((r) => (r.paymentStatus ?? '').toLowerCase() === 'pending')
+                  .map((registration) => ({ event: ev, registration }))
+              )
+            )
+          )
+        ).pipe(
+          map((arrays) => arrays.flat())
+        );
+      }),
+      catchError(() => of([]))
+    );
+  }
+
+  /**
+   * Admin/instructor: approve or reject a pending payment.
+   * POST /api/events/{eventId}/registrations/{registrationId}/approve-payment
+   * Body: { approved: true | false, approvalNotes?: string }
+   * Only registrations with pending payment can be approved/rejected; otherwise 400.
+   * Returns the updated EventRegistration (200).
+   */
+  approvePaymentRegistration(
+    eventId: number,
+    registrationId: number,
+    request: ApprovePaymentRequest
+  ): Observable<EventRegistration> {
+    return this.http.post<EventRegistration>(
+      `${this.apiUrl}/events/${eventId}/registrations/${registrationId}/approve-payment`,
+      request,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError((error) => {
+        if (error.status !== 0 && error.status !== 503) {
+          console.error('Approve payment error:', error);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Admin/instructor: resend registration emails (confirmation to registrant and/or payment approval to event creator).
+   * POST /api/events/{eventId}/registrations/{registrationId}/resend-email
+   * Use when initial background sending failed. Omit type or pass "both" for both emails.
+   */
+  resendRegistrationEmail(
+    eventId: number,
+    registrationId: number,
+    type: 'confirmation' | 'payment_approval' | 'both'
+  ): Observable<unknown> {
+    const body: ResendRegistrationEmailRequest = { type };
+    return this.http.post(
+      `${this.apiUrl}/events/${eventId}/registrations/${registrationId}/resend-email`,
+      body,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError((error) => {
+        if (error.status !== 0 && error.status !== 503) {
+          console.error('Resend registration email error:', error);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Admin/instructor: update attendance for a registration.
+   * PATCH /api/events/{eventId}/registrations/{registrationId}/attendance
+   */
+  updateRegistrationAttendance(
+    eventId: number,
+    registrationId: number,
+    request: UpdateEventAttendanceRequest
+  ): Observable<EventRegistration> {
+    return this.http.patch<EventRegistration>(
+      `${this.apiUrl}/events/${eventId}/registrations/${registrationId}/attendance`,
+      request,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError((error) => {
+        if (error.status !== 0 && error.status !== 503) {
+          console.error('Update attendance error:', error);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Get current user's event registrations (for "My Events" page).
+   * GET /api/users/me/event-registrations
+   */
+  getMyEventRegistrations(): Observable<EventRegistrationHistoryResponse[]> {
+    return this.http
+      .get<EventRegistrationHistoryResponse[]>(`${this.apiUrl}/users/me/event-registrations`, {
+        headers: this.getAuthHeaders()
+      })
+      .pipe(
+        map((data) => (Array.isArray(data) ? data : [])),
+        catchError((error) => {
+          if (error.status === 503) return of([]);
+          if (error.status === 404) return of([]);
+          if (error.status !== 0 && error.status !== 503) console.error('Get my event registrations error:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   private getAuthHeaders(): HttpHeaders {

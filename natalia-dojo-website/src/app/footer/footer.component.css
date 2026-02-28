@@ -1,0 +1,267 @@
+/* Footer – professional typography; keep background & link colors of footer__main */
+
+/* Row same size as outer div: no negative margins, full width, equal-height columns */
+.footer__main-row {
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  align-items: stretch;
+}
+
+.footer__main-row > [class*="col-"] {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+@media (min-width: 992px) {
+  .footer__main-row > [class*="col-"] {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Red CTA column: no vertical padding so it touches outer container top/bottom */
+.footer__main-col--cta {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Other columns: vertical padding so content is spaced; red still fills container height */
+.footer__main-col--padded {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 992px) {
+  .footer__main-col--padded {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+.footer__cta {
+  min-height: 260px;
+}
+
+/* Newsletter feedback – no box, text + icon on red background */
+.footer__newsletter-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.footer__newsletter-feedback--success {
+  color: #fff;
+}
+
+.footer__newsletter-feedback--success .footer__newsletter-feedback__icon {
+  color: #90ee90;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.footer__newsletter-feedback--error {
+  color: #ffd700;
+}
+
+.footer__newsletter-feedback--error .footer__newsletter-feedback__icon {
+  color: #ffd700;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.footer__newsletter-feedback__text {
+  flex: 1;
+}
+
+@media (min-width: 992px) {
+  .footer__cta {
+    min-height: 100%;
+  }
+}
+
+/* Orange accent for icons and arrows (like reference site) */
+.footer__icon--orange,
+.footer__arrow--orange {
+  color: #e67e22 !important;
+}
+
+.footer__main a:hover,
+.footer__links a:hover {
+  color: var(--bs-primary) !important;
+}
+
+.footer__links a:hover .footer__arrow--orange {
+  color: var(--bs-primary) !important;
+}
+
+.footer__contact-item a:hover {
+  color: var(--bs-primary) !important;
+}
+
+/* Headings: readable, not too big/fat, not too small */
+.footer__heading {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.footer__heading--cta {
+  font-size: 1.25rem;
+}
+
+.footer__subheading {
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+/* Quick links – space between arrow and text */
+.footer__link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.footer__link-item:hover {
+  text-decoration: none;
+}
+
+.footer__arrow {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+/* Contact block – space between icon and text */
+.footer__contact-item {
+  font-size: 0.95rem;
+}
+
+.footer__contact-item .footer__icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.footer__contact-item a {
+  transition: color 0.2s ease;
+}
+
+.footer__social {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.footer__social:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+/* Credits bar – refined; brand name same size as rest, not oversized */
+.footer__credits {
+  font-size: 0.8125rem;
+}
+
+.footer__credits-text {
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+.footer__brand-link {
+  font-size: inherit;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer__brand-link:hover {
+  color: var(--bs-primary) !important;
+}
+
+.footer__credits-sep {
+  opacity: 0.6;
+}
+
+.footer__credits-link {
+  font-size: inherit;
+  transition: color 0.2s ease;
+}
+
+.footer__credits-link:hover {
+  color: var(--bs-primary) !important;
+}
+
+/* Credits row – same alignment and text size for both sides */
+.footer__credits-row .footer__credits-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Terms link – noticeable at first glance */
+.footer__credits-left {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.footer__terms-link {
+  font-size: inherit;
+  font-weight: 600;
+  color: #e67e22 !important;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer__terms-link:hover {
+  color: var(--bs-primary) !important;
+}
+
+/* Creator line – noticeable at first glance */
+.footer__built-by {
+  font-size: inherit;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.footer__built-by-icon {
+  color: var(--bs-primary);
+  margin-inline-end: 0.35rem;
+  font-size: 1rem;
+}
+
+.footer__built-by-name {
+  color: #e67e22;
+  font-weight: 700;
+}
+
+/* Back to top */
+.back-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 999;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.back-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.back-to-top i {
+  font-size: 1.1rem;
+}

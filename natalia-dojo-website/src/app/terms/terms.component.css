@@ -1,0 +1,55 @@
+.terms-page {
+  padding: 3rem 1.5rem;
+  min-height: 50vh;
+}
+
+.terms-page__wrap {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.terms-page__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.terms-page__updated {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.terms-page__content h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.terms-page__content p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+
+.terms-page__content a {
+  color: #dc2626;
+  text-decoration: none;
+}
+
+.terms-page__content a:hover {
+  text-decoration: underline;
+}
+
+.terms-page__back {
+  margin-top: 2.5rem;
+}
+
+.terms-page__back a {
+  color: #64748b;
+  text-decoration: none;
+}
+
+.terms-page__back a:hover {
+  color: #dc2626;
+}

@@ -181,8 +181,16 @@
               type="tel"
               formControlName="phone"
               class="form-input"
+              [class.error]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
               placeholder="מספר טלפון">
           </div>
+          @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
+            <div class="error-message">
+              @if (registerForm.get('phone')?.errors?.['required']) {
+                <span>טלפון נדרש עבור מדריך</span>
+              }
+            </div>
+          }
         </div>
         <div class="form-group">
           <label for="register-dob" class="form-label">תאריך לידה</label>

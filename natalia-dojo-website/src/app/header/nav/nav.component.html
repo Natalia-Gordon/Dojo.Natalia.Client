@@ -3,7 +3,7 @@
   <div class="d-flex d-lg-none w-100 justify-content-between align-items-center">
     <div class="flex-grow-1 d-flex justify-content-center order-2">
       <a href="#" class="navbar-brand m-0">
-        <img src="/assets/img/logo.svg" alt="Dojo Natalia" loading="lazy">
+        <img src="/assets/img/logo.svg" alt="Dojo Natalia">
       </a>
     </div>
     <button type="button" class="navbar-toggler order-1" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-controls="navbarCollapse">
@@ -16,12 +16,22 @@
     @if (isAuthenticated && userInfo && isBrowser) {
       <div class="mobile-user-section d-lg-none">
         <div class="mobile-user-header">
+          @let avatarSrc = getAvatarSrc();
           <button
             type="button"
             class="mobile-user-avatar"
             (click)="openUserDetails(); closeMobileMenu()"
             title="פרטי משתמש">
-            <span class="mobile-avatar-initial">{{ getUserInitials() }}</span>
+            @if (avatarSrc && !avatarImageError) {
+              <img
+                [src]="avatarSrc"
+                alt=""
+                class="mobile-user-avatar__img"
+                (error)="onAvatarError($event)">
+            }
+            @if (!avatarSrc || avatarImageError) {
+              <span class="mobile-avatar-initial">{{ getUserInitials() }}</span>
+            }
           </button>
           <div class="mobile-user-details">
             <div class="mobile-user-name">{{ userInfo.displayName || userInfo.username }}</div>
@@ -42,7 +52,7 @@
       <a routerLink="/events" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">סמינרים</a>
       <a routerLink="/gallery" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">גלריה</a>
       <div class="nav-item dropdown">
-        <a href="#" class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">בלוג</a>
+        <a href="#" class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">מאמרים</a>
         <div class="dropdown-menu">
           <a routerLink="/sensei/articles/zen" routerLinkActive="active" class="dropdown-item" (click)="closeMobileMenu()">פילוסופיה של זן</a>
         </div>
@@ -55,10 +65,16 @@
         <a routerLink="/user-details" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">פרופיל משתמש</a>
       }
       @if (isAuthenticated && isBrowser) {
+        <a routerLink="/my-events" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">אירועים שלי</a>
+      }
+      @if (isAuthenticated && isBrowser) {
         <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">רכישות</a>
       }
       @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
         <a routerLink="/admin/users" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול משתמשים</a>
+      }
+      @if (isAuthenticated && isAdmin() && isBrowser) {
+        <a routerLink="/admin/events" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול אירועים</a>
       }
       @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
         <a href="#" class="nav-item nav-link d-lg-none" (click)="openRegisterNewUser(); closeMobileMenu(); $event.preventDefault()">רישום משתמש חדש</a>

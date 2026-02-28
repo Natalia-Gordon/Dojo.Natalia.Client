@@ -2,11 +2,15 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, finalize } from 'rxjs';
 import { AuthService, User, UpdateUserRequest } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { Title, Meta } from '@angular/platform-browser';
 import { UserDetailsHeroComponent } from '../user-details-hero/user-details-hero.component';
+import { PaymentMethodsService, CreateOrUpdatePaymentMethodRequest } from '../../_services/payment-methods.service';
+import { InstructorCertificate, InstructorPaymentMethodDto } from '../../_services/instructors.service';
+import { InstructorsService } from '../../_services/instructors.service';
+import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
 
 @Component({
   selector: 'app-user-details',
@@ -21,9 +25,27 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
-  isUnauthorized = false;
   profileForm: FormGroup;
+  /** When true, profile image failed to load – show initials instead. */
+  avatarImageError = false;
+  private avatarAttempt = 0;
+  private avatarSrcOverride: string | null = null;
   private destroy$ = new Subject<void>();
+
+  paymentMethods: InstructorPaymentMethodDto[] = [];
+  isLoadingPaymentMethods = false;
+  paymentMethodError: string | null = null;
+  showPaymentMethodForm = false;
+  editingPaymentMethod: InstructorPaymentMethodDto | null = null;
+  isSavingPaymentMethod = false;
+  paymentMethodForm!: FormGroup;
+
+  /** Instructor ID for current user (when role is instructor). Used for certificate upload. */
+  instructorId: number | null = null;
+  /** Certificates from GET /api/instructors (by userId). */
+  instructorCertificates: InstructorCertificate[] = [];
+  isLoadingCertificates = false;
+  isUploadingCertificates = false;
 
   constructor(
     private authService: AuthService,
@@ -31,7 +53,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private title: Title,
     private meta: Meta,
-    private loginModalService: LoginModalService
+    private loginModalService: LoginModalService,
+    private paymentMethodsService: PaymentMethodsService,
+    private instructorsService: InstructorsService
   ) {
     this.profileForm = this.fb.group({
       username: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(3)]],
@@ -41,10 +65,26 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       displayName: [''],
       phone: [''], // Use 'phone' to match API
       dateOfBirth: [''],
+      profileImageUrl: [''],
       bio: [''],
       password: ['', [Validators.minLength(6)]],
       confirmPassword: ['']
     }, { validators: this.passwordMatchValidator });
+
+    this.paymentMethodForm = this.fb.group({
+      paymentType: ['bank_transfer' as 'bit' | 'bank_transfer', Validators.required],
+      isDefault: [false],
+      phoneNumber: [''],
+      bankName: [''],
+      accountHolderName: [''],
+      accountNumber: [''],
+      iban: [''],
+      swiftBic: [''],
+      bankAddress: [''],
+      bankNumber: [''],
+      branchName: [''],
+      branchNumber: ['']
+    });
   }
 
   ngOnInit(): void {
@@ -77,28 +117,32 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   loadUserDetails(userId: number): void {
     this.isLoading = true;
     this.errorMessage = null;
-    this.isUnauthorized = false;
     
     this.authService.getUserDetails(userId)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => { this.isLoading = false; })
+      )
       .subscribe({
         next: (user: User) => {
           this.user = user;
+          this.avatarImageError = false;
+          this.avatarAttempt = 0;
+          this.avatarSrcOverride = null;
           this.populateForm(user);
-          this.isLoading = false;
-          this.isUnauthorized = false;
+          if (this.isInstructor()) {
+            this.loadPaymentMethods();
+            this.loadInstructorCertificates();
+          }
         },
         error: (error: any) => {
           console.error('Error loading user details:', error);
           if (error.status === 401 || error.status === 403) {
-            // Unauthorized or Forbidden
-            this.isUnauthorized = true;
-            this.errorMessage = 'הגישה נדחתה. יש להתחבר מחדש';
-          } else {
-            this.errorMessage = 'שגיאה בטעינת פרטי המשתמש';
-            this.isUnauthorized = false;
+            // Handled globally by auth interceptor (redirect + login). No page message.
+            this.errorMessage = null;
+            return;
           }
-          this.isLoading = false;
+          this.errorMessage = error?.error?.message || 'שגיאה בטעינת פרטי המשתמש';
         }
       });
   }
@@ -115,6 +159,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       displayName: user.displayName || '',
       phone: phoneValue,
       dateOfBirth: user.dateOfBirth ? user.dateOfBirth.split('T')[0] : '',
+      profileImageUrl: user.profileImageUrl || '',
       bio: user.bio || '',
       password: '',
       confirmPassword: ''
@@ -132,6 +177,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.profileForm.get('displayName')?.disable({ onlySelf: true });
       this.profileForm.get('phone')?.disable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.disable({ onlySelf: true });
+      this.profileForm.get('profileImageUrl')?.disable({ onlySelf: true });
       this.profileForm.get('bio')?.disable({ onlySelf: true });
     } else {
       // Enable form controls in edit mode (username stays disabled)
@@ -141,6 +187,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.profileForm.get('displayName')?.enable({ onlySelf: true });
       this.profileForm.get('phone')?.enable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.enable({ onlySelf: true });
+      this.profileForm.get('profileImageUrl')?.enable({ onlySelf: true });
       this.profileForm.get('bio')?.enable({ onlySelf: true });
     }
   }
@@ -181,6 +228,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.profileForm.get('displayName')?.disable({ onlySelf: true });
       this.profileForm.get('phone')?.disable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.disable({ onlySelf: true });
+      this.profileForm.get('profileImageUrl')?.disable({ onlySelf: true });
       this.profileForm.get('bio')?.disable({ onlySelf: true });
     } else {
       // Enable form controls for editing (username remains disabled)
@@ -190,6 +238,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.profileForm.get('displayName')?.enable({ onlySelf: true });
       this.profileForm.get('phone')?.enable({ onlySelf: true });
       this.profileForm.get('dateOfBirth')?.enable({ onlySelf: true });
+      this.profileForm.get('profileImageUrl')?.enable({ onlySelf: true });
       this.profileForm.get('bio')?.enable({ onlySelf: true });
     }
     this.isEditMode = !this.isEditMode;
@@ -218,7 +267,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       lastName: formValue.lastName || null,
       displayName: formValue.displayName || null,
       phone: formValue.phone || null,
-      profileImageUrl: this.user?.profileImageUrl || null,
+      profileImageUrl: (formValue.profileImageUrl && formValue.profileImageUrl.trim()) ? formValue.profileImageUrl.trim() : null,
       bio: formValue.bio || null,
       dateOfBirth: formValue.dateOfBirth ? formValue.dateOfBirth.trim() || null : null,
       isActive: this.user?.isActive !== undefined ? this.user.isActive : true
@@ -239,23 +288,23 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           this.successMessage = 'הפרופיל עודכן בהצלחה';
           this.isEditMode = false;
           this.isLoading = false;
-          
+          // Reset avatar state so the new profile image URL is shown immediately
+          this.avatarImageError = false;
+          this.avatarAttempt = 0;
+          this.avatarSrcOverride = null;
           // Clear password fields
           this.profileForm.get('password')?.setValue('');
           this.profileForm.get('confirmPassword')?.setValue('');
-          
           // Reload form with updated data
           this.populateForm(updatedUser);
         },
         error: (error: any) => {
           console.error('Error updating user:', error);
           if (error.status === 401 || error.status === 403) {
-            // Unauthorized or Forbidden
-            this.isUnauthorized = true;
-            this.errorMessage = 'הגישה נדחתה. יש להתחבר מחדש';
+            // Handled globally by auth interceptor (redirect + login). No page message.
+            this.errorMessage = null;
           } else {
             this.errorMessage = error.error?.message || 'שגיאה בעדכון הפרופיל';
-            this.isUnauthorized = false;
           }
           this.isLoading = false;
         }
@@ -313,6 +362,33 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     return '?';
   }
 
+  getAvatarSrc(): string | null {
+    if (this.avatarSrcOverride) return this.avatarSrcOverride;
+    return getProfileImageUrlForAttempt(this.user?.profileImageUrl ?? null, this.avatarAttempt, 'w256');
+  }
+
+  onAvatarError(event: Event): void {
+    const url = this.user?.profileImageUrl ?? null;
+    const fileId = getDriveFileId(url);
+    if (!fileId) {
+      this.avatarImageError = true;
+      return;
+    }
+
+    const imgElement = (event.target as HTMLImageElement) ?? (event as unknown as { target?: HTMLImageElement })?.target;
+    const nextAttempt = this.avatarAttempt + 1;
+    const nextUrl = getProfileImageUrlForAttempt(url, nextAttempt, 'w256');
+    if (!nextUrl) {
+      this.avatarImageError = true;
+      return;
+    }
+
+    this.avatarAttempt = nextAttempt;
+    this.avatarSrcOverride = nextUrl;
+    this.avatarImageError = false;
+    if (imgElement) imgElement.src = nextUrl;
+  }
+
   getLevelColor(level: string | null): string {
     if (!level) return 'bg-secondary';
     switch (level) {
@@ -364,5 +440,321 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   openLoginModal(): void {
     this.loginModalService.openForReconnect(this.user?.username ?? this.authService.getUserInfo()?.username);
+  }
+
+  isInstructor(): boolean {
+    const r = this.user?.role;
+    return r != null && String(r).toLowerCase() === 'instructor';
+  }
+
+  loadPaymentMethods(): void {
+    if (!this.isInstructor()) return;
+    this.isLoadingPaymentMethods = true;
+    this.paymentMethodError = null;
+    this.paymentMethodsService.getMyPaymentMethods()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (list) => {
+          this.paymentMethods = list;
+          this.isLoadingPaymentMethods = false;
+        },
+        error: (err) => {
+          this.paymentMethodError = err?.error?.message || 'שגיאה בטעינת שיטות התשלום';
+          this.paymentMethods = [];
+          this.isLoadingPaymentMethods = false;
+        }
+      });
+  }
+
+  loadInstructorCertificates(): void {
+    if (!this.isInstructor() || !this.user?.id) return;
+    this.isLoadingCertificates = true;
+    this.instructorsService.getInstructors(true)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (instructors) => {
+          const inst = (instructors || []).find(i => i.userId === this.user!.id);
+          this.instructorId = inst?.instructorId ?? null;
+          this.instructorCertificates = inst?.certificates ?? [];
+          this.isLoadingCertificates = false;
+        },
+        error: () => {
+          this.instructorId = null;
+          this.instructorCertificates = [];
+          this.isLoadingCertificates = false;
+        }
+      });
+  }
+
+  uploadCertificates(): void {
+    if (!this.instructorId || this.certificateFiles.length === 0 || this.isUploadingCertificates) return;
+    this.certificateFileError = null;
+    this.isUploadingCertificates = true;
+    const files = [...this.certificateFiles];
+    this.instructorsService.uploadInstructorCertificates(this.instructorId, files)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (instructor) => {
+          this.instructorCertificates = instructor.certificates ?? [];
+          this.certificateFiles = [];
+          this.isUploadingCertificates = false;
+        },
+        error: (err) => {
+          this.certificateFileError = err?.error?.message ?? 'שגיאה בהעלאת תעודות';
+          this.isUploadingCertificates = false;
+        }
+      });
+  }
+
+  getPaymentMethodDisplayText(pm: InstructorPaymentMethodDto): string {
+    if (pm.paymentType === 'bit') {
+      return pm.phoneNumber ? `ביט – ${pm.phoneNumber}` : 'ביט';
+    }
+    const parts: string[] = [];
+    if (pm.bankName) parts.push(pm.bankName);
+    if (pm.bankNumber || pm.branchName || pm.branchNumber) {
+      parts.push([pm.bankNumber, pm.branchName, pm.branchNumber].filter(Boolean).join(' / '));
+    }
+    if (pm.accountNumber) parts.push(`חשבון ${pm.accountNumber}`);
+    if (pm.accountHolderName) parts.push(pm.accountHolderName);
+    return parts.length ? parts.join(' · ') : 'העברה בנקאית';
+  }
+
+  getPaymentTypeLabel(pm: InstructorPaymentMethodDto): string {
+    return pm.paymentType === 'bit' ? 'ביט' : 'העברה בנקאית';
+  }
+
+  paymentMethodTrackBy(_index: number, pm: InstructorPaymentMethodDto): number {
+    return pm.id;
+  }
+
+  openAddPaymentMethod(): void {
+    this.editingPaymentMethod = null;
+    this.paymentMethodForm.reset({
+      paymentType: 'bank_transfer',
+      isDefault: false,
+      phoneNumber: '',
+      bankName: '', accountHolderName: '', accountNumber: '', iban: '', swiftBic: '', bankAddress: '', bankNumber: '', branchName: '', branchNumber: ''
+    });
+    this.paymentMethodForm.get('paymentType')?.enable();
+    this.showPaymentMethodForm = true;
+    this.paymentMethodError = null;
+  }
+
+  openEditPaymentMethod(pm: InstructorPaymentMethodDto): void {
+    this.editingPaymentMethod = pm;
+    this.paymentMethodForm.patchValue({
+      paymentType: pm.paymentType,
+      isDefault: !!pm.isDefault,
+      phoneNumber: pm.phoneNumber || '',
+      bankName: pm.bankName || '',
+      accountHolderName: pm.accountHolderName || '',
+      accountNumber: pm.accountNumber || '',
+      iban: pm.iban || '',
+      swiftBic: pm.swiftBic || '',
+      bankAddress: pm.bankAddress || '',
+      bankNumber: pm.bankNumber || '',
+      branchName: pm.branchName || '',
+      branchNumber: pm.branchNumber || ''
+    });
+    this.paymentMethodForm.get('paymentType')?.disable();
+    this.showPaymentMethodForm = true;
+    this.paymentMethodError = null;
+  }
+
+  closePaymentMethodForm(): void {
+    this.showPaymentMethodForm = false;
+    this.editingPaymentMethod = null;
+    this.paymentMethodForm.get('paymentType')?.enable();
+    this.paymentMethodError = null;
+  }
+
+  buildPaymentMethodRequest(): CreateOrUpdatePaymentMethodRequest | null {
+    const v = this.paymentMethodForm.value;
+    const paymentType = (this.editingPaymentMethod?.paymentType ?? v.paymentType) as 'bit' | 'bank_transfer';
+    if (paymentType === 'bit') {
+      const phone = (v.phoneNumber || '').trim();
+      if (!phone) return null;
+      return { paymentType: 'bit', isDefault: !!v.isDefault, phoneNumber: phone };
+    }
+    const bank: CreateOrUpdatePaymentMethodRequest = {
+      paymentType: 'bank_transfer',
+      isDefault: !!v.isDefault,
+      phoneNumber: null
+    };
+    const set = (key: keyof CreateOrUpdatePaymentMethodRequest, val: string) => {
+      const s = (val || '').trim();
+      if (s) (bank as any)[key] = s;
+    };
+    set('bankName', v.bankName);
+    set('accountHolderName', v.accountHolderName);
+    set('accountNumber', v.accountNumber);
+    set('iban', v.iban);
+    set('swiftBic', v.swiftBic);
+    set('bankAddress', v.bankAddress);
+    set('bankNumber', v.bankNumber);
+    set('branchName', v.branchName);
+    set('branchNumber', v.branchNumber);
+    const hasBank = !!(bank.bankName || bank.accountHolderName || bank.accountNumber || bank.iban || bank.bankNumber || bank.branchName || bank.branchNumber);
+    if (!hasBank) return null;
+    return bank;
+  }
+
+  savePaymentMethod(): void {
+    const request = this.buildPaymentMethodRequest();
+    if (!request) {
+      const pt = this.editingPaymentMethod?.paymentType ?? this.paymentMethodForm.value.paymentType;
+      this.paymentMethodError = pt === 'bit'
+        ? 'יש להזין מספר טלפון לביט'
+        : 'יש למלא לפחות שדה אחד של פרטי בנק';
+      return;
+    }
+    this.isSavingPaymentMethod = true;
+    this.paymentMethodError = null;
+    const obs = this.editingPaymentMethod
+      ? this.paymentMethodsService.update(this.editingPaymentMethod.id, request)
+      : this.paymentMethodsService.create(request);
+    obs.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.isSavingPaymentMethod = false;
+        this.closePaymentMethodForm();
+        this.loadPaymentMethods();
+      },
+      error: (err) => {
+        this.paymentMethodError = err?.error?.message || 'שגיאה בשמירת שיטת התשלום';
+        this.isSavingPaymentMethod = false;
+      }
+    });
+  }
+
+  deletePaymentMethod(id: number): void {
+    if (!confirm('למחוק שיטת תשלום זו?')) return;
+    this.paymentMethodsService.delete(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.loadPaymentMethods(),
+        error: (err) => {
+          this.paymentMethodError = err?.error?.message || 'שגיאה במחיקת שיטת התשלום';
+        }
+      });
+  }
+
+  get paymentTypeFormValue(): 'bit' | 'bank_transfer' {
+    return this.paymentMethodForm?.get('paymentType')?.value ?? 'bank_transfer';
+  }
+
+  get paymentMethodFormTitle(): string {
+    return this.editingPaymentMethod ? 'עריכת שיטת תשלום' : 'הוספת שיטת תשלום';
+  }
+
+  // ---------- Certificates (instructors only: list from API + upload) ----------
+  certificateFiles: File[] = [];
+  certificateFileError: string | null = null;
+  certificatesDragOver = false;
+
+  private readonly certificateAllowedExtensions = ['.pdf', '.tiff', '.tif', '.jpeg', '.jpg', '.png'];
+  private readonly certificateAllowedTypes = ['application/pdf', 'image/tiff', 'image/jpeg', 'image/png'];
+
+  private isCertificateFileAllowed(file: File): boolean {
+    const name = (file.name || '').toLowerCase();
+    const ext = this.certificateAllowedExtensions.some(e => name.endsWith(e));
+    const type = this.certificateAllowedTypes.includes(file.type || '');
+    return ext || type;
+  }
+
+  private addCertificateFilesFromList(files: FileList | File[]): void {
+    const list = Array.isArray(files) ? files : Array.from(files);
+    const toAdd: File[] = [];
+    for (const file of list) {
+      if (!this.isCertificateFileAllowed(file)) {
+        this.certificateFileError = `סוג קובץ לא נתמך: ${file.name}. יש להעלות רק PDF, TIFF, JPEG או PNG.`;
+        return;
+      }
+      toAdd.push(file);
+    }
+    this.certificateFiles.push(...toAdd);
+  }
+
+  onCertificatesSelected(event: Event): void {
+    this.certificateFileError = null;
+    const input = event.target as HTMLInputElement;
+    if (!input?.files?.length) return;
+    this.addCertificateFilesFromList(input.files);
+    input.value = '';
+  }
+
+  onCertificatesDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer?.types?.includes('Files')) {
+      this.certificatesDragOver = true;
+    }
+  }
+
+  onCertificatesDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.certificatesDragOver = false;
+  }
+
+  onCertificatesDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.certificatesDragOver = false;
+    this.certificateFileError = null;
+    const files = event.dataTransfer?.files;
+    if (!files?.length) return;
+    this.addCertificateFilesFromList(files);
+  }
+
+  removeCertificateFile(index: number): void {
+    this.certificateFiles.splice(index, 1);
+    this.certificateFileError = null;
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  getCertificateFileIcon(file: File): 'pdf' | 'image' {
+    const name = (file.name || '').toLowerCase();
+    if (name.endsWith('.pdf') || (file.type || '').includes('pdf')) return 'pdf';
+    return 'image';
+  }
+
+  isPdfFile(file: File): boolean {
+    return this.getCertificateFileIcon(file) === 'pdf';
+  }
+
+  certificateTrackBy(_index: number, cert: InstructorCertificate): string {
+    return cert.downloadUrl;
+  }
+
+  /** Download certificate via authenticated request (sends Bearer token; direct link causes 401). */
+  downloadCertificate(cert: InstructorCertificate): void {
+    this.certificateFileError = null;
+    this.instructorsService.downloadInstructorCertificate(cert.downloadUrl).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = cert.fileName || 'certificate';
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.certificateFileError = err?.status === 401
+          ? 'יש להתחבר מחדש כדי להוריד את הקובץ.'
+          : (err?.error?.message || 'שגיאה בהורדת הקובץ. נסה שוב.');
+      }
+    });
+  }
+
+  certificateFileTrackBy(index: number): number {
+    return index;
   }
 }

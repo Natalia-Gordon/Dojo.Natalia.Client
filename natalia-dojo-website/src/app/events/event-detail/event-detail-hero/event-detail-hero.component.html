@@ -2,19 +2,15 @@
   <div class="event-detail-hero__overlay">
     <div class="event-detail-hero__content" dir="rtl">
       <h1 class="event-detail-hero__title">{{ eventTitle || 'פרטי סמינר' }}</h1>
-      @if (eventDescription) {
-        <p class="event-detail-hero__description">{{ getDescriptionSummary() }}</p>
-      }
+      <p *ngIf="eventDescription" class="event-detail-hero__description">{{ getDescriptionSummary() }}</p>
       <div class="event-detail-hero__breadcrumbs">
         <a routerLink="/home">דף הבית</a>
         <span class="divider">/</span>
-        <a routerLink="/events">סמינרים</a>
-        @if (eventTitle) {
-          <span class="divider">/</span>
-        }
-        @if (eventTitle) {
-          <span class="current-page">{{ eventTitle }}</span>
-        }
+        <a *ngIf="fromEventsManagement" routerLink="/admin/events">ניהול אירועים</a>
+        <a *ngIf="fromMyEvents && !fromEventsManagement" routerLink="/my-events">אירועים שלי</a>
+        <a *ngIf="!fromEventsManagement && !fromMyEvents" routerLink="/events">סמינרים</a>
+        <span *ngIf="eventTitle" class="divider">/</span>
+        <span *ngIf="eventTitle" class="current-page">{{ eventTitle }}</span>
       </div>
     </div>
   </div>

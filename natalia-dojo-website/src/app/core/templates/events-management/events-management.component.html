@@ -1,0 +1,214 @@
+<!-- Hero – same style as סמינרים -->
+<section class="events-management-hero">
+  <div class="events-management-hero__overlay">
+    <div class="events-management-hero__content" dir="rtl">
+      <h1 class="events-management-hero__title">ניהול אירועים</h1>
+      <p class="events-management-hero__subtitle">
+        צפייה ועריכת אירועים והרשמות
+      </p>
+      <div class="events-management-hero__breadcrumbs">
+        <a routerLink="/home">דף הבית</a>
+        <span class="divider">/</span>
+        <span>ניהול אירועים</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-fluid events-management-container px-2 px-md-5" dir="rtl" style="overflow-x: hidden; max-width: 100vw; width: 100%;">
+  <div class="row g-5" style="margin: 0;">
+    <div class="col-12" style="padding: 0;">
+      <div class="events-management-content-card">
+        <div *ngIf="!isAdmin" class="events-management-restricted">
+          אין לך הרשאה לצפות בעמוד זה.
+        </div>
+
+        <ng-container *ngIf="isAdmin">
+          <div *ngIf="!isLoading && errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ errorMessage }}
+            <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="סגור"></button>
+          </div>
+
+          <div *ngIf="isLoading" class="loading-state">
+            <div class="loading-spinner">
+              <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">טוען...</span>
+              </div>
+            </div>
+            <p class="loading-text">טוען אירועים...</p>
+          </div>
+
+          <ng-container *ngIf="!isLoading && !errorMessage">
+            <div class="events-management-filters">
+              <label class="events-management-filter">
+                <span class="events-management-filter__label">חיפוש (כותרת/תיאור)</span>
+                <input
+                  type="text"
+                  class="events-management-input"
+                  [ngModel]="filterTitle"
+                  (ngModelChange)="filterTitle = $event; onFilterChange()"
+                  placeholder="חפש..."
+                />
+              </label>
+              <label class="events-management-filter">
+                <span class="events-management-filter__label">סוג</span>
+                <select
+                  class="events-management-select"
+                  [ngModel]="filterType"
+                  (ngModelChange)="filterType = $event; onFilterChange()"
+                >
+                  <option *ngFor="let opt of eventTypes" [value]="opt.value">{{ opt.label }}</option>
+                </select>
+              </label>
+              <label class="events-management-filter">
+                <span class="events-management-filter__label">סטטוס</span>
+                <select
+                  class="events-management-select"
+                  [ngModel]="filterStatus"
+                  (ngModelChange)="filterStatus = $event; onFilterChange()"
+                >
+                  <option *ngFor="let opt of eventStatuses" [value]="opt.value">{{ opt.label }}</option>
+                </select>
+              </label>
+            </div>
+
+            <ng-container *ngIf="totalCount > 0">
+              <div class="events-management-summary">
+                <i class="bi bi-calendar-event"></i>
+                <span>{{ totalCount }} אירועים</span>
+                <button
+                  type="button"
+                  class="events-management-btn events-management-btn--danger ms-3"
+                  [disabled]="!canDeleteSelectedEvent || deleteEventLoading"
+                  (click)="deleteSelectedEvent()"
+                >
+                  <i class="bi bi-trash" *ngIf="!deleteEventLoading"></i>
+                  <span *ngIf="deleteEventLoading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                  מחיקת אירוע
+                </button>
+                <span *ngIf="selectedTableEvent && !canDeleteSelectedEvent" class="text-muted small me-2" style="font-size: 0.9rem;">
+                  (מחיקה אפשרית רק כאשר כמות משתתפים = 0)
+                </span>
+              </div>
+
+              <div class="events-management-table-wrapper">
+              <table class="events-management-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <button type="button" class="events-management-sort-btn" (click)="setSort('id')">
+                        מזהה
+                        <span *ngIf="sortField === 'id'" class="events-management-sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button type="button" class="events-management-sort-btn" (click)="setSort('title')">
+                        כותרת
+                        <span *ngIf="sortField === 'title'" class="events-management-sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button type="button" class="events-management-sort-btn" (click)="setSort('eventType')">
+                        סוג
+                        <span *ngIf="sortField === 'eventType'" class="events-management-sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button type="button" class="events-management-sort-btn" (click)="setSort('status')">
+                        סטטוס
+                        <span *ngIf="sortField === 'status'" class="events-management-sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button type="button" class="events-management-sort-btn" (click)="setSort('startDateTime')">
+                        תאריך התחלה
+                        <span *ngIf="sortField === 'startDateTime'" class="events-management-sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      </button>
+                    </th>
+                    <th>כמות ימים</th>
+                    <th>מיקום</th>
+                    <th>הרשמה</th>
+                    <th>כמות משתתפים</th>
+                    <th>
+                      <button type="button" class="events-management-sort-btn" (click)="setSort('price')">
+                        מחיר
+                        <span *ngIf="sortField === 'price'" class="events-management-sort-indicator">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      </button>
+                    </th>
+                    <th class="events-management-th-actions">פעולה</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let ev of pagedEvents; trackBy: trackByEventId"
+                    [class.events-management-row--selected]="selectedTableEvent?.id === ev.id"
+                    (click)="selectTableEvent(ev)"
+                    class="events-management-row-clickable"
+                  >
+                    <td>{{ ev.id }}</td>
+                    <td class="events-management-td-title">{{ ev.title || '—' }}</td>
+                    <td><span class="events-management-badge events-management-badge--type">{{ getTypeLabel(ev.eventType) }}</span></td>
+                    <td><span class="events-management-badge events-management-badge--status" [attr.data-status]="ev.status">{{ getStatusLabel(ev.status) }}</span></td>
+                    <td>{{ formatDateOnly(ev.startDateTime) }}</td>
+                    <td>{{ getEventDays(ev) }}</td>
+                    <td class="events-management-td-location">{{ ev.location || '—' }}</td>
+                    <td>
+                      <span class="events-management-badge events-management-badge--reg" [class.events-management-badge--reg-open]="ev.registrationOpen" [class.events-management-badge--reg-closed]="!ev.registrationOpen">
+                        {{ ev.registrationOpen ? 'פתוח' : 'סגור' }}
+                      </span>
+                    </td>
+                    <td>{{ getRegisteredCount(ev.id) }}</td>
+                    <td>{{ getPriceDisplay(ev) }}</td>
+                    <td class="events-management-td-actions" (click)="$event.stopPropagation()">
+                      <div class="events-management-actions">
+                        <button type="button" class="events-management-btn events-management-btn--primary" (click)="goToEvent(ev.id)">
+                          <i class="bi bi-eye"></i> לצפייה
+                        </button>
+                        <a [routerLink]="['/admin/events', ev.id, 'registrations']" class="events-management-btn events-management-btn--success">
+                          <i class="bi bi-people"></i> נרשמים
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div *ngIf="totalPages > 1" class="events-management-pagination">
+              <button
+                type="button"
+                class="events-management-page-btn"
+                [disabled]="page <= 1"
+                (click)="setPage(page - 1)"
+              >
+                <i class="bi bi-chevron-right"></i> הקודם
+              </button>
+              <span class="events-management-page-info">
+                עמוד {{ page }} מתוך {{ totalPages }} — {{ totalCount }} אירועים
+              </span>
+              <button
+                type="button"
+                class="events-management-page-btn"
+                [disabled]="page >= totalPages"
+                (click)="setPage(page + 1)"
+              >
+                הבא <i class="bi bi-chevron-left"></i>
+              </button>
+            </div>
+            </ng-container>
+          </ng-container>
+
+          <div *ngIf="!isLoading && !errorMessage && totalCount === 0" class="events-management-empty">
+            <div class="events-management-empty__icon">
+              <i class="bi bi-calendar-x"></i>
+            </div>
+            <h3 class="events-management-empty__title">אין אירועים להצגה</h3>
+            <p class="events-management-empty__text">לא נוצרו עדיין אירועים, או שאין תוצאות לפי הסינון שבחרת.</p>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
