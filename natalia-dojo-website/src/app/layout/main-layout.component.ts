@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
@@ -12,13 +12,12 @@ import { AuthDialogComponent } from '../core/dialogs/auth-dialog/auth-dialog.com
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.css',
   imports: [
-    CommonModule,
     RouterOutlet,
     HeaderComponent,
     FooterComponent,
     LoginComponent,
-    AuthDialogComponent,
-  ],
+    AuthDialogComponent
+],
 })
 export class MainLayoutComponent implements OnInit {
   isBrowser = false;

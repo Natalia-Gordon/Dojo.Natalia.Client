@@ -16,7 +16,7 @@ import {
   AbstractControl,
   ValidationErrors
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../../_services/auth.service';
@@ -27,7 +27,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-registration-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './registration-form.component.html',
   styleUrl: './registration-form.component.css'
 })

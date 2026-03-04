@@ -12,14 +12,20 @@
               <input type="email" id="footer-email" name="footerEmail" class="form-control border-white p-2 p-lg-3" placeholder="השאר כתובת מייל כאן"
                 [(ngModel)]="newsletterEmail" required email [disabled]="newsletterLoading">
               <button type="submit" class="btn btn-dark px-3 px-lg-4" [disabled]="newsletterLoading || !newsletterForm.valid">
-                <span *ngIf="!newsletterLoading">הצטרפי</span>
-                <span *ngIf="newsletterLoading">שולח...</span>
+                @if (!newsletterLoading) {
+                  <span>הצטרפי</span>
+                }
+                @if (newsletterLoading) {
+                  <span>שולח...</span>
+                }
               </button>
             </div>
-            <div *ngIf="newsletterMessage" class="footer__newsletter-feedback mt-3" [class.footer__newsletter-feedback--success]="newsletterSuccess" [class.footer__newsletter-feedback--error]="!newsletterSuccess">
-              <i class="bi footer__newsletter-feedback__icon" [class.bi-check-circle-fill]="newsletterSuccess" [class.bi-exclamation-circle-fill]="!newsletterSuccess" aria-hidden="true"></i>
-              <span class="footer__newsletter-feedback__text">{{ newsletterMessage }}</span>
-            </div>
+            @if (newsletterMessage) {
+              <div class="footer__newsletter-feedback mt-3" [class.footer__newsletter-feedback--success]="newsletterSuccess" [class.footer__newsletter-feedback--error]="!newsletterSuccess">
+                <i class="bi footer__newsletter-feedback__icon" [class.bi-check-circle-fill]="newsletterSuccess" [class.bi-exclamation-circle-fill]="!newsletterSuccess" aria-hidden="true"></i>
+                <span class="footer__newsletter-feedback__text">{{ newsletterMessage }}</span>
+              </div>
+            }
           </form>
         </div>
       </div>
@@ -87,4 +93,6 @@
 </footer>
 
 <!-- Back to Top -->
-<a *ngIf="isBackToTopVisible && isBrowser" href="#" class="btn btn-dark py-3 back-to-top" (click)="scrollToTop($event)" aria-label="חזרה למעלה"><i class="bi bi-arrow-up"></i></a>
+@if (isBackToTopVisible && isBrowser) {
+  <a href="#" class="btn btn-dark py-3 back-to-top" (click)="scrollToTop($event)" aria-label="חזרה למעלה"><i class="bi bi-arrow-up"></i></a>
+}

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -12,7 +12,7 @@ import { EventCreateHeroComponent } from './event-create-hero/event-create-hero.
 @Component({
   selector: 'app-event-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, EventCreateHeroComponent],
+  imports: [ReactiveFormsModule, RouterModule, EventCreateHeroComponent],
   templateUrl: './event-create.component.html',
   styleUrl: './event-create.component.css'
 })
