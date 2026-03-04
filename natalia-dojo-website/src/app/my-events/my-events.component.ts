@@ -102,7 +102,7 @@ export class MyEventsComponent implements OnInit, OnDestroy {
         } else if (err.status === 404) {
           this.registrations = [];
         } else if (err.status === 0) {
-          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסה שוב.';
+          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסי שוב.';
         } else {
           this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
         }

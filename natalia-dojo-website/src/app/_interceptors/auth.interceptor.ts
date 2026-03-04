@@ -82,7 +82,7 @@ export class AuthInterceptor implements HttpInterceptor {
           error.message.toLowerCase().includes('load failed')));
     if (isNetworkError) {
       return new HttpErrorResponse({
-        error: { message: 'השרות לא זמין כרגע, אנא נסה מאוחר יותר' },
+        error: { message: 'השרות לא זמין כרגע, אנא נסי מאוחר יותר' },
         status: error.status,
         statusText: error.statusText,
         url: error.url ?? undefined

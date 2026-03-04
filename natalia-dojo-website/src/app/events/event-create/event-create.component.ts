@@ -176,7 +176,7 @@ export class EventCreateComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isCreating = false;
-        this.errorMessage = error.error?.message || 'שגיאה ביצירת האירוע. אנא נסה שוב.';
+        this.errorMessage = error.error?.message || 'שגיאה ביצירת האירוע. אנא נסי שוב.';
       }
     });
   }

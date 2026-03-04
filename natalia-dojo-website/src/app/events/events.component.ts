@@ -89,7 +89,7 @@ export class EventsComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           // Handle 503 Service Unavailable with specific message
           if (error.status === 503) {
-            this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
+            this.errorMessage = 'השירות זמנית לא זמין. אנא נסי שוב בעוד כמה רגעים.';
           } else if (error.status === 0) {
             // Network error - backend not available
             this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודאי שהשרת פועל ונסי שוב.';

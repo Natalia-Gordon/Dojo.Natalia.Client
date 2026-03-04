@@ -113,7 +113,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     if (this.isAdmin) {
       if (this.authService.isTokenExpired()) {
         this.isUnauthorized = true;
-        this.errorMessage = 'שגיאה: הגישה נדחתה. יש להתחבר מחדש';
+        this.errorMessage = 'שגיאה: הגישה נדחתה. אנא התחברי מחדש';
       } else {
         this.loadRanks();
         this.loadUsers();
@@ -125,7 +125,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         this.users = [];
         if (this.isAdmin) {
           this.isUnauthorized = true;
-          this.errorMessage = 'שגיאה: הגישה נדחתה. יש להתחבר מחדש';
+          this.errorMessage = 'שגיאה: הגישה נדחתה. אנא התחברי מחדש';
         }
         this.isAdmin = false;
         this.isLoading = false;
@@ -176,7 +176,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     }
     if (this.authService.isTokenExpired()) {
       this.isUnauthorized = true;
-      this.errorMessage = 'שגיאה: הגישה נדחתה. יש להתחבר מחדש';
+      this.errorMessage = 'שגיאה: הגישה נדחתה. אנא התחברי מחדש';
       this.users = [];
       return;
     }
@@ -200,11 +200,11 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           if (error.status === 403 || error.status === 401) {
             this.isUnauthorized = true;
-            this.errorMessage = 'שגיאה: הגישה נדחתה. יש להתחבר מחדש';
+            this.errorMessage = 'שגיאה: הגישה נדחתה. אנא התחברי מחדש';
             this.users = [];
           } else if (error.status === 0) {
             this.isUnauthorized = false;
-            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסה שוב.';
+            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסי שוב.';
           } else {
             this.isUnauthorized = false;
             this.errorMessage = 'שגיאה בטעינת המשתמשים. נסו שוב מאוחר יותר.';
@@ -238,7 +238,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isRanksLoading = false;
-        this.ranksError = 'שגיאה בטעינת דרגות. נסה שוב מאוחר יותר.';
+        this.ranksError = 'שגיאה בטעינת דרגות. אנא נסי שוב מאוחר יותר.';
       }
     });
   }
@@ -650,7 +650,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isBankFormLoading = false;
-        this.bankFormError = err?.error?.message ?? 'שגיאה בשמירת פרטי הבנק. נסה שוב.';
+        this.bankFormError = err?.error?.message ?? 'שגיאה בשמירת פרטי הבנק. אנא נסי שוב.';
       }
     });
   }
@@ -697,7 +697,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         this.loadUsers();
       },
       error: err => {
-        this.errorMessage = err.error?.message ?? 'שגיאה במחיקת המשתמש. נסה שוב.';
+        this.errorMessage = err.error?.message ?? 'שגיאה במחיקת המשתמש. אנא נסי שוב.';
       }
     });
   }

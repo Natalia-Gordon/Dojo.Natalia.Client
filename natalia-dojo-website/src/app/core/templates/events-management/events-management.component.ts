@@ -438,7 +438,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.resendMessage =
-            err?.error?.message ?? err?.message ?? 'שגיאה בשליחת המייל. נסה שוב.';
+            err?.error?.message ?? err?.message ?? 'שגיאה בשליחת המייל. אנא נסי שוב.';
           this.resendLoadingId = null;
         },
       });

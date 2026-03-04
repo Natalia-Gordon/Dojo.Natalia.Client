@@ -155,7 +155,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
         // Provide user-friendly error messages
         if (error.status === 503) {
           // Service Unavailable - database connection issues
-          this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
+          this.errorMessage = 'השירות זמנית לא זמין. אנא נסי שוב בעוד כמה רגעים.';
         } else if (error.status === 0) {
           // Network error - backend not available
           this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודאי שהשרת פועל ונסי שוב.';
@@ -164,7 +164,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
         } else if (error.status === 401 || error.status === 403) {
           this.errorMessage = 'אין הרשאה לצפות באירוע זה.';
         } else {
-          this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסה שוב מאוחר יותר.';
+          this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסי שוב מאוחר יותר.';
         }
       }
     });
@@ -286,7 +286,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     errorMsg.innerHTML = `
       <i class="bi bi-exclamation-triangle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #dc2626; opacity: 0.7;"></i>
       <p style="margin: 0; font-weight: 600; color: #1f2937;">התמונה לא נטענה</p>
-      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">אנא ודא שהקובץ ב-Google Drive משותף עם "כל אחד עם הקישור"</p>
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">אנא ודאי שהקובץ ב-Google Drive משותף עם "כל אחד עם הקישור"</p>
     `;
     container.appendChild(errorMsg);
   }
