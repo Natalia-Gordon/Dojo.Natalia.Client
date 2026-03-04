@@ -25,6 +25,8 @@ export interface Event {
   description: string | null;
   eventType: EventType | string | null;
   instructorId: number | null;
+  /** Instructor display name from GET /api/events/{id} (avoids separate GET /api/instructors/{id}). */
+  instructorName?: string | null;
   status: EventStatus | string | null;
   startDateTime: string;
   endDateTime: string;
