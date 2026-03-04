@@ -92,7 +92,7 @@ export class EventsComponent implements OnInit, OnDestroy {
             this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
           } else if (error.status === 0) {
             // Network error - backend not available
-            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודאי שהשרת פועל ונסי שוב.';
           } else {
             this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
           }

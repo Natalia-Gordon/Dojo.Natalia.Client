@@ -70,7 +70,7 @@ export class RegistrationApproveComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isLoading = false;
         if (err?.status === 401 || err?.status === 403) {
-          this.errorMessage = 'אין הרשאה לצפות בדף זה. התחבר כמנהל או מדריך.';
+          this.errorMessage = 'אין הרשאה לצפות בדף זה. אנא התחברי כמנהל/ת או מדריך/ת.';
         } else if (err?.status === 404) {
           this.errorMessage = 'אירוע לא נמצא.';
         } else {

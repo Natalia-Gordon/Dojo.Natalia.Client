@@ -186,7 +186,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
           if (err.status === 403 || err.status === 401) {
             this.errorMessage = 'אין הרשאה לצפות באירועים.';
           } else if (err.status === 0) {
-            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסה שוב.';
+            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסי שוב.';
           } else {
             this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
           }

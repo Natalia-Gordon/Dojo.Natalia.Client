@@ -97,7 +97,7 @@ export class MyEventsComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isLoading = false;
         if (err.status === 401 || err.status === 403) {
-          this.errorMessage = 'יש להתחבר כדי לראות את האירועים שלך.';
+          this.errorMessage = 'אנא התחברי כדי לראות את האירועים שלך.';
           this.registrations = [];
         } else if (err.status === 404) {
           this.registrations = [];

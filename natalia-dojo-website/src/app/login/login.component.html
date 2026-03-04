@@ -17,10 +17,6 @@
         </h5>
       </div>
       <div class="modal-body login-modal-body">
-        @if (showLoginTab || isReconnectMode) {
-          <p class="login-subtitle">היכנסו לחשבון שלכם כדי לגשת לאימונים ומשאבי הנינג'וטסו</p>
-        }
-
         <!-- Tabs (hidden in reconnect mode - login only) -->
         @if (showLoginTab && !isReconnectMode) {
           <div class="login-tabs">
@@ -109,7 +105,7 @@
                     class="submit-button"
                     [disabled]="isLoginLoading || loginForm.invalid">
                     @if (!isLoginLoading) {
-                      <span>התחבר</span>
+                      <span>אנא התחברי</span>
                     }
                     @if (isLoginLoading) {
                       <span>מתחבר...</span>

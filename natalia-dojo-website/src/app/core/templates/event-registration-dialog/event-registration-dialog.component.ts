@@ -248,7 +248,7 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
           // Service Unavailable - database connection issues
           this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
         } else if (error.status === 0) {
-          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודאי שהשרת פועל ונסי שוב.';
         } else if (error.status === 404) {
           this.errorMessage = 'האירוע לא נמצא או שההרשמה לא זמינה.';
         } else if (error.status === 401) {

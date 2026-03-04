@@ -158,7 +158,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
           this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
         } else if (error.status === 0) {
           // Network error - backend not available
-          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודאי שהשרת פועל ונסי שוב.';
         } else if (error.status === 404) {
           this.errorMessage = 'האירוע לא נמצא.';
         } else if (error.status === 401 || error.status === 403) {
@@ -181,7 +181,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (!this.isAuthenticated || !this.userInfo?.userId) {
       this.authService.clearSessionLocally();
       this.loginModalService.open('login');
-      this.errorMessage = 'יש להתחבר או להירשם כאורח כדי להירשם לסמינר.';
+      this.errorMessage = 'אנא התחברי או הירשמי כדי להירשם לסמינר.';
       return;
     }
 

@@ -158,7 +158,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.errorMessage = 'השירות זמנית לא זמין. נסה שוב בעוד רגע.';
         } else if (error.status === 0) {
           // Network error (CORS, connection refused, server unreachable, etc.)
-          this.errorMessage = 'שגיאת רשת: לא ניתן להתחבר לשרת. אנא בדוק את החיבור לאינטרנט ונסה שוב.';
+          this.errorMessage = 'שגיאת רשת: לא ניתן להתחבר לשרת. אנא בדקי את החיבור לאינטרנט ונסי שוב.';
         } else if (error.error?.message) {
           this.errorMessage = error.error.message;
         } else if (error.message) {
