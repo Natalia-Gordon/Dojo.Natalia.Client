@@ -31,15 +31,15 @@ FROM node:20-alpine
 ENV APP_HOME /usr/src/app
 WORKDIR $APP_HOME
 
+ENV NODE_ENV=production
+# Cloud Run / flexible port
+ENV PORT=8080
+EXPOSE 8080
+
 RUN apk add --no-cache dumb-init
 
 # Copy full dist (browser + server) so the SSR server can serve static assets and render pages
 COPY --from=builder $APP_HOME/dist/natalia-dojo-website ./dist/natalia-dojo-website
-
-# Cloud Run / flexible port
-ENV PORT=8080
-ENV NODE_ENV=production
-EXPOSE 8080
 
 ENTRYPOINT ["dumb-init", "--"]
 
