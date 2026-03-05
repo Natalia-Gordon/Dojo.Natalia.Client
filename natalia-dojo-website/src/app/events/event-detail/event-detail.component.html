@@ -44,13 +44,14 @@
         @if (event && !isLoading) {
           <div class="event-detail-card">
             <!-- Event Image -->
-            @if (event.imageUrl && displayImageUrl && isBrowser) {
+            @if (displayImageUrl && isBrowser) {
               <div class="event-detail-image">
                 <img [src]="displayImageUrl" [alt]="event.title || 'Event'" loading="eager"
+                  referrerPolicy="no-referrer"
                   (error)="onImageError($event)"
                   (load)="onImageLoad($event)">
-                </div>
-              }
+              </div>
+            }
               <!-- Event Header -->
               <div class="event-detail-header">
                 <div class="event-detail-badges">

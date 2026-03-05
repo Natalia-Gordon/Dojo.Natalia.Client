@@ -122,14 +122,20 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       next: (event) => {
         this.event = event;
         this.instructorName = null;
+        // Support both camelCase and snake_case from API
+        const imageUrl = event.imageUrl ?? (event as { image_url?: string | null }).image_url ?? null;
+        if (event && !(event as { imageUrl?: string | null }).imageUrl && imageUrl) {
+          (event as { imageUrl?: string }).imageUrl = imageUrl;
+        }
         // Compute image URL only in browser; use shared Drive URL conversion so event picture displays
-        if (isPlatformBrowser(this.platformId) && event.imageUrl) {
-          this.imageLoadAttempt = 0;
-          this.imageId = getDriveFileId(event.imageUrl);
-          const directUrl = getProfileImageUrlForAttempt(event.imageUrl, 0, 'w1920');
-          this.displayImageUrl = directUrl || event.imageUrl.trim();
+        // Prefer uc?export=view first (attempt 1) - often works when thumbnail is blocked by referrer/CORS
+        if (isPlatformBrowser(this.platformId) && imageUrl) {
+          this.imageLoadAttempt = 1;
+          this.imageId = getDriveFileId(imageUrl);
+          const directUrl = getProfileImageUrlForAttempt(imageUrl, 1, 'w1920');
+          this.displayImageUrl = directUrl || imageUrl.trim();
         } else {
-          this.displayImageUrl = event.imageUrl || '';
+          this.displayImageUrl = imageUrl || '';
         }
         if (event.instructorId) {
           this.instructorsService.getInstructorById(event.instructorId).subscribe({
@@ -171,7 +177,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     } catch (error) {
       // Fallback for any unexpected errors during SSR
       this.isLoading = false;
-      this.errorMessage = 'שגיאה בטעינת האירוע. נסו שוב מאוחר יותר.';
+      this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסי שוב מאוחר יותר.';
     }
   }
 
@@ -221,6 +227,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
   /**
    * Handle image load error - try alternative Google Drive URL formats (same as profile images).
+   * Order tried: 1 (uc?export=view), then 0 (thumbnail), then 2 (uc?export=download).
    */
   onImageError(event: ErrorEvent): void {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -229,8 +236,9 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (!imgElement || !this.event?.imageUrl) return;
 
     const rawUrl = this.event.imageUrl.trim();
-    const nextAttempt = this.imageLoadAttempt + 1;
-    const nextUrl = getProfileImageUrlForAttempt(rawUrl, nextAttempt, 'w1920');
+    // Next attempt in order: 1 -> 0 -> 2 -> give up
+    const nextAttempt = this.imageLoadAttempt === 1 ? 0 : this.imageLoadAttempt === 0 ? 2 : -1;
+    const nextUrl = nextAttempt >= 0 ? getProfileImageUrlForAttempt(rawUrl, nextAttempt, 'w1920') : null;
 
     if (nextUrl) {
       this.imageLoadAttempt = nextAttempt;
