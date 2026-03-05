@@ -6,6 +6,35 @@
   animation: fadeIn 0.4s ease-in;
 }
 
+.events-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(248, 250, 252, .98), rgba(241, 245, 249, .95));
+  border: 1px solid rgba(148, 163, 184, .2);
+  border-radius: 14px;
+  border-right: 4px solid #dc2626;
+  flex-wrap: wrap;
+  animation: fadeIn 0.4s ease-in;
+}
+
+.events-toolbar__text {
+  margin: 0;
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.7;
+  flex: 1;
+  min-width: 200px;
+}
+
+.events-toolbar__btn {
+  flex-shrink: 0;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -57,7 +86,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   padding: 1.5rem;
   background: linear-gradient(135deg, rgba(220, 38, 38, .08), rgba(220, 38, 38, .03));
@@ -65,16 +94,28 @@
   flex-wrap: wrap;
 }
 
+.event-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+}
+
 .event-card__badge {
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: .4rem;
   background: rgba(220, 38, 38, .1);
   color: #dc2626;
   padding: .4rem .85rem;
   border-radius: 20px;
   font-size: .85rem;
   font-weight: 600;
+}
+
+.event-card__badge--type {
+  background: rgba(30, 41, 59, .08);
+  color: #1e293b;
 }
 
 .event-card__badge i {
@@ -127,8 +168,8 @@
   font-size: .95rem;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -138,8 +179,6 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(148, 163, 184, .15);
 }
 
 .event-meta-item {
@@ -154,6 +193,66 @@
   color: #dc2626;
   font-size: 1.1rem;
   flex-shrink: 0;
+}
+
+.event-meta-link {
+  color: #475569;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(220, 38, 38, .4);
+  transition: color .2s, border-color .2s;
+}
+
+.event-meta-link:hover {
+  color: #dc2626;
+  border-bottom-color: #dc2626;
+}
+
+.event-meta-item--price {
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.event-meta-item--price .event-payment-icons {
+  margin-inline-start: 0.25rem;
+}
+
+.event-price {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.event-price--free {
+  color: #22c55e;
+}
+
+.event-price--early {
+  font-size: .9rem;
+  color: #dc2626;
+  background: rgba(220, 38, 38, .08);
+  padding: .2rem .5rem;
+  border-radius: 8px;
+}
+
+.event-payment-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.event-payment-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(220, 38, 38, .08);
+  color: #dc2626;
+  font-size: 1rem;
+}
+
+.event-payment-icon i {
+  color: inherit;
 }
 
 .event-card__footer {
@@ -511,6 +610,17 @@ textarea.seminar-form__input {
 @media (max-width: 768px) {
   .events-list {
     gap: 1.25rem;
+  }
+
+  .events-toolbar {
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    gap: 1rem;
+  }
+
+  .events-toolbar__text {
+    font-size: .95rem;
+    min-width: 0;
   }
 
   .events-content-card {

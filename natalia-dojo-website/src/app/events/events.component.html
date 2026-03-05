@@ -2,12 +2,25 @@
 <div class="container-fluid px-2 px-md-5 py-2 py-md-3" style="overflow-x: hidden; max-width: 100vw; width: 100%;">
   <div class="row g-5" style="margin: 0;">
     <div class="col-12" dir="rtl" style="padding: 0;">
-      @if (isAdminOrInstructor) {
+      @if (isAdminOrInstructor && (!isLoading && events.length === 0)) {
         <div class="d-flex justify-content-end mb-4">
           <a routerLink="/events/create" class="btn btn-danger px-4 py-3">
             <i class="bi bi-plus-lg me-2"></i>
-            יצירת סמינר חדש
+            יצירת אירוע חדש
           </a>
+        </div>
+      }
+      @if (!isLoading && events.length > 0) {
+        <div class="events-toolbar">
+          <p class="events-toolbar__text">
+            אירועים שמחכים לך — כל הפרטים במקום אחד. בחרי את מה שמתאים לך והרשמי בקליק.
+          </p>
+          @if (isAdminOrInstructor) {
+            <a routerLink="/events/create" class="btn btn-danger px-4 py-3 events-toolbar__btn">
+              <i class="bi bi-plus-lg me-2"></i>
+              יצירת אירוע חדש
+            </a>
+          }
         </div>
       }
       <div class="events-content-card">
@@ -33,7 +46,7 @@
                 <span class="visually-hidden">טוען...</span>
               </div>
             </div>
-            <p class="loading-text">טוען סמינרים...</p>
+            <p class="loading-text">טוען אירועים...</p>
           </div>
         }
 
@@ -42,8 +55,8 @@
             <div class="empty-state__icon">
               <i class="bi bi-calendar-x"></i>
             </div>
-            <h3 class="empty-state__title">אין סמינרים זמינים כרגע</h3>
-            <p class="empty-state__text">כרגע אין סמינרים פתוחים להרשמה, חזרו אלינו בקרוב.</p>
+            <h3 class="empty-state__title">אין אירועים זמינים כרגע</h3>
+            <p class="empty-state__text">כרגע אין אירועים פתוחים להרשמה. חזרי אלינו בקרוב.</p>
             @if (errorMessage) {
               <button class="btn btn-outline-primary mt-3" (click)="loadEvents()">
                 <i class="bi bi-arrow-clockwise me-2"></i>
@@ -56,29 +69,74 @@
         @if (!isLoading && events.length > 0) {
           <div class="events-list">
             @for (eventItem of events; track trackByEventId($index, eventItem)) {
-              <div class="event-card" [attr.aria-label]="'סמינר: ' + (eventItem.title || 'סמינר')">
+              <div class="event-card" [attr.aria-label]="'אירוע: ' + (eventItem.title || 'אירוע')">
                 <div class="event-card__header">
-                  <h3 class="event-card__title">{{ eventItem.title || 'סמינר' }}</h3>
-                  <div class="event-card__status" [class.status-open]="eventItem.registrationOpen" [class.status-closed]="!eventItem.registrationOpen">
-                    <i class="bi" [class.bi-check-circle]="eventItem.registrationOpen" [class.bi-x-circle]="!eventItem.registrationOpen"></i>
-                    <span>{{ eventItem.registrationOpen ? 'פתוח להרשמה' : 'הרשמה סגורה' }}</span>
+                  <h3 class="event-card__title">{{ eventItem.title || 'אירוע' }}</h3>
+                  <div class="event-card__badges">
+                    @if (eventItem.eventType) {
+                      <span class="event-card__badge event-card__badge--type">
+                        <i class="bi bi-tag"></i>
+                        {{ getEventTypeLabel(eventItem.eventType) }}
+                      </span>
+                    }
+                    <div class="event-card__status" [class.status-open]="eventItem.registrationOpen" [class.status-closed]="!eventItem.registrationOpen">
+                      <i class="bi" [class.bi-check-circle]="eventItem.registrationOpen" [class.bi-x-circle]="!eventItem.registrationOpen"></i>
+                      <span>{{ getRegistrationStatusText(eventItem) }}</span>
+                    </div>
                   </div>
                 </div>
                 <div class="event-card__body">
-                  @if (eventItem.description) {
-                    <p class="event-card__description">{{ eventItem.description }}</p>
-                  }
                   <div class="event-card__meta">
+                    @if (eventItem.instructorId) {
+                      <div class="event-meta-item">
+                        <i class="bi bi-person-badge"></i>
+                        <span>מדריך: {{ getInstructorName(eventItem.instructorId) }}</span>
+                      </div>
+                    }
                     <div class="event-meta-item">
                       <i class="bi bi-calendar3"></i>
-                      <span>{{ eventItem.startDateTime | date:'dd/MM/yyyy' }} - {{ eventItem.endDateTime | date:'dd/MM/yyyy' }}</span>
+                      <span>התחלה: {{ formatDateTime(eventItem.startDateTime) }}</span>
+                    </div>
+                    <div class="event-meta-item">
+                      <i class="bi bi-calendar-check"></i>
+                      <span>סיום: {{ formatDateTime(eventItem.endDateTime) }}</span>
+                    </div>
+                    @if (eventItem.location) {
+                      <div class="event-meta-item">
+                        <i class="bi bi-geo-alt"></i>
+                        @if (eventItem.locationUrl) {
+                          <a [href]="eventItem.locationUrl" target="_blank" rel="noopener noreferrer" class="event-meta-link">{{ eventItem.location }}</a>
+                        } @else {
+                          <span>{{ eventItem.location }}</span>
+                        }
+                      </div>
+                    }
+                    <div class="event-meta-item event-meta-item--price">
+                      <i class="bi bi-currency-exchange"></i>
+                      @if (eventItem.price === 0) {
+                        <span class="event-price event-price--free">חינם</span>
+                      } @else {
+                        <span class="event-price">{{ getFormattedPrice(eventItem.price) }}</span>
+                        @if (isEarlyBirdAvailable(eventItem) && eventItem.earlyBirdPrice != null && eventItem.earlyBirdPrice < eventItem.price) {
+                          <span class="event-price event-price--early">הרשמה מוקדמת: {{ getFormattedPrice(eventItem.earlyBirdPrice) }}</span>
+                        }
+                      }
+                      @if (getPaymentMethodTypes(eventItem).length > 0) {
+                        <span class="event-payment-icons">
+                          @for (pm of getPaymentMethodTypes(eventItem); track pm) {
+                            <span class="event-payment-icon" [title]="getPaymentMethodLabel(pm)" [attr.aria-label]="getPaymentMethodLabel(pm)">
+                              <i class="bi" [ngClass]="getPaymentMethodIcon(pm)"></i>
+                            </span>
+                          }
+                        </span>
+                      }
                     </div>
                   </div>
                 </div>
                 <div class="event-card__footer">
                   <a [routerLink]="['/events', eventItem.id]" class="event-card__button">
                     <i class="bi bi-arrow-left"></i>
-                    <span>תצוגה מקדימה</span>
+                    <span>לפרטים והרשמה</span>
                   </a>
                 </div>
               </div>
