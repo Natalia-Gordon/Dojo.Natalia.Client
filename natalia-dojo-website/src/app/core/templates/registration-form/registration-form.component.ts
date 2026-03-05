@@ -16,7 +16,7 @@ import {
   AbstractControl,
   ValidationErrors
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../../_services/auth.service';
@@ -27,7 +27,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-registration-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './registration-form.component.html',
   styleUrl: './registration-form.component.css'
 })
@@ -245,7 +245,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
           }
           return;
         }
-        this.registerSuccess = 'ההרשמה הושלמה. ניתן להתחבר כעת.';
+        this.registerSuccess = 'ההרשמה הושלמה. אנא התחברי כעת.';
         this.switchToLoginTab.emit(request.username || request.email || '');
         this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null, isActive: true });
         this.setRegisterModeValidators();
@@ -256,7 +256,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
         if (error.status === 400) {
           this.registerError = error.error?.message || 'פרטי הרשמה אינם תקינים';
         } else {
-          this.registerError = 'שגיאה בהרשמה. אנא נסה שוב.';
+          this.registerError = 'שגיאה בהרשמה. אנא נסי שוב.';
         }
       }
     });
@@ -300,7 +300,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isRegisterLoading = false;
-        this.registerError = 'שגיאה בעדכון משתמש. אנא נסה שוב.';
+        this.registerError = 'שגיאה בעדכון משתמש. אנא נסי שוב.';
       }
     });
   }
@@ -429,7 +429,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
         this.setRankControlState();
       },
       error: () => {
-        this.ranksError = 'שגיאה בטעינת דרגות. נסה שוב מאוחר יותר.';
+        this.ranksError = 'שגיאה בטעינת דרגות. אנא נסי שוב מאוחר יותר.';
         this.isRanksLoading = false;
         this.setRankControlState();
       }

@@ -29,30 +29,22 @@ export class TestimonialComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      console.log('Running ngAfterViewInit on browser platform.');
-      if (typeof $ !== 'undefined') {
-        console.log('jQuery ($) is defined.');
-        // Testimonials carousel initialization
-        $("#testimonials-list.testimonial-carousel").owlCarousel({
-          autoplay: true,
-          smartSpeed: 1000,
-          items: 1,
-          dots: true,
-          loop: true,
-          nav: true,
-          navText: ["<i class='bi bi-arrow-right'></i>", "<i class='bi bi-arrow-left'></i>"],
-          rtl: true,
-          responsive: {
-            0: {
-              items: 1
-            }
+    if (isPlatformBrowser(this.platformId) && typeof $ !== 'undefined' && typeof ($ as any).fn?.owlCarousel === 'function') {
+      $("#testimonials-list.testimonial-carousel").owlCarousel({
+        autoplay: true,
+        smartSpeed: 1000,
+        items: 1,
+        dots: true,
+        loop: true,
+        nav: true,
+        navText: ["<i class='bi bi-arrow-right'></i>", "<i class='bi bi-arrow-left'></i>"],
+        rtl: true,
+        responsive: {
+          0: {
+            items: 1
           }
-        });
-        console.log('Owl Carousel initialization attempted.');
-      } else {
-        console.error('jQuery ($) is not defined. Owl Carousel cannot be initialized.');
-      }
+        }
+      });
     }
   }
 }

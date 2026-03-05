@@ -127,6 +127,8 @@ export interface EventRegistrationDetailsResponse {
   confirmationEmailSentAt?: string | null;
   /** When the payment approval email was last sent to the event creator (null = not sent). */
   paymentApprovalEmailSentAt?: string | null;
+  /** תאריך תשלום – when the payment was approved. */
+  paymentApprovedAt?: string | null;
 }
 
 /** Optional query filters for GET /api/events/{id}/registrations (case-insensitive substring where applicable). */
@@ -151,6 +153,11 @@ export interface EventRegistrationHistoryResponse {
   confirmationEmailSentAt?: string | null;
   /** When the payment approval email was last sent (null = not sent). */
   paymentApprovalEmailSentAt?: string | null;
+  /** תאריך תשלום – when the payment was approved. */
+  paymentApprovedAt?: string | null;
+  /** When the payment was approved/paid (for display as תאריך תשלום). */
+  paidAt?: string | null;
+  approvedAt?: string | null;
 }
 
 /** Admin events list: GET /api/events/admin (sorting, filtering, paging). registeredCountByEventId has string keys (e.g. "1", "2"). */

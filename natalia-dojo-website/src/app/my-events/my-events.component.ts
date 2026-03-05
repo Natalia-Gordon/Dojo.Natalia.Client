@@ -97,12 +97,12 @@ export class MyEventsComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isLoading = false;
         if (err.status === 401 || err.status === 403) {
-          this.errorMessage = 'יש להתחבר כדי לראות את האירועים שלך.';
+          this.errorMessage = 'אנא התחברי כדי לראות את האירועים שלך.';
           this.registrations = [];
         } else if (err.status === 404) {
           this.registrations = [];
         } else if (err.status === 0) {
-          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסה שוב.';
+          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסי שוב.';
         } else {
           this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
         }
@@ -130,6 +130,20 @@ export class MyEventsComponent implements OnInit, OnDestroy {
   formatEmailSentAt(sentAt: string | null | undefined): string {
     if (!sentAt) return 'לא נשלח';
     return this.formatDate(sentAt);
+  }
+
+  /** Display payment date (תאריך תשלום / מתי שולם). Uses paymentApprovedAt, paidAt or approvedAt from API. */
+  formatPaymentDate(r: EventRegistrationHistoryResponse): string {
+    const dateStr = r.paymentApprovedAt ?? r.paidAt ?? r.approvedAt ?? null;
+    if (!dateStr) return '—';
+    return this.formatDate(dateStr);
+  }
+
+  /** סטטוס הרשמה: if paid show "נרשם בהצלחה", otherwise show status. */
+  getRegistrationStatusDisplay(r: EventRegistrationHistoryResponse): string {
+    const paid = (r.paymentStatus ?? '').toLowerCase() === 'paid';
+    if (paid) return 'נרשם בהצלחה';
+    return r.status || '—';
   }
 
   getPaymentStatusLabel(status: string | null): string {
