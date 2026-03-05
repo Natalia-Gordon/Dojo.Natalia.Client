@@ -41,4 +41,4 @@ jobs:
 
     - name: Run natalia-dojo-website tests
       working-directory: natalia-dojo-website
-      run: npm test -- --watch=false --browsers=ChromeHeadless
+      run: npm test:ci
