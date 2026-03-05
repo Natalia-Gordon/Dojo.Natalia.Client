@@ -132,6 +132,20 @@ export class MyEventsComponent implements OnInit, OnDestroy {
     return this.formatDate(sentAt);
   }
 
+  /** Display payment date (תאריך תשלום / מתי שולם). Uses paymentApprovedAt, paidAt or approvedAt from API. */
+  formatPaymentDate(r: EventRegistrationHistoryResponse): string {
+    const dateStr = r.paymentApprovedAt ?? r.paidAt ?? r.approvedAt ?? null;
+    if (!dateStr) return '—';
+    return this.formatDate(dateStr);
+  }
+
+  /** סטטוס הרשמה: if paid show "נרשם בהצלחה", otherwise show status. */
+  getRegistrationStatusDisplay(r: EventRegistrationHistoryResponse): string {
+    const paid = (r.paymentStatus ?? '').toLowerCase() === 'paid';
+    if (paid) return 'נרשם בהצלחה';
+    return r.status || '—';
+  }
+
   getPaymentStatusLabel(status: string | null): string {
     if (!status) return '—';
     const s = (status + '').toLowerCase();

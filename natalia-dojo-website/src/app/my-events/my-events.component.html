@@ -105,12 +105,10 @@
                       </div>
                     </div>
                     <dl class="my-events-card-details">
+                      <dt>שולם בתאריך</dt>
+                      <dd>{{ formatPaymentDate(r) }}</dd>
                       <dt>סטטוס הרשמה</dt>
-                      <dd>{{ r.status || '—' }}</dd>
-                      <dt>אימייל אישור</dt>
-                      <dd>{{ formatEmailSentAt(r.confirmationEmailSentAt) }}</dd>
-                      <dt>אימייל אישור תשלום</dt>
-                      <dd>{{ formatEmailSentAt(r.paymentApprovalEmailSentAt) }}</dd>
+                      <dd>{{ getRegistrationStatusDisplay(r) }}</dd>
                       @if (r.attended) {
                         <dt>השתתפות</dt>
                         <dd>השתתפת באירוע</dd>
