@@ -94,7 +94,10 @@ export class EventsComponent implements OnInit, OnDestroy {
         next: (events) => {
           this.events = events || [];
           this.isLoading = false;
-          this.loadInstructorsForEvents(this.events);
+          // Load instructor names (and payment methods) for admin/instructor; others use event.instructorName from API when present
+          if (this.isAdminOrInstructor) {
+            this.loadInstructorsForEvents(this.events);
+          }
         },
         error: (error) => {
           this.isLoading = false;
@@ -182,6 +185,15 @@ export class EventsComponent implements OnInit, OnDestroy {
   getInstructorName(instructorId: number | null | undefined): string {
     if (instructorId == null) return '—';
     return this.instructorNamesMap[instructorId] ?? '—';
+  }
+
+  /** Prefer instructorName from the event (from API list), then instructorNamesMap (for admin/instructor). */
+  getInstructorDisplayName(eventItem: Event): string {
+    if (eventItem?.instructorName != null && eventItem.instructorName !== '') {
+      return eventItem.instructorName;
+    }
+    if (eventItem?.instructorId == null) return '—';
+    return this.instructorNamesMap[eventItem.instructorId] ?? '—';
   }
 
   /**
