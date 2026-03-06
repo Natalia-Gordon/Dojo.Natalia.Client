@@ -9,17 +9,23 @@
           <p class="footer__subheading text-white mb-4">הירשמי לרשימת התפוצה ותתעדכני על האימונים, הסדנאות והאירועים</p>
           <form class="w-100" (ngSubmit)="onNewsletterSubmit()" #newsletterForm="ngForm">
             <div class="input-group" dir="ltr">
-              <input type="email" id="footer-email" name="footerEmail" class="form-control border-white p-2 p-lg-3" placeholder="השאר כתובת מייל כאן"
+              <input type="email" id="footer-email" name="footerEmail" class="form-control border-white p-2 p-lg-3" placeholder="אנא השאירי את כתובת המייל שלך"
                 [(ngModel)]="newsletterEmail" required email [disabled]="newsletterLoading">
               <button type="submit" class="btn btn-dark px-3 px-lg-4" [disabled]="newsletterLoading || !newsletterForm.valid">
-                <span *ngIf="!newsletterLoading">הצטרפי</span>
-                <span *ngIf="newsletterLoading">שולח...</span>
+                @if (!newsletterLoading) {
+                  <span>הצטרפי</span>
+                }
+                @if (newsletterLoading) {
+                  <span>שולח...</span>
+                }
               </button>
             </div>
-            <div *ngIf="newsletterMessage" class="footer__newsletter-feedback mt-3" [class.footer__newsletter-feedback--success]="newsletterSuccess" [class.footer__newsletter-feedback--error]="!newsletterSuccess">
-              <i class="bi footer__newsletter-feedback__icon" [class.bi-check-circle-fill]="newsletterSuccess" [class.bi-exclamation-circle-fill]="!newsletterSuccess" aria-hidden="true"></i>
-              <span class="footer__newsletter-feedback__text">{{ newsletterMessage }}</span>
-            </div>
+            @if (newsletterMessage) {
+              <div class="footer__newsletter-feedback mt-3" [class.footer__newsletter-feedback--success]="newsletterSuccess" [class.footer__newsletter-feedback--error]="!newsletterSuccess">
+                <i class="bi footer__newsletter-feedback__icon" [class.bi-check-circle-fill]="newsletterSuccess" [class.bi-exclamation-circle-fill]="!newsletterSuccess" aria-hidden="true"></i>
+                <span class="footer__newsletter-feedback__text">{{ newsletterMessage }}</span>
+              </div>
+            }
           </form>
         </div>
       </div>
@@ -54,7 +60,7 @@
           <a routerLink="/home" class="text-secondary mb-2 footer__link-item"><i class="bi bi-arrow-left footer__arrow footer__arrow--orange"></i><span>דף הבית</span></a>
           <a routerLink="/about" class="text-secondary mb-2 footer__link-item"><i class="bi bi-arrow-left footer__arrow footer__arrow--orange"></i><span>על עצמי</span></a>
           <a routerLink="/sensei/about" class="text-secondary mb-2 footer__link-item"><i class="bi bi-arrow-left footer__arrow footer__arrow--orange"></i><span>הסנסאי</span></a>
-          <a routerLink="/events" class="text-secondary mb-2 footer__link-item"><i class="bi bi-arrow-left footer__arrow footer__arrow--orange"></i><span>סמינרים ואירועים</span></a>
+          <a routerLink="/events" class="text-secondary mb-2 footer__link-item"><i class="bi bi-arrow-left footer__arrow footer__arrow--orange"></i><span>אירועים</span></a>
           <a routerLink="/workouts" class="text-secondary mb-2 footer__link-item"><i class="bi bi-arrow-left footer__arrow footer__arrow--orange"></i><span>יומן אימונים</span></a>
           <a routerLink="/team" class="text-secondary mb-2 footer__link-item"><i class="bi bi-arrow-left footer__arrow footer__arrow--orange"></i><span>מאמנים</span></a>
           <a routerLink="/testimonial" class="text-secondary mb-2 footer__link-item"><i class="bi bi-arrow-left footer__arrow footer__arrow--orange"></i><span>ממליצים</span></a>
@@ -87,4 +93,6 @@
 </footer>
 
 <!-- Back to Top -->
-<a *ngIf="isBackToTopVisible && isBrowser" href="#" class="btn btn-dark py-3 back-to-top" (click)="scrollToTop($event)" aria-label="חזרה למעלה"><i class="bi bi-arrow-up"></i></a>
+@if (isBackToTopVisible && isBrowser) {
+  <a href="#" class="btn btn-dark py-3 back-to-top" (click)="scrollToTop($event)" aria-label="חזרה למעלה"><i class="bi bi-arrow-up"></i></a>
+}

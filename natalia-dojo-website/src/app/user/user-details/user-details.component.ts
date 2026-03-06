@@ -748,8 +748,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.certificateFileError = err?.status === 401
-          ? 'יש להתחבר מחדש כדי להוריד את הקובץ.'
-          : (err?.error?.message || 'שגיאה בהורדת הקובץ. נסה שוב.');
+          ? 'אנא התחברי מחדש כדי להוריד את הקובץ.'
+          : (err?.error?.message || 'שגיאה בהורדת הקובץ. אנא נסי שוב.');
       }
     });
   }

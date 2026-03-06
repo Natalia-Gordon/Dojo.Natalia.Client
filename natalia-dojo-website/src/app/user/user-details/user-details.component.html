@@ -8,7 +8,7 @@
     <!-- Sidebar Start - Right Side -->
     <div class="col-lg-4 order-lg-2" dir="rtl">
       <!-- User Info Card -->
-      <ng-container *ngIf="user">
+      @if (user) {
         <div class="user-info-card">
           <!-- Avatar Section -->
           <div class="user-info-card__header">
@@ -20,625 +20,641 @@
                   alt=""
                   class="user-avatar-large__img"
                   (error)="onAvatarError($event)">
-              }
-              @if (!avatarSrc || avatarImageError) {
-                <span class="avatar-initial-large">{{ getUserInitials() }}</span>
-              }
-            </div>
-            <h4 class="user-info-card__name">
-              {{ getDisplayName() }}
-            </h4>
-            <p class="user-info-card__email">
-              <i class="bi bi-envelope me-1"></i>
-              {{ user.email }}
-            </p>
-            @if (user.firstName || user.lastName) {
-              <p class="user-info-card__full-name">
-                <i class="bi bi-person me-1"></i>
-                {{ user.firstName }} {{ user.lastName }}
+                }
+                @if (!avatarSrc || avatarImageError) {
+                  <span class="avatar-initial-large">{{ getUserInitials() }}</span>
+                }
+              </div>
+              <h4 class="user-info-card__name">
+                {{ getDisplayName() }}
+              </h4>
+              <p class="user-info-card__email">
+                <i class="bi bi-envelope me-1"></i>
+                {{ user.email }}
               </p>
-            }
-          </div>
-          <!-- Info Items -->
-          <div class="user-info-card__body">
-            <!-- Last Login -->
-            @if (user.lastLoginAt) {
-              <div class="info-item">
-                <div class="info-item__icon">
-                  <i class="bi bi-clock-history"></i>
-                </div>
-                <div class="info-item__content">
-                  <div class="info-item__label">התחברות אחרונה</div>
-                  <div class="info-item__value">{{ formatLastLogin(user.lastLoginAt) }}</div>
-                </div>
-              </div>
-            }
-            <!-- Join Date or Created At -->
-            @if (user.joinDate || user.createdAt) {
-              <div class="info-item">
-                <div class="info-item__icon">
-                  <i class="bi bi-calendar-date"></i>
-                </div>
-                <div class="info-item__content">
-                  <div class="info-item__label">תאריך הצטרפות</div>
-                  <div class="info-item__value">{{ formatDate(user.joinDate || user.createdAt) }}</div>
-                </div>
-              </div>
-            }
-            <!-- Role -->
-            <div class="info-item">
-              <div class="info-item__icon">
-                <i class="bi bi-person-badge"></i>
-              </div>
-              <div class="info-item__content">
-                <div class="info-item__label">תפקיד</div>
-                <div class="info-item__value">
-                  @if (user.role) {
-                    <span class="badge badge-role">{{ user.role }}</span>
-                  }
-                  @if (!user.role) {
-                    <span class="text-muted small">לא הוגדר</span>
-                  }
-                </div>
-              </div>
+              @if (user.firstName || user.lastName) {
+                <p class="user-info-card__full-name">
+                  <i class="bi bi-person me-1"></i>
+                  {{ user.firstName }} {{ user.lastName }}
+                </p>
+              }
             </div>
-            <!-- Level -->
-            @if (user.level) {
+            <!-- Info Items -->
+            <div class="user-info-card__body">
+              <!-- Last Login -->
+              @if (user.lastLoginAt) {
+                <div class="info-item">
+                  <div class="info-item__icon">
+                    <i class="bi bi-clock-history"></i>
+                  </div>
+                  <div class="info-item__content">
+                    <div class="info-item__label">התחברות אחרונה</div>
+                    <div class="info-item__value">{{ formatLastLogin(user.lastLoginAt) }}</div>
+                  </div>
+                </div>
+              }
+              <!-- Join Date or Created At -->
+              @if (user.joinDate || user.createdAt) {
+                <div class="info-item">
+                  <div class="info-item__icon">
+                    <i class="bi bi-calendar-date"></i>
+                  </div>
+                  <div class="info-item__content">
+                    <div class="info-item__label">תאריך הצטרפות</div>
+                    <div class="info-item__value">{{ formatDate(user.joinDate || user.createdAt) }}</div>
+                  </div>
+                </div>
+              }
+              <!-- Role -->
               <div class="info-item">
                 <div class="info-item__icon">
-                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-person-badge"></i>
                 </div>
                 <div class="info-item__content">
-                  <div class="info-item__label">רמה</div>
+                  <div class="info-item__label">תפקיד</div>
                   <div class="info-item__value">
-                    <span class="badge" [ngClass]="getLevelColor(user.level)">
-                      {{ user.level }}
-                    </span>
+                    @if (user.role) {
+                      <span class="badge badge-role">{{ user.role }}</span>
+                    }
+                    @if (!user.role) {
+                      <span class="text-muted small">לא הוגדר</span>
+                    }
                   </div>
                 </div>
               </div>
-            }
-            <!-- Status -->
-            @if (user.isActive !== undefined) {
-              <div class="info-item">
-                <div class="info-item__icon">
-                  <i class="bi bi-circle-fill" [ngClass]="user.isActive ? 'text-success' : 'text-secondary'"></i>
-                </div>
-                <div class="info-item__content">
-                  <div class="info-item__label">סטטוס</div>
-                  <div class="info-item__value">
-                    <span class="badge" [ngClass]="user.isActive ? 'bg-success' : 'bg-secondary'">
-                      {{ user.isActive ? 'פעיל' : 'לא פעיל' }}
-                    </span>
+              <!-- Level -->
+              @if (user.level) {
+                <div class="info-item">
+                  <div class="info-item__icon">
+                    <i class="bi bi-star-fill"></i>
+                  </div>
+                  <div class="info-item__content">
+                    <div class="info-item__label">רמה</div>
+                    <div class="info-item__value">
+                      <span class="badge" [ngClass]="getLevelColor(user.level)">
+                        {{ user.level }}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            }
-            <!-- Email Verified -->
-            @if (user.isEmailVerified !== undefined) {
-              <div class="info-item">
-                <div class="info-item__icon">
-                  <i class="bi" [class.bi-check-circle-fill]="user.isEmailVerified" [class.bi-x-circle-fill]="!user.isEmailVerified" [ngClass]="user.isEmailVerified ? 'text-success' : 'text-warning'"></i>
-                </div>
-                <div class="info-item__content">
-                  <div class="info-item__label">אימות דוא&quot;ל</div>
-                  <div class="info-item__value">
-                    <span class="badge" [ngClass]="user.isEmailVerified ? 'bg-success' : 'bg-warning'">
-                      {{ user.isEmailVerified ? 'מאומת' : 'לא מאומת' }}
-                    </span>
+              }
+              <!-- Status -->
+              @if (user.isActive !== undefined) {
+                <div class="info-item">
+                  <div class="info-item__icon">
+                    <i class="bi bi-circle-fill" [ngClass]="user.isActive ? 'text-success' : 'text-secondary'"></i>
+                  </div>
+                  <div class="info-item__content">
+                    <div class="info-item__label">סטטוס</div>
+                    <div class="info-item__value">
+                      <span class="badge" [ngClass]="user.isActive ? 'bg-success' : 'bg-secondary'">
+                        {{ user.isActive ? 'פעיל' : 'לא פעיל' }}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            }
-            <!-- Created At -->
-            @if (user.createdAt) {
-              <div class="info-item">
-                <div class="info-item__icon">
-                  <i class="bi bi-calendar-plus"></i>
+              }
+              <!-- Email Verified -->
+              @if (user.isEmailVerified !== undefined) {
+                <div class="info-item">
+                  <div class="info-item__icon">
+                    <i class="bi" [class.bi-check-circle-fill]="user.isEmailVerified" [class.bi-x-circle-fill]="!user.isEmailVerified" [ngClass]="user.isEmailVerified ? 'text-success' : 'text-warning'"></i>
+                  </div>
+                  <div class="info-item__content">
+                    <div class="info-item__label">אימות דוא&quot;ל</div>
+                    <div class="info-item__value">
+                      <span class="badge" [ngClass]="user.isEmailVerified ? 'bg-success' : 'bg-warning'">
+                        {{ user.isEmailVerified ? 'מאומת' : 'לא מאומת' }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div class="info-item__content">
-                  <div class="info-item__label">תאריך יצירה</div>
-                  <div class="info-item__value">{{ formatDate(user.createdAt) }}</div>
+              }
+              <!-- Created At -->
+              @if (user.createdAt) {
+                <div class="info-item">
+                  <div class="info-item__icon">
+                    <i class="bi bi-calendar-plus"></i>
+                  </div>
+                  <div class="info-item__content">
+                    <div class="info-item__label">תאריך יצירה</div>
+                    <div class="info-item__value">{{ formatDate(user.createdAt) }}</div>
+                  </div>
                 </div>
-              </div>
-            }
-            <!-- Updated At -->
-            @if (user.updatedAt) {
-              <div class="info-item">
-                <div class="info-item__icon">
-                  <i class="bi bi-calendar-check"></i>
+              }
+              <!-- Updated At -->
+              @if (user.updatedAt) {
+                <div class="info-item">
+                  <div class="info-item__icon">
+                    <i class="bi bi-calendar-check"></i>
+                  </div>
+                  <div class="info-item__content">
+                    <div class="info-item__label">עודכן לאחרונה</div>
+                    <div class="info-item__value">{{ formatDate(user.updatedAt) }}</div>
+                  </div>
                 </div>
-                <div class="info-item__content">
-                  <div class="info-item__label">עודכן לאחרונה</div>
-                  <div class="info-item__value">{{ formatDate(user.updatedAt) }}</div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      </ng-container>
-    </div>
-    <!-- Sidebar End -->
-
-    <!-- Main Content - Left Side -->
-    <div class="col-lg-8 order-lg-1" dir="rtl">
-      <!-- User Details Start -->
-      <div class="mb-5">
-
-        <!-- Error Message (non-401: 401 is handled globally) -->
-        <ng-container *ngIf="errorMessage">
-          <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            <strong>שגיאה:</strong> {{ errorMessage }}
-            <button type="button" class="btn-close btn-close-white" (click)="errorMessage = null" aria-label="Close"></button>
-          </div>
-        </ng-container>
-
-        <!-- Success Message -->
-        <ng-container *ngIf="successMessage">
-          <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-            <strong>הצלחה:</strong> {{ successMessage }}
-            <button type="button" class="btn-close" (click)="successMessage = null" aria-label="Close"></button>
-          </div>
-        </ng-container>
-
-        <!-- Loading State -->
-        <ng-container *ngIf="isLoading && !user">
-          <div class="text-center py-5">
-            <div class="spinner-border text-danger" role="status">
-              <span class="visually-hidden">טוען...</span>
+              }
             </div>
           </div>
-        </ng-container>
+        }
+      </div>
+      <!-- Sidebar End -->
 
-        <!-- User Details Form -->
-        <ng-container *ngIf="user && !isLoading">
-          <section class="user-details-card">
-            <header class="user-details-card__header">
-              <div class="user-details-card__header-text">
-                <i class="bi bi-person-circle"></i>
-                <h3 class="user-details-card__title">{{ isEditMode ? 'עריכת פרטים' : 'פרטי משתמש' }}</h3>
+      <!-- Main Content - Left Side -->
+      <div class="col-lg-8 order-lg-1" dir="rtl">
+        <!-- User Details Start -->
+        <div class="mb-5">
+
+          <!-- Error Message (non-401: 401 is handled globally) -->
+          @if (errorMessage) {
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+              <strong>שגיאה:</strong> {{ errorMessage }}
+              <button type="button" class="btn-close btn-close-white" (click)="errorMessage = null" aria-label="Close"></button>
+            </div>
+          }
+
+          <!-- Success Message -->
+          @if (successMessage) {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+              <strong>הצלחה:</strong> {{ successMessage }}
+              <button type="button" class="btn-close" (click)="successMessage = null" aria-label="Close"></button>
+            </div>
+          }
+
+          <!-- Loading State -->
+          @if (isLoading && !user) {
+            <div class="text-center py-5">
+              <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">טוען...</span>
               </div>
-              <button
-                type="button"
-                class="user-details-card__btn-edit"
-                (click)="toggleEditMode()">
-                <i class="bi" [class.bi-pencil]="!isEditMode" [class.bi-x]="isEditMode"></i>
-                {{ isEditMode ? 'ביטול' : 'עריכה' }}
-              </button>
-            </header>
-            <div class="user-details-card__body">
-              <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-                <div class="user-details-card__section">
-                  <h5 class="user-details-card__section-title">
-                    <i class="bi bi-person-vcard"></i>
-                    פרטים אישיים
-                  </h5>
-                  <div class="user-details-form__grid">
-                    <!-- Username -->
-                    <div class="user-details-form__field">
-                      <label class="user-details-form__label">
-                        שם משתמש
-                        <span class="user-details-form__hint" title="לא ניתן לשנות שם משתמש לאחר יצירת החשבון">
-                          <i class="bi bi-info-circle"></i>
-                        </span>
-                      </label>
-                      <input
-                        type="text"
-                        class="user-details-form__input"
-                        formControlName="username"
-                        readonly>
-                      <small class="user-details-form__note">
-                        <i class="bi bi-lock"></i>
-                        שם משתמש לא ניתן לשינוי
-                      </small>
-                      @if (getFieldError('username')) {
-                        <div class="user-details-form__error">{{ getFieldError('username') }}</div>
-                      }
-                    </div>
-                    <!-- Email -->
-                    <div class="user-details-form__field">
-                      <label class="user-details-form__label">כתובת דוא&quot;ל <span class="text-danger">*</span></label>
-                      <input
-                        type="email"
-                        class="user-details-form__input"
-                        formControlName="email"
-                        [readonly]="!isEditMode">
-                      @if (getFieldError('email')) {
-                        <div class="user-details-form__error">{{ getFieldError('email') }}</div>
-                      }
-                    </div>
-                    <!-- First Name -->
-                    <div class="user-details-form__field">
-                      <label class="user-details-form__label">שם פרטי</label>
-                      <input
-                        type="text"
-                        class="user-details-form__input"
-                        formControlName="firstName"
-                        [readonly]="!isEditMode">
-                    </div>
-                    <!-- Last Name -->
-                    <div class="user-details-form__field">
-                      <label class="user-details-form__label">שם משפחה</label>
-                      <input
-                        type="text"
-                        class="user-details-form__input"
-                        formControlName="lastName"
-                        [readonly]="!isEditMode">
-                    </div>
-                    <!-- Display Name -->
-                    <div class="user-details-form__field">
-                      <label class="user-details-form__label">שם תצוגה</label>
-                      <input
-                        type="text"
-                        class="user-details-form__input"
-                        formControlName="displayName"
-                        [readonly]="!isEditMode">
-                    </div>
-                    <!-- Profile Image URL -->
-                    <div class="user-details-form__field user-details-form__field--full">
-                      <label class="user-details-form__label">קישור לתמונה</label>
-                      <input
-                        type="url"
-                        class="user-details-form__input"
-                        formControlName="profileImageUrl"
-                        [readonly]="!isEditMode"
-                        placeholder="https://drive.google.com/...">
-                    </div>
-                    <!-- Phone Number -->
-                    <div class="user-details-form__field">
-                      <label class="user-details-form__label">מספר טלפון</label>
-                      <input
-                        type="tel"
-                        class="user-details-form__input"
-                        formControlName="phone"
-                        [readonly]="!isEditMode">
-                    </div>
-                    <!-- Date of Birth -->
-                    <div class="user-details-form__field">
-                      <label class="user-details-form__label">תאריך לידה</label>
-                      @if (isEditMode) {
-                        <input
-                          type="date"
-                          class="user-details-form__input"
-                          formControlName="dateOfBirth">
-                      }
-                      @if (!isEditMode && user) {
-                        <div class="user-details-form__input user-details-form__input--readonly">
-                          {{ formatDate(user.dateOfBirth) || 'לא הוגדר' }}
-                        </div>
-                      }
-                    </div>
-                    <!-- Bio -->
-                    <div class="user-details-form__field user-details-form__field--full">
-                      <label class="user-details-form__label">אודות</label>
-                      <textarea
-                        class="user-details-form__input user-details-form__input--textarea"
-                        formControlName="bio"
-                        [readonly]="!isEditMode"
-                        rows="4"
-                        placeholder="ספר על עצמך..."></textarea>
-                    </div>
-                  </div>
+            </div>
+          }
+
+          <!-- User Details Form -->
+          @if (user && !isLoading) {
+            <section class="user-details-card">
+              <header class="user-details-card__header">
+                <div class="user-details-card__header-text">
+                  <i class="bi bi-person-circle"></i>
+                  <h3 class="user-details-card__title">{{ isEditMode ? 'עריכת פרטים' : 'פרטי משתמש' }}</h3>
                 </div>
-                <!-- Password Section (only in edit mode) -->
-                @if (isEditMode) {
+                <button
+                  type="button"
+                  class="user-details-card__btn-edit"
+                  (click)="toggleEditMode()">
+                  <i class="bi" [class.bi-pencil]="!isEditMode" [class.bi-x]="isEditMode"></i>
+                  {{ isEditMode ? 'ביטול' : 'עריכה' }}
+                </button>
+              </header>
+              <div class="user-details-card__body">
+                <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
                   <div class="user-details-card__section">
                     <h5 class="user-details-card__section-title">
-                      <i class="bi bi-lock"></i>
-                      שינוי סיסמה
+                      <i class="bi bi-person-vcard"></i>
+                      פרטים אישיים
                     </h5>
-                    <p class="user-details-card__section-note">
-                      <i class="bi bi-info-circle"></i>
-                      השאר את השדות הבאים ריקים אם אינך רוצה לשנות את הסיסמה
-                    </p>
                     <div class="user-details-form__grid">
+                      <!-- Username -->
                       <div class="user-details-form__field">
-                        <label class="user-details-form__label">סיסמה חדשה</label>
+                        <label class="user-details-form__label">
+                          שם משתמש
+                          <span class="user-details-form__hint" title="לא ניתן לשנות שם משתמש לאחר יצירת החשבון">
+                            <i class="bi bi-info-circle"></i>
+                          </span>
+                        </label>
                         <input
-                          type="password"
+                          type="text"
                           class="user-details-form__input"
-                          formControlName="password"
-                          placeholder="הזן סיסמה חדשה">
-                        @if (getFieldError('password')) {
-                          <div class="user-details-form__error">{{ getFieldError('password') }}</div>
-                        }
-                      </div>
-                      <div class="user-details-form__field">
-                        <label class="user-details-form__label">אישור סיסמה</label>
-                        <input
-                          type="password"
-                          class="user-details-form__input"
-                          formControlName="confirmPassword"
-                          placeholder="הזן שוב את הסיסמה">
-                        @if (getFieldError('confirmPassword')) {
-                          <div class="user-details-form__error">{{ getFieldError('confirmPassword') }}</div>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                }
-                <!-- Submit Button -->
-                @if (isEditMode) {
-                  <div class="user-details-card__actions">
-                    <button
-                      type="submit"
-                      class="btn btn-danger user-details-card__btn-submit"
-                      [disabled]="isLoading || profileForm.invalid">
-                      @if (isLoading) {
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                      }
-                      @if (!isLoading) {
-                        <i class="bi bi-check-lg me-2"></i>
-                      }
-                      שמור שינויים
-                    </button>
-                  </div>
-                }
-              </form>
-              <!-- Certificates (instructors only: list from API + upload + download) -->
-              <ng-container *ngIf="user && isInstructor()">
-              <section class="certificates-card">
-                <header class="certificates-card__header">
-                  <div class="certificates-card__header-text">
-                    <i class="bi bi-award"></i>
-                    <h5 class="certificates-card__title">תעודות</h5>
-                  </div>
-                </header>
-                <div class="certificates-card__body">
-                  <ng-container *ngIf="isLoadingCertificates">
-                    <div class="certificates-card__loading">
-                      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                      <span>טוען תעודות...</span>
-                    </div>
-                  </ng-container>
-                  <ng-container *ngIf="!isLoadingCertificates">
-                  <div class="certificates-card__intro">
-                    <p class="certificates-card__note">
-                      <i class="bi bi-info-circle"></i>
-                      ניתן להעלות קבצי תעודות בפורמטים: PDF, TIFF, JPEG, PNG
-                    </p>
-                    <div class="certificates-upload certificates-upload--above">
-                      <input
-                        type="file"
-                        #certificatesInput
-                        class="certificates-upload__input"
-                        accept=".pdf,.tiff,.tif,.jpeg,.jpg,.png,application/pdf,image/tiff,image/jpeg,image/png"
-                        multiple
-                        (change)="onCertificatesSelected($event)">
-                      <button type="button" class="certificates-upload__btn" (click)="certificatesInput.click()">
-                        <i class="bi bi-cloud-upload"></i>
-                        בחר קבצים להעלאה
-                      </button>
-                    </div>
-                    <div
-                      class="certificates-drop-zone"
-                      [class.certificates-drop-zone--over]="certificatesDragOver"
-                      (dragover)="onCertificatesDragOver($event)"
-                      (dragleave)="onCertificatesDragLeave($event)"
-                      (drop)="onCertificatesDrop($event)">
-                      <span class="certificates-drop-zone__hint">גרור קבצים לכאן</span>
-                    </div>
-                  </div>
-                  <ng-container *ngIf="certificateFileError">
-                    <div class="certificates-card__alert certificates-card__alert--error" [textContent]="certificateFileError"></div>
-                  </ng-container>
-                  <ng-container *ngIf="instructorCertificates.length > 0">
-                    <div class="certificates-list-wrap">
-                      <h6 class="certificates-list__title">תעודות שהועלו</h6>
-                      <ul class="certificates-list">
-                        <ng-container *ngFor="let cert of instructorCertificates; trackBy: certificateTrackBy">
-                          <li class="certificate-item">
-                            <span class="certificate-item__icon"><i class="bi bi-file-earmark-arrow-down"></i></span>
-                            <span class="certificate-item__name" [textContent]="cert.fileName" [title]="cert.fileName"></span>
-                            <button type="button" class="certificate-item__link" (click)="downloadCertificate(cert)" title="הורדה">הורדה</button>
-                          </li>
-                        </ng-container>
-                      </ul>
-                    </div>
-                  </ng-container>
-                  <ng-container *ngIf="certificateFiles.length > 0">
-                    <div class="certificates-list-wrap">
-                      <h6 class="certificates-list__title">קבצים שנבחרו: <span [textContent]="certificateFiles.length"></span></h6>
-                      <ul class="certificates-list">
-                        <ng-container *ngFor="let file of certificateFiles; let i = index; trackBy: certificateFileTrackBy">
-                          <li class="certificate-item">
-                            <span class="certificate-item__icon">
-                              <i class="bi bi-file-pdf" *ngIf="isPdfFile(file)"></i>
-                              <i class="bi bi-file-image" *ngIf="!isPdfFile(file)"></i>
-                            </span>
-                            <span class="certificate-item__name" [title]="file.name" [textContent]="file.name"></span>
-                            <span class="certificate-item__size" [textContent]="formatFileSize(file.size)"></span>
-                            <button
-                              type="button"
-                              class="certificate-item__btn"
-                              (click)="removeCertificateFile(i)"
-                              title="הסר קובץ"
-                              aria-label="הסר קובץ">
-                              <i class="bi bi-trash"></i>
-                            </button>
-                          </li>
-                        </ng-container>
-                      </ul>
-                      <div class="certificates-card__upload-actions">
-                        <button type="button" class="btn btn-danger" [disabled]="isUploadingCertificates" (click)="uploadCertificates()">
-                          <span class="spinner-border spinner-border-sm me-2" *ngIf="isUploadingCertificates"></span>
-                          <ng-container [ngSwitch]="isUploadingCertificates">
-                            <span *ngSwitchCase="true">מעלה...</span>
-                            <span *ngSwitchDefault>העלה קבצים</span>
-                          </ng-container>
-                        </button>
-                      </div>
-                    </div>
-                  </ng-container>
-                  <ng-container *ngIf="instructorCertificates.length === 0 && certificateFiles.length === 0">
-                    <div class="certificates-card__empty">
-                      <i class="bi bi-folder2-open"></i>
-                      <span>לא הועלו תעודות</span>
-                    </div>
-                  </ng-container>
-                  </ng-container>
-                </div>
-              </section>
-              </ng-container>
-              <!-- Payment methods (instructors only) -->
-              <ng-container *ngIf="user && isInstructor()">
-                <section class="payment-methods-card">
-                                  <header class="payment-methods-card__header">
-                                    <div class="payment-methods-card__header-text">
-                                      <i class="bi bi-credit-card-2-front"></i>
-                                      <h5 class="payment-methods-card__title">שיטות תשלום שלי</h5>
-                                    </div>
-                                    <button type="button" class="payment-methods-card__btn-add payment-methods-card__btn-add--header" (click)="openAddPaymentMethod()">
-                                      <i class="bi bi-plus-lg"></i>
-                                      הוסף שיטת תשלום
-                                    </button>
-                                  </header>
-                                  <div class="payment-methods-card__body">
-                                    <ng-container *ngIf="paymentMethodError">
-                                      <div class="payment-methods-card__alert payment-methods-card__alert--error" [textContent]="paymentMethodError"></div>
-                                    </ng-container>
-                                    <ng-container *ngIf="isLoadingPaymentMethods">
-                                      <div class="payment-methods-card__loading">
-                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                                        <span>טוען שיטות תשלום...</span>
-                                      </div>
-                                    </ng-container>
-                                    <ng-container *ngIf="!isLoadingPaymentMethods">
-                                      <ng-container *ngIf="paymentMethods.length === 0 && !showPaymentMethodForm">
-                                        <div class="payment-methods-card__empty">
-                                          <i class="bi bi-wallet2"></i>
-                                          <p class="payment-methods-card__empty-text">אין שיטות תשלום. הוסף ביט או העברה בנקאית כדי שמשתתפים יוכלו לשלם.</p>
-                                        </div>
-                                      </ng-container>
-                                      <ng-container *ngIf="paymentMethods.length > 0 || showPaymentMethodForm">
-                                        <div class="payment-methods-list">
-                                          <ng-container *ngFor="let pm of paymentMethods; trackBy: paymentMethodTrackBy">
-                                            <article class="payment-method-item">
-                                              <div class="payment-method-item__main">
-                                                <span class="payment-method-item__badge" [ngClass]="pm.paymentType === 'bit' ? 'payment-method-item__badge--bit' : 'payment-method-item__badge--bank'" [textContent]="getPaymentTypeLabel(pm)"></span>
-                                                <span class="payment-method-item__default" *ngIf="pm.isDefault">ברירת מחדל</span>
-                                                <p class="payment-method-item__details" [textContent]="getPaymentMethodDisplayText(pm)"></p>
-                                              </div>
-                                              <div class="payment-method-item__actions">
-                                                <button type="button" class="payment-method-item__btn payment-method-item__btn--edit" (click)="openEditPaymentMethod(pm)" title="עריכה" aria-label="עריכה">
-                                                  <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button type="button" class="payment-method-item__btn payment-method-item__btn--delete" (click)="deletePaymentMethod(pm.id)" title="מחיקה" aria-label="מחיקה">
-                                                  <i class="bi bi-trash"></i>
-                                                </button>
-                                              </div>
-                                            </article>
-                                            <ng-container *ngIf="showPaymentMethodForm && editingPaymentMethod?.id === pm.id">
-                                              <div class="payment-method-form-card">
-                                                <h6 class="payment-method-form-card__title" [textContent]="paymentMethodFormTitle"></h6>
-                                                <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
-                                                  <div class="payment-method-form__row">
-                                                    <div class="payment-method-form__field">
-                                                      <label class="payment-method-form__label">סוג</label>
-                                                      <select class="payment-method-form__input form-select" formControlName="paymentType">
-                                                        <option value="bank_transfer">העברה בנקאית</option>
-                                                        <option value="bit">ביט (Bit)</option>
-                                                      </select>
-                                                    </div>
-                                                    <div class="payment-method-form__field payment-method-form__field--checkbox">
-                                                      <div class="form-check">
-                                                        <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefaultEdit">
-                                                        <label class="form-check-label" for="pmDefaultEdit">ברירת מחדל</label>
-                                                      </div>
-                                                    </div>
-                                                  </div>
-                                                  <ng-container *ngIf="paymentTypeFormValue === 'bit'">
-                                                    <div class="payment-method-form__field">
-                                                      <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
-                                                      <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
-                                                    </div>
-                                                  </ng-container>
-                                                  <ng-container *ngIf="paymentTypeFormValue === 'bank_transfer'">
-                                                    <div class="payment-method-form__grid">
-                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
-                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
-                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
-                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
-                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
-                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
-                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
-                                                      <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
-                                                      <div class="payment-method-form__field payment-method-form__field--full"><label class="payment-method-form__label">כתובת הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankAddress"></div>
-                                                    </div>
-                                                  </ng-container>
-                                                  <div class="payment-method-form__actions">
-                                                    <button type="submit" class="btn btn-danger" [disabled]="isSavingPaymentMethod">
-                                                      <span class="spinner-border spinner-border-sm me-2" *ngIf="isSavingPaymentMethod"></span>
-                                                      שמור
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary" (click)="closePaymentMethodForm()">ביטול</button>
-                                                  </div>
-                                                </form>
-                                              </div>
-                                            </ng-container>
-                                          </ng-container>
-                                        </div>
-                                        <ng-container *ngIf="showPaymentMethodForm && !editingPaymentMethod">
-                                          <div class="payment-method-form-card">
-                                            <h6 class="payment-method-form-card__title" [textContent]="paymentMethodFormTitle"></h6>
-                                            <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
-                                              <div class="payment-method-form__row">
-                                                <div class="payment-method-form__field">
-                                                  <label class="payment-method-form__label">סוג</label>
-                                                  <select class="payment-method-form__input form-select" formControlName="paymentType">
-                                                    <option value="bank_transfer">העברה בנקאית</option>
-                                                    <option value="bit">ביט (Bit)</option>
-                                                  </select>
-                                                </div>
-                                                <div class="payment-method-form__field payment-method-form__field--checkbox">
-                                                  <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefault">
-                                                    <label class="form-check-label" for="pmDefault">ברירת מחדל</label>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <ng-container *ngIf="paymentTypeFormValue === 'bit'">
-                                                <div class="payment-method-form__field">
-                                                  <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
-                                                  <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
-                                                </div>
-                                              </ng-container>
-                                              <ng-container *ngIf="paymentTypeFormValue === 'bank_transfer'">
-                                                <div class="payment-method-form__grid">
-                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
-                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
-                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
-                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
-                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
-                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
-                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
-                                                  <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
-                                                  <div class="payment-method-form__field payment-method-form__field--full"><label class="payment-method-form__label">כתובת הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankAddress"></div>
-                                                </div>
-                                              </ng-container>
-                                              <div class="payment-method-form__actions">
-                                                <button type="submit" class="btn btn-danger" [disabled]="isSavingPaymentMethod">
-                                                  <span class="spinner-border spinner-border-sm me-2" *ngIf="isSavingPaymentMethod"></span>
-                                                  שמור
-                                                </button>
-                                                <button type="button" class="btn btn-outline-secondary" (click)="closePaymentMethodForm()">ביטול</button>
-                                              </div>
-                                            </form>
-                                          </div>
-                                        </ng-container>
-                                        </ng-container>
-                                    </ng-container>
+                          formControlName="username"
+                          readonly>
+                          <small class="user-details-form__note">
+                            <i class="bi bi-lock"></i>
+                            שם משתמש לא ניתן לשינוי
+                          </small>
+                          @if (getFieldError('username')) {
+                            <div class="user-details-form__error">{{ getFieldError('username') }}</div>
+                          }
+                        </div>
+                        <!-- Email -->
+                        <div class="user-details-form__field">
+                          <label class="user-details-form__label">כתובת דוא&quot;ל <span class="text-danger">*</span></label>
+                          <input
+                            type="email"
+                            class="user-details-form__input"
+                            formControlName="email"
+                            [readonly]="!isEditMode">
+                            @if (getFieldError('email')) {
+                              <div class="user-details-form__error">{{ getFieldError('email') }}</div>
+                            }
+                          </div>
+                          <!-- First Name -->
+                          <div class="user-details-form__field">
+                            <label class="user-details-form__label">שם פרטי</label>
+                            <input
+                              type="text"
+                              class="user-details-form__input"
+                              formControlName="firstName"
+                              [readonly]="!isEditMode">
+                            </div>
+                            <!-- Last Name -->
+                            <div class="user-details-form__field">
+                              <label class="user-details-form__label">שם משפחה</label>
+                              <input
+                                type="text"
+                                class="user-details-form__input"
+                                formControlName="lastName"
+                                [readonly]="!isEditMode">
+                              </div>
+                              <!-- Display Name -->
+                              <div class="user-details-form__field">
+                                <label class="user-details-form__label">שם תצוגה</label>
+                                <input
+                                  type="text"
+                                  class="user-details-form__input"
+                                  formControlName="displayName"
+                                  [readonly]="!isEditMode">
+                                </div>
+                                <!-- Profile Image URL -->
+                                <div class="user-details-form__field user-details-form__field--full">
+                                  <label class="user-details-form__label">קישור לתמונה</label>
+                                  <input
+                                    type="url"
+                                    class="user-details-form__input"
+                                    formControlName="profileImageUrl"
+                                    [readonly]="!isEditMode"
+                                    placeholder="https://drive.google.com/...">
                                   </div>
-                                </section>
-              </ng-container>
-              </div>
-            </section>
-        </ng-container>
-      </div>
-      <!-- User Details End -->
-      <!-- Main Content End -->
-    </div>
-  </div>
-  <!-- Blog End -->
-</div>
+                                  <!-- Phone Number -->
+                                  <div class="user-details-form__field">
+                                    <label class="user-details-form__label">מספר טלפון</label>
+                                    <input
+                                      type="tel"
+                                      class="user-details-form__input"
+                                      formControlName="phone"
+                                      [readonly]="!isEditMode">
+                                    </div>
+                                    <!-- Date of Birth -->
+                                    <div class="user-details-form__field">
+                                      <label class="user-details-form__label">תאריך לידה</label>
+                                      @if (isEditMode) {
+                                        <input
+                                          type="date"
+                                          class="user-details-form__input"
+                                          formControlName="dateOfBirth">
+                                        }
+                                        @if (!isEditMode && user) {
+                                          <div class="user-details-form__input user-details-form__input--readonly">
+                                            {{ formatDate(user.dateOfBirth) || 'לא הוגדר' }}
+                                          </div>
+                                        }
+                                      </div>
+                                      <!-- Bio -->
+                                      <div class="user-details-form__field user-details-form__field--full">
+                                        <label class="user-details-form__label">אודות</label>
+                                        <textarea
+                                          class="user-details-form__input user-details-form__input--textarea"
+                                          formControlName="bio"
+                                          [readonly]="!isEditMode"
+                                          rows="4"
+                                        placeholder="ספר על עצמך..."></textarea>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <!-- Password Section (only in edit mode) -->
+                                  @if (isEditMode) {
+                                    <div class="user-details-card__section">
+                                      <h5 class="user-details-card__section-title">
+                                        <i class="bi bi-lock"></i>
+                                        שינוי סיסמה
+                                      </h5>
+                                      <p class="user-details-card__section-note">
+                                        <i class="bi bi-info-circle"></i>
+                                        השאר את השדות הבאים ריקים אם אינך רוצה לשנות את הסיסמה
+                                      </p>
+                                      <div class="user-details-form__grid">
+                                        <div class="user-details-form__field">
+                                          <label class="user-details-form__label">סיסמה חדשה</label>
+                                          <input
+                                            type="password"
+                                            class="user-details-form__input"
+                                            formControlName="password"
+                                            placeholder="הזן סיסמה חדשה">
+                                            @if (getFieldError('password')) {
+                                              <div class="user-details-form__error">{{ getFieldError('password') }}</div>
+                                            }
+                                          </div>
+                                          <div class="user-details-form__field">
+                                            <label class="user-details-form__label">אישור סיסמה</label>
+                                            <input
+                                              type="password"
+                                              class="user-details-form__input"
+                                              formControlName="confirmPassword"
+                                              placeholder="הזן שוב את הסיסמה">
+                                              @if (getFieldError('confirmPassword')) {
+                                                <div class="user-details-form__error">{{ getFieldError('confirmPassword') }}</div>
+                                              }
+                                            </div>
+                                          </div>
+                                        </div>
+                                      }
+                                      <!-- Submit Button -->
+                                      @if (isEditMode) {
+                                        <div class="user-details-card__actions">
+                                          <button
+                                            type="submit"
+                                            class="btn btn-danger user-details-card__btn-submit"
+                                            [disabled]="isLoading || profileForm.invalid">
+                                            @if (isLoading) {
+                                              <span class="spinner-border spinner-border-sm me-2"></span>
+                                            }
+                                            @if (!isLoading) {
+                                              <i class="bi bi-check-lg me-2"></i>
+                                            }
+                                            שמרי שינויים
+                                          </button>
+                                        </div>
+                                      }
+                                    </form>
+                                    <!-- Certificates (instructors only: list from API + upload + download) -->
+                                    @if (user && isInstructor()) {
+                                      <section class="certificates-card">
+                                        <header class="certificates-card__header">
+                                          <div class="certificates-card__header-text">
+                                            <i class="bi bi-award"></i>
+                                            <h5 class="certificates-card__title">תעודות</h5>
+                                          </div>
+                                        </header>
+                                        <div class="certificates-card__body">
+                                          @if (isLoadingCertificates) {
+                                            <div class="certificates-card__loading">
+                                              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                              <span>טוען תעודות...</span>
+                                            </div>
+                                          }
+                                          @if (!isLoadingCertificates) {
+                                            <div class="certificates-card__intro">
+                                              <p class="certificates-card__note">
+                                                <i class="bi bi-info-circle"></i>
+                                                ניתן להעלות קבצי תעודות בפורמטים: PDF, TIFF, JPEG, PNG
+                                              </p>
+                                              <div class="certificates-upload certificates-upload--above">
+                                                <input
+                                                  type="file"
+                                                  #certificatesInput
+                                                  class="certificates-upload__input"
+                                                  accept=".pdf,.tiff,.tif,.jpeg,.jpg,.png,application/pdf,image/tiff,image/jpeg,image/png"
+                                                  multiple
+                                                  (change)="onCertificatesSelected($event)">
+                                                  <button type="button" class="certificates-upload__btn" (click)="certificatesInput.click()">
+                                                    <i class="bi bi-cloud-upload"></i>
+                                                    אנא בחרי קבצים להעלאה
+                                                  </button>
+                                                </div>
+                                                <div
+                                                  class="certificates-drop-zone"
+                                                  [class.certificates-drop-zone--over]="certificatesDragOver"
+                                                  (dragover)="onCertificatesDragOver($event)"
+                                                  (dragleave)="onCertificatesDragLeave($event)"
+                                                  (drop)="onCertificatesDrop($event)">
+                                                  <span class="certificates-drop-zone__hint">גרור קבצים לכאן</span>
+                                                </div>
+                                              </div>
+                                              @if (certificateFileError) {
+                                                <div class="certificates-card__alert certificates-card__alert--error" [textContent]="certificateFileError"></div>
+                                              }
+                                              @if (instructorCertificates.length > 0) {
+                                                <div class="certificates-list-wrap">
+                                                  <h6 class="certificates-list__title">תעודות שהועלו</h6>
+                                                  <ul class="certificates-list">
+                                                    @for (cert of instructorCertificates; track cert.downloadUrl) {
+                                                      <li class="certificate-item">
+                                                        <span class="certificate-item__icon"><i class="bi bi-file-earmark-arrow-down"></i></span>
+                                                        <span class="certificate-item__name" [textContent]="cert.fileName" [title]="cert.fileName"></span>
+                                                        <button type="button" class="certificate-item__link" (click)="downloadCertificate(cert)" title="הורדה">הורדה</button>
+                                                      </li>
+                                                    }
+                                                  </ul>
+                                                </div>
+                                              }
+                                              @if (certificateFiles.length > 0) {
+                                                <div class="certificates-list-wrap">
+                                                  <h6 class="certificates-list__title">קבצים שנבחרו: <span [textContent]="certificateFiles.length"></span></h6>
+                                                  <ul class="certificates-list">
+@for (file of certificateFiles; track $index) {
+                                                        <li class="certificate-item">
+                                                        <span class="certificate-item__icon">
+                                                          @if (isPdfFile(file)) {
+                                                            <i class="bi bi-file-pdf"></i>
+                                                          }
+                                                          @if (!isPdfFile(file)) {
+                                                            <i class="bi bi-file-image"></i>
+                                                          }
+                                                        </span>
+                                                        <span class="certificate-item__name" [title]="file.name" [textContent]="file.name"></span>
+                                                        <span class="certificate-item__size" [textContent]="formatFileSize(file.size)"></span>
+                                                        <button
+                                                          type="button"
+                                                          class="certificate-item__btn"
+                                                          (click)="removeCertificateFile($index)"
+                                                          title="הסר קובץ"
+                                                          aria-label="הסר קובץ">
+                                                          <i class="bi bi-trash"></i>
+                                                        </button>
+                                                      </li>
+                                                    }
+                                                  </ul>
+                                                  <div class="certificates-card__upload-actions">
+                                                    <button type="button" class="btn btn-danger" [disabled]="isUploadingCertificates" (click)="uploadCertificates()">
+                                                      @if (isUploadingCertificates) {
+                                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                                      }
+                                                      @switch (isUploadingCertificates) {
+                                                        @case (true) {
+                                                          <span>מעלה...</span>
+                                                        }
+                                                        @default {
+                                                          <span>העלי קבצים</span>
+                                                        }
+                                                      }
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              }
+                                              @if (instructorCertificates.length === 0 && certificateFiles.length === 0) {
+                                                <div class="certificates-card__empty">
+                                                  <i class="bi bi-folder2-open"></i>
+                                                  <span>לא הועלו תעודות</span>
+                                                </div>
+                                              }
+                                            }
+                                          </div>
+                                        </section>
+                                      }
+                                      <!-- Payment methods (instructors only) -->
+                                      @if (user && isInstructor()) {
+                                        <section class="payment-methods-card">
+                                          <header class="payment-methods-card__header">
+                                            <div class="payment-methods-card__header-text">
+                                              <i class="bi bi-credit-card-2-front"></i>
+                                              <h5 class="payment-methods-card__title">שיטות תשלום שלי</h5>
+                                            </div>
+                                            <button type="button" class="payment-methods-card__btn-add payment-methods-card__btn-add--header" (click)="openAddPaymentMethod()">
+                                              <i class="bi bi-plus-lg"></i>
+                                              הוסיפי שיטת תשלום
+                                            </button>
+                                          </header>
+                                          <div class="payment-methods-card__body">
+                                            @if (paymentMethodError) {
+                                              <div class="payment-methods-card__alert payment-methods-card__alert--error" [textContent]="paymentMethodError"></div>
+                                            }
+                                            @if (isLoadingPaymentMethods) {
+                                              <div class="payment-methods-card__loading">
+                                                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                                <span>טוען שיטות תשלום...</span>
+                                              </div>
+                                            }
+                                            @if (!isLoadingPaymentMethods) {
+                                              @if (paymentMethods.length === 0 && !showPaymentMethodForm) {
+                                                <div class="payment-methods-card__empty">
+                                                  <i class="bi bi-wallet2"></i>
+                                                  <p class="payment-methods-card__empty-text">אין שיטות תשלום. אנא הוסיפי ביט או העברה בנקאית כדי שמשתתפים יוכלו לשלם.</p>
+                                                </div>
+                                              }
+                                              @if (paymentMethods.length > 0 || showPaymentMethodForm) {
+                                                <div class="payment-methods-list">
+                                                  @for (pm of paymentMethods; track pm.id) {
+                                                    <article class="payment-method-item">
+                                                      <div class="payment-method-item__main">
+                                                        <span class="payment-method-item__badge" [ngClass]="pm.paymentType === 'bit' ? 'payment-method-item__badge--bit' : 'payment-method-item__badge--bank'" [textContent]="getPaymentTypeLabel(pm)"></span>
+                                                        @if (pm.isDefault) {
+                                                          <span class="payment-method-item__default">ברירת מחדל</span>
+                                                        }
+                                                        <p class="payment-method-item__details" [textContent]="getPaymentMethodDisplayText(pm)"></p>
+                                                      </div>
+                                                      <div class="payment-method-item__actions">
+                                                        <button type="button" class="payment-method-item__btn payment-method-item__btn--edit" (click)="openEditPaymentMethod(pm)" title="עריכה" aria-label="עריכה">
+                                                          <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button type="button" class="payment-method-item__btn payment-method-item__btn--delete" (click)="deletePaymentMethod(pm.id)" title="מחיקה" aria-label="מחיקה">
+                                                          <i class="bi bi-trash"></i>
+                                                        </button>
+                                                      </div>
+                                                    </article>
+                                                    @if (showPaymentMethodForm && editingPaymentMethod?.id === pm.id) {
+                                                      <div class="payment-method-form-card">
+                                                        <h6 class="payment-method-form-card__title" [textContent]="paymentMethodFormTitle"></h6>
+                                                        <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
+                                                          <div class="payment-method-form__row">
+                                                            <div class="payment-method-form__field">
+                                                              <label class="payment-method-form__label">סוג</label>
+                                                              <select class="payment-method-form__input form-select" formControlName="paymentType">
+                                                                <option value="bank_transfer">העברה בנקאית</option>
+                                                                <option value="bit">ביט (Bit)</option>
+                                                              </select>
+                                                            </div>
+                                                            <div class="payment-method-form__field payment-method-form__field--checkbox">
+                                                              <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefaultEdit">
+                                                                <label class="form-check-label" for="pmDefaultEdit">ברירת מחדל</label>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                          @if (paymentTypeFormValue === 'bit') {
+                                                            <div class="payment-method-form__field">
+                                                              <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                                                              <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
+                                                            </div>
+                                                          }
+                                                          @if (paymentTypeFormValue === 'bank_transfer') {
+                                                            <div class="payment-method-form__grid">
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
+                                                              <div class="payment-method-form__field payment-method-form__field--full"><label class="payment-method-form__label">כתובת הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankAddress"></div>
+                                                            </div>
+                                                          }
+                                                          <div class="payment-method-form__actions">
+                                                            <button type="submit" class="btn btn-danger" [disabled]="isSavingPaymentMethod">
+                                                              @if (isSavingPaymentMethod) {
+                                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                              }
+                                                              שמרי
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-secondary" (click)="closePaymentMethodForm()">ביטול</button>
+                                                          </div>
+                                                        </form>
+                                                      </div>
+                                                    }
+                                                  }
+                                                </div>
+                                                @if (showPaymentMethodForm && !editingPaymentMethod) {
+                                                  <div class="payment-method-form-card">
+                                                    <h6 class="payment-method-form-card__title" [textContent]="paymentMethodFormTitle"></h6>
+                                                    <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
+                                                      <div class="payment-method-form__row">
+                                                        <div class="payment-method-form__field">
+                                                          <label class="payment-method-form__label">סוג</label>
+                                                          <select class="payment-method-form__input form-select" formControlName="paymentType">
+                                                            <option value="bank_transfer">העברה בנקאית</option>
+                                                            <option value="bit">ביט (Bit)</option>
+                                                          </select>
+                                                        </div>
+                                                        <div class="payment-method-form__field payment-method-form__field--checkbox">
+                                                          <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefault">
+                                                            <label class="form-check-label" for="pmDefault">ברירת מחדל</label>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                      @if (paymentTypeFormValue === 'bit') {
+                                                        <div class="payment-method-form__field">
+                                                          <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                                                          <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
+                                                        </div>
+                                                      }
+                                                      @if (paymentTypeFormValue === 'bank_transfer') {
+                                                        <div class="payment-method-form__grid">
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
+                                                          <div class="payment-method-form__field payment-method-form__field--full"><label class="payment-method-form__label">כתובת הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankAddress"></div>
+                                                        </div>
+                                                      }
+                                                      <div class="payment-method-form__actions">
+                                                        <button type="submit" class="btn btn-danger" [disabled]="isSavingPaymentMethod">
+                                                          @if (isSavingPaymentMethod) {
+                                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                                          }
+                                                          שמרי
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-secondary" (click)="closePaymentMethodForm()">ביטול</button>
+                                                      </div>
+                                                    </form>
+                                                  </div>
+                                                }
+                                              }
+                                            }
+                                          </div>
+                                        </section>
+                                      }
+                                    </div>
+                                  </section>
+                                }
+                              </div>
+                              <!-- User Details End -->
+                              <!-- Main Content End -->
+                            </div>
+                          </div>
+                          <!-- Blog End -->
+                        </div>
 

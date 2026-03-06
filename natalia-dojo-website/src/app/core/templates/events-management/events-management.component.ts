@@ -5,7 +5,7 @@ import {
   Inject,
   PLATFORM_ID,
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -42,7 +42,7 @@ type AdminSortBy = 'id' | 'title' | 'type' | 'status' | 'startDate' | 'price';
 @Component({
   selector: 'app-events-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './events-management.component.html',
   styleUrl: './events-management.component.css',
 })
@@ -186,7 +186,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
           if (err.status === 403 || err.status === 401) {
             this.errorMessage = 'אין הרשאה לצפות באירועים.';
           } else if (err.status === 0) {
-            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסה שוב.';
+            this.errorMessage = 'לא ניתן להתחבר לשרת. אנא נסי שוב.';
           } else {
             this.errorMessage = 'שגיאה בטעינת האירועים. נסו שוב מאוחר יותר.';
           }
@@ -438,7 +438,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.resendMessage =
-            err?.error?.message ?? err?.message ?? 'שגיאה בשליחת המייל. נסה שוב.';
+            err?.error?.message ?? err?.message ?? 'שגיאה בשליחת המייל. אנא נסי שוב.';
           this.resendLoadingId = null;
         },
       });

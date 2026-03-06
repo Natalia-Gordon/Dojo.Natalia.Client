@@ -1,7 +1,7 @@
 // Custom LocationStrategy for SSR that doesn't access window
 // This prevents "window is not defined" errors during SSR
-import { Injectable, Inject, Optional } from '@angular/core';
-import { LocationStrategy, PathLocationStrategy, PlatformLocation, DOCUMENT } from '@angular/common';
+import { Injectable, Inject, Optional, DOCUMENT } from '@angular/core';
+import { LocationStrategy, PathLocationStrategy, PlatformLocation } from '@angular/common';
 
 @Injectable()
 export class ServerLocationStrategy extends PathLocationStrategy {

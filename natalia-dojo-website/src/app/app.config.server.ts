@@ -1,5 +1,5 @@
+import { provideServerRendering } from '@angular/ssr';
 import { ApplicationConfig } from '@angular/core';
-import { provideServerRendering } from '@angular/platform-server';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';

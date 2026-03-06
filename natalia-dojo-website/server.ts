@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/core';
 // CRITICAL: Set up window mock BEFORE any Angular imports
 // This must happen at the very top, before CommonEngine or any Angular code
 (function setupGlobalWindowMock() {
@@ -43,7 +44,7 @@
   }
 })();
 
-import { APP_BASE_HREF, DOCUMENT } from '@angular/common';
+import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr/node';
 import express from 'express';
 import { fileURLToPath } from 'node:url';

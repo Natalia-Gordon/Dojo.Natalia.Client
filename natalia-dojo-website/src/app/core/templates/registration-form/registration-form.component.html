@@ -65,7 +65,7 @@
           <label for="register-rank" class="form-label">דרגה</label>
           <div class="input-wrapper">
             <select id="register-rank" formControlName="rankId" class="form-input">
-              <option [ngValue]="null">בחר דרגה</option>
+              <option [ngValue]="null">אנא בחרי דרגה</option>
               @for (rank of ranks; track rank.id) {
                 <option [ngValue]="rank.id">{{ rank.name }}</option>
               }
@@ -90,7 +90,7 @@
               formControlName="username"
               class="form-input"
               [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
-              placeholder="בחר/י שם משתמש"
+              placeholder="אנא בחרי שם משתמש"
               autocomplete="username"
               required>
           </div>
@@ -138,7 +138,7 @@
               formControlName="password"
               class="form-input"
               [class.error]="registerPassword?.invalid && registerPassword?.touched"
-              placeholder="בחר/י סיסמה"
+              placeholder="אנא בחרי סיסמה"
               autocomplete="new-password"
               required>
           </div>
@@ -291,10 +291,10 @@
           [disabled]="isRegisterLoading || registerForm.invalid"
           (click)="onUpdateRegisteredUser()">
           @if (!isRegisterLoading) {
-            <span>עדכן חשבון</span>
+            <span>עדכני חשבון</span>
           }
           @if (isRegisterLoading) {
-            <span>מעדכן חשבון...</span>
+            <span>מעדכנת חשבון...</span>
           }
         </button>
       }

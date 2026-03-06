@@ -114,7 +114,7 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
         } else if (err?.status === 404) {
           this.errorMessage = 'אירוע לא נמצא.';
         } else {
-          this.errorMessage = 'שגיאה בטעינת האירוע. נסה שוב.';
+          this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסי שוב.';
         }
       },
     });

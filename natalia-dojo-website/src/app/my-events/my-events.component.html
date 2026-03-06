@@ -20,7 +20,7 @@
       <div class="my-events-content-card">
         @if (!isAuthenticated) {
           <div class="my-events-restricted">
-            יש להתחבר כדי לראות את האירועים שנרשמת אליהם.
+            אנא התחברי כדי לראות את האירועים שנרשמת אליהם.
           </div>
         }
 
@@ -50,7 +50,7 @@
                 <i class="bi bi-calendar-x"></i>
               </div>
               <h3 class="empty-state__title">עדיין לא נרשמת לאף אירוע</h3>
-              <p class="empty-state__text">אפשר להצטרף לאירועים מהדף <a routerLink="/events" class="empty-state__link">סמינרים</a>.</p>
+              <p class="empty-state__text">אפשר להצטרף לאירועים מהדף <a routerLink="/events" class="empty-state__link">אירועים</a>.</p>
             </div>
           }
 
@@ -68,7 +68,7 @@
               </div>
               <button type="button" class="my-events-download-btn" (click)="downloadUpcomingEvents()" [disabled]="upcomingCount === 0">
                 <i class="bi bi-download"></i>
-                <span>הורד אירועים קרובים ({{ upcomingCount }})</span>
+                <span>הורידי אירועים קרובים ({{ upcomingCount }})</span>
               </button>
             </div>
 
@@ -105,12 +105,10 @@
                       </div>
                     </div>
                     <dl class="my-events-card-details">
+                      <dt>שולם בתאריך</dt>
+                      <dd>{{ formatPaymentDate(r) }}</dd>
                       <dt>סטטוס הרשמה</dt>
-                      <dd>{{ r.status || '—' }}</dd>
-                      <dt>אימייל אישור</dt>
-                      <dd>{{ formatEmailSentAt(r.confirmationEmailSentAt) }}</dd>
-                      <dt>אימייל אישור תשלום</dt>
-                      <dd>{{ formatEmailSentAt(r.paymentApprovalEmailSentAt) }}</dd>
+                      <dd>{{ getRegistrationStatusDisplay(r) }}</dd>
                       @if (r.attended) {
                         <dt>השתתפות</dt>
                         <dd>השתתפת באירוע</dd>

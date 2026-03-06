@@ -155,16 +155,16 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.errorMessage = 'שם משתמש או סיסמה שגויים';
         } else if (error.status === 503) {
           // Service Unavailable: backend up but dependency (e.g. DB) down
-          this.errorMessage = 'השירות זמנית לא זמין. נסה שוב בעוד רגע.';
+          this.errorMessage = 'השירות זמנית לא זמין. אנא נסי שוב בעוד רגע.';
         } else if (error.status === 0) {
           // Network error (CORS, connection refused, server unreachable, etc.)
-          this.errorMessage = 'שגיאת רשת: לא ניתן להתחבר לשרת. אנא בדוק את החיבור לאינטרנט ונסה שוב.';
+          this.errorMessage = 'שגיאת רשת: לא ניתן להתחבר לשרת. אנא בדקי את החיבור לאינטרנט ונסי שוב.';
         } else if (error.error?.message) {
           this.errorMessage = error.error.message;
         } else if (error.message) {
           this.errorMessage = error.message;
         } else {
-          this.errorMessage = 'שגיאה בהתחברות. אנא נסה שוב.';
+          this.errorMessage = 'שגיאה בהתחברות. אנא נסי שוב.';
         }
       }
     });

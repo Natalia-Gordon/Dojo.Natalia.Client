@@ -120,14 +120,20 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       next: (event) => {
         this.event = event;
         this.instructorName = event.instructorName ?? null;
+        // Support both camelCase and snake_case from API
+        const imageUrl = event.imageUrl ?? (event as { image_url?: string | null }).image_url ?? null;
+        if (event && !(event as { imageUrl?: string | null }).imageUrl && imageUrl) {
+          (event as { imageUrl?: string }).imageUrl = imageUrl;
+        }
         // Compute image URL only in browser; use shared Drive URL conversion so event picture displays
-        if (isPlatformBrowser(this.platformId) && event.imageUrl) {
-          this.imageLoadAttempt = 0;
-          this.imageId = getDriveFileId(event.imageUrl);
-          const directUrl = getProfileImageUrlForAttempt(event.imageUrl, 0, 'w1920');
-          this.displayImageUrl = directUrl || event.imageUrl.trim();
+        // Prefer uc?export=view first (attempt 1) - often works when thumbnail is blocked by referrer/CORS
+        if (isPlatformBrowser(this.platformId) && imageUrl) {
+          this.imageLoadAttempt = 1;
+          this.imageId = getDriveFileId(imageUrl);
+          const directUrl = getProfileImageUrlForAttempt(imageUrl, 1, 'w1920');
+          this.displayImageUrl = directUrl || imageUrl.trim();
         } else {
-          this.displayImageUrl = event.imageUrl || '';
+          this.displayImageUrl = imageUrl || '';
         }
         this.isLoading = false;
         this.errorMessage = '';
@@ -143,23 +149,23 @@ export class EventDetailComponent implements OnInit, OnDestroy {
         // Provide user-friendly error messages
         if (error.status === 503) {
           // Service Unavailable - database connection issues
-          this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
+          this.errorMessage = 'השירות זמנית לא זמין. אנא נסי שוב בעוד כמה רגעים.';
         } else if (error.status === 0) {
           // Network error - backend not available
-          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודאי שהשרת פועל ונסי שוב.';
         } else if (error.status === 404) {
           this.errorMessage = 'האירוע לא נמצא.';
         } else if (error.status === 401 || error.status === 403) {
           this.errorMessage = 'אין הרשאה לצפות באירוע זה.';
         } else {
-          this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסה שוב מאוחר יותר.';
+          this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסי שוב מאוחר יותר.';
         }
       }
     });
     } catch (error) {
       // Fallback for any unexpected errors during SSR
       this.isLoading = false;
-      this.errorMessage = 'שגיאה בטעינת האירוע. נסו שוב מאוחר יותר.';
+      this.errorMessage = 'שגיאה בטעינת האירוע. אנא נסי שוב מאוחר יותר.';
     }
   }
 
@@ -169,7 +175,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (!this.isAuthenticated || !this.userInfo?.userId) {
       this.authService.clearSessionLocally();
       this.loginModalService.open('login');
-      this.errorMessage = 'יש להתחבר או להירשם כאורח כדי להירשם לסמינר.';
+      this.errorMessage = 'אנא התחברי או הירשמי כדי להירשם לסמינר.';
       return;
     }
 
@@ -209,6 +215,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
   /**
    * Handle image load error - try alternative Google Drive URL formats (same as profile images).
+   * Order tried: 1 (uc?export=view), then 0 (thumbnail), then 2 (uc?export=download).
    */
   onImageError(event: ErrorEvent): void {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -217,8 +224,9 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     if (!imgElement || !this.event?.imageUrl) return;
 
     const rawUrl = this.event.imageUrl.trim();
-    const nextAttempt = this.imageLoadAttempt + 1;
-    const nextUrl = getProfileImageUrlForAttempt(rawUrl, nextAttempt, 'w1920');
+    // Next attempt in order: 1 -> 0 -> 2 -> give up
+    const nextAttempt = this.imageLoadAttempt === 1 ? 0 : this.imageLoadAttempt === 0 ? 2 : -1;
+    const nextUrl = nextAttempt >= 0 ? getProfileImageUrlForAttempt(rawUrl, nextAttempt, 'w1920') : null;
 
     if (nextUrl) {
       this.imageLoadAttempt = nextAttempt;
@@ -274,7 +282,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     errorMsg.innerHTML = `
       <i class="bi bi-exclamation-triangle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #dc2626; opacity: 0.7;"></i>
       <p style="margin: 0; font-weight: 600; color: #1f2937;">התמונה לא נטענה</p>
-      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">אנא ודא שהקובץ ב-Google Drive משותף עם "כל אחד עם הקישור"</p>
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">אנא ודאי שהקובץ ב-Google Drive משותף עם "כל אחד עם הקישור"</p>
     `;
     container.appendChild(errorMsg);
   }

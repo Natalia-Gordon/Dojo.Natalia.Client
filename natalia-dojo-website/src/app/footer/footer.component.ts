@@ -1,5 +1,5 @@
 import { Component, HostListener, Inject, PLATFORM_ID, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NewsletterService } from '../_services/newsletter.service';
@@ -7,7 +7,7 @@ import { NewsletterService } from '../_services/newsletter.service';
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css'
 })

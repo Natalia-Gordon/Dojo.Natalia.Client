@@ -1,6 +1,6 @@
 # Natalia Dojo Website
 
-Angular 18 site for Bujinkan Ninjutsu Israel Dojo: landing page, blog, events, team, and Hebrew/RTL support with optional SSR.
+Angular 20 site for Bujinkan Ninjutsu Israel Dojo: landing page, blog, events, team, and Hebrew/RTL support with optional SSR.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ Angular 18 site for Bujinkan Ninjutsu Israel Dojo: landing page, blog, events, t
 npm install
 ```
 
-Patches for Karma (tests on Windows/CI) are applied automatically via `postinstall`. See [KARMA_WINDOWS_PATCHES.md](KARMA_WINDOWS_PATCHES.md) for details.
+Patches (e.g. for Windows/CI) are applied automatically via `postinstall` when applicable.
 
 ## Development
 
@@ -35,17 +35,17 @@ Open [http://localhost:4200](http://localhost:4200).
 
 ## Tests
 
+Unit tests use **Vitest** (Node + jsdom). Do not pass `--browsers=ChromeHeadless` — that option was for the old Karma setup.
+
 ```bash
 npm test
+# or
+npm run test:ci
 ```
 
-Runs unit tests with Karma and ChromeHeadless. For CI / single run:
+Runs tests once (no watch). For watch mode during development, use `ng test` (without `--watch=false`).
 
-```bash
-npm test -- --watch=false --browsers=ChromeHeadless
-```
-
-Run from the `natalia-dojo-website` folder so the correct `node_modules` (and Karma builder) are used.
+Run from the `natalia-dojo-website` folder.
 
 ## Project structure
 
@@ -57,7 +57,6 @@ Run from the `natalia-dojo-website` folder so the correct `node_modules` (and Ka
 
 ## Docs in this folder
 
-- [KARMA_WINDOWS_PATCHES.md](KARMA_WINDOWS_PATCHES.md) – Karma patches for Windows and CI
 - [TRANSLATION_BEST_PRACTICES.md](TRANSLATION_BEST_PRACTICES.md) – Translation and RTL practices
 - [SSR_FIXES_SUMMARY.md](SSR_FIXES_SUMMARY.md) – SSR and browser-API safety notes
 

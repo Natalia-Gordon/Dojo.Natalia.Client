@@ -246,13 +246,13 @@ export class EventRegistrationDialogComponent implements OnInit, OnDestroy {
 
         if (error.status === 503) {
           // Service Unavailable - database connection issues
-          this.errorMessage = 'השירות זמנית לא זמין. אנא נסה שוב בעוד כמה רגעים.';
+          this.errorMessage = 'השירות זמנית לא זמין. אנא נסי שוב בעוד כמה רגעים.';
         } else if (error.status === 0) {
-          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודא שהשרת פועל ונסה שוב.';
+          this.errorMessage = 'לא ניתן להתחבר לשרת. אנא ודאי שהשרת פועל ונסי שוב.';
         } else if (error.status === 404) {
           this.errorMessage = 'האירוע לא נמצא או שההרשמה לא זמינה.';
         } else if (error.status === 401) {
-          this.errorMessage = 'יש להתחבר או להירשם כדי להירשם לאירוע.';
+          this.errorMessage = 'אנא התחברי או הירשמי כדי להירשם לאירוע.';
         } else if (error.status === 409) {
           this.errorMessage = 'את/ה כבר רשום/ה לאירוע זה.';
         } else {

@@ -56,12 +56,12 @@
                     <option value="zen_session">מפגש זן</option>
                     <option value="Special">אירוע מיוחד</option>
                   </select>
-                  <small class="seminar-form__hint">בחר/י את סוג האירוע מתוך הרשימה.</small>
+                  <small class="seminar-form__hint">אנא בחרי את סוג האירוע מתוך הרשימה.</small>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">מדריך</label>
                   <select class="form-control seminar-form__input" formControlName="instructorId" [disabled]="isLoadingInstructors">
-                    <option value="">-- בחר/י מדריך --</option>
+                    <option value="">-- אנא בחרי מדריך --</option>
                     @for (inst of instructors; track inst.instructorId) {
                       <option [value]="inst.instructorId">
                         {{ inst.displayName || inst.username || 'מדריך ' + inst.instructorId }}
@@ -69,7 +69,7 @@
                     }
                   </select>
                   @if (!isLoadingInstructors) {
-                    <small class="seminar-form__hint">בחר/י מדריך לאירוע (אופציונלי)</small>
+                    <small class="seminar-form__hint">אנא בחרי מדריך לאירוע (אופציונלי)</small>
                   }
                   @if (isLoadingInstructors) {
                     <small class="seminar-form__hint text-muted">
@@ -105,8 +105,8 @@
                   <input class="form-control seminar-form__input" type="url" formControlName="imageUrl" placeholder="https://drive.google.com/...">
                   <small class="seminar-form__hint">
                     <strong>איך לטעון תמונה מ-Google Drive:</strong><br>
-                    1. העלה את התמונה ל-Google Drive<br>
-                    2. לחץ לחיצה ימנית על הקובץ → "קבל קישור" → "כל מי שיש לו את הקישור" → "העתק קישור"<br>
+                    1. העלי את התמונה ל-Google Drive<br>
+                    2. אנא לחצי לחיצה ימנית על הקובץ → "קבל קישור" → "כל מי שיש לו את הקישור" → "העתיקי קישור"<br>
                     3. הדבק את הקישור כאן (ההמרה תתבצע אוטומטית)
                   </small>
                 </div>
