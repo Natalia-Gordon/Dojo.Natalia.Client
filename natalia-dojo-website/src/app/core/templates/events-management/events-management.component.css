@@ -309,7 +309,69 @@
 }
 
 .events-management-th-actions {
-  min-width: 200px;
+  width: 1%;
+  min-width: 0;
+}
+
+/* View column (first column – לצפייה) */
+.events-management-th-view,
+.events-management-td-view {
+  width: 1%;
+  min-width: 0;
+  text-align: center;
+}
+
+/* כמות משתתפים: icon link + number in same cell */
+.events-management-reg-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Icon-only links (no button look – just icon with tooltip) */
+.events-management-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  color: #64748b;
+  text-decoration: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.events-management-icon-link i {
+  font-size: 1.2rem;
+}
+
+.events-management-icon-link:hover {
+  color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.08);
+}
+
+/* Registrations icon (inside כמות משתתפים) – green tint on hover */
+.events-management-reg-cell .events-management-icon-link:hover {
+  color: #16a34a;
+  background-color: rgba(22, 163, 74, 0.08);
+}
+
+/* Delete event icon (summary bar) – red, only visible when a row is selected */
+.events-management-icon-link--danger {
+  color: #b91c1c;
+}
+
+.events-management-icon-link--danger:hover:not(:disabled) {
+  color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.12);
+}
+
+.events-management-icon-link--danger:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .events-management-td-title {
@@ -320,6 +382,7 @@
 
 .events-management-td-actions {
   white-space: nowrap;
+  width: 1%;
 }
 
 /* Badges */
@@ -437,6 +500,18 @@
 .events-management-btn--small {
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
+}
+
+/* Icon-only action buttons (with tooltip via title) */
+.events-management-btn--icon {
+  padding: 0.4rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  justify-content: center;
+}
+
+.events-management-btn--icon i {
+  font-size: 1.1rem;
 }
 
 /* Pagination */
