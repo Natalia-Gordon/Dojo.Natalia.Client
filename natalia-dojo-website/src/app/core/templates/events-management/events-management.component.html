@@ -19,13 +19,13 @@
   <div class="row g-5" style="margin: 0;">
     <div class="col-12" style="padding: 0;">
       <div class="events-management-content-card">
-        @if (!isAdmin) {
+        @if (!canManageEvents) {
           <div class="events-management-restricted">
             אין לך הרשאה לצפות בעמוד זה.
           </div>
         }
 
-        @if (isAdmin) {
+        @if (canManageEvents) {
           @if (!isLoading && errorMessage) {
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
               <i class="bi bi-exclamation-triangle-fill me-2"></i>
