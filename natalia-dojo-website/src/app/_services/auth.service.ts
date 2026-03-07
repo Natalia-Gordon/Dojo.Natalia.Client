@@ -583,8 +583,8 @@ export class AuthService {
   }
 
   /**
-   * Schedule a single timer to emit sessionExpiring$ shortly before access token expiry.
-   * Call after login/refresh; cleared on logout.
+   * Schedule a single timer: when access token is about to expire, try silent refresh first.
+   * Only emit sessionExpiring$ (popup) if refresh token is missing or refresh fails.
    */
   private scheduleSessionExpiryTimer(): void {
     this.clearExpiryTimer();
@@ -597,7 +597,15 @@ export class AuthService {
     const delayMs = Math.max(0, warnAt - nowMs);
     this.expiryTimerId = setTimeout(() => {
       this.expiryTimerId = null;
-      this.sessionExpiringSubject.next();
+      const refreshToken = this.getRefreshToken();
+      if (!refreshToken) {
+        this.sessionExpiringSubject.next();
+        return;
+      }
+      this.refreshToken().subscribe({
+        next: () => { /* setAccessTokenExpiresAt in refreshToken tap reschedules timer */ },
+        error: () => { this.sessionExpiringSubject.next(); }
+      });
     }, delayMs);
   }
 

@@ -84,12 +84,12 @@
                 <div class="events-management-summary">
                   <i class="bi bi-calendar-event"></i>
                   <span>{{ totalCount }} אירועים</span>
-                  @if (selectedTableEvent) {
+                  @if (selectedTableEvent && canDeleteSelectedEvent) {
                     <button
                       type="button"
                       class="events-management-icon-link events-management-icon-link--danger ms-3"
-                      [disabled]="!canDeleteSelectedEvent || deleteEventLoading"
-                      (click)="deleteSelectedEvent()"
+                      [disabled]="deleteEventLoading"
+                      (click)="openDeleteConfirm()"
                       title="מחיקת אירוע"
                       aria-label="מחיקת אירוע"
                       >
@@ -100,20 +100,13 @@
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                       }
                     </button>
-                    @if (!canDeleteSelectedEvent) {
-                      <span class="text-muted small me-2" style="font-size: 0.9rem;">
-                        (מחיקה אפשרית רק כאשר כמות משתתפים = 0)
-                      </span>
-                    }
                   }
                 </div>
                 <div class="events-management-table-wrapper">
                   <table class="events-management-table">
                     <thead>
                       <tr>
-                        <th class="events-management-th-view" title="לצפייה">
-                          <i class="bi bi-eye" aria-hidden="true"></i>
-                        </th>
+                        <th class="events-management-th-view"></th>
                         <th>
                           <button type="button" class="events-management-sort-btn" (click)="setSort('id')">
                             מזהה
@@ -165,7 +158,7 @@
                         </th>
                         <th>מיקום</th>
                         <th>הרשמה</th>
-                        <th>כמות משתתפים</th>
+                        <th>כמות נרשמים</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -240,8 +233,39 @@
                 <p class="events-management-empty__text">לא נוצרו עדיין אירועים, או שאין תוצאות לפי הסינון שבחרת.</p>
               </div>
             }
+          @if (deleteConfirmEvent) {
+          <div
+            class="events-management-confirm-overlay"
+            (click)="cancelDeleteEvent()"
+            role="button"
+            tabindex="0"
+            aria-label="סגור אישור מחיקה"
+            dir="rtl">
+            <div class="events-management-confirm-dialog" (click)="$event.stopPropagation()">
+              <div class="events-management-confirm-header">
+                <h3 class="events-management-confirm-title">אישור מחיקה</h3>
+                <button type="button" class="events-management-confirm-close" (click)="cancelDeleteEvent()" aria-label="סגור">&times;</button>
+              </div>
+              <div class="events-management-confirm-body">
+                <p class="events-management-confirm-message">
+                  האם למחוק את האירוע "{{ deleteConfirmEvent.title || 'אירוע ' + deleteConfirmEvent.id }}"?
+                </p>
+                <p class="events-management-confirm-warning">פעולה זו אינה ניתנת לשחזור.</p>
+              </div>
+              <div class="events-management-confirm-actions">
+                <button type="button" class="events-management-confirm-btn events-management-confirm-btn--cancel" (click)="cancelDeleteEvent()">
+                  ביטול
+                </button>
+                <button type="button" class="events-management-confirm-btn events-management-confirm-btn--delete" [disabled]="deleteEventLoading" (click)="confirmDeleteEvent()">
+                  @if (!deleteEventLoading) { מחיקה }
+                  @if (deleteEventLoading) { <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> }
+                </button>
+              </div>
+            </div>
+          </div>
           }
-        </div>
+        }
+      </div>
       </div>
     </div>
   </div>
