@@ -79,6 +79,8 @@
               <span class="menu-icon">👥</span>
               <span>ניהול משתמשים</span>
             </a>
+          }
+          @if (isAdminOrInstructor()) {
             <a href="#" class="menu-item" (click)="onManageEventsClick(); $event.preventDefault()">
               <span class="menu-icon">📋</span>
               <span>ניהול אירועים</span>

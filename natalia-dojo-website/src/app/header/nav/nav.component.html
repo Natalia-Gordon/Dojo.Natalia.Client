@@ -70,10 +70,10 @@
       @if (isAuthenticated && isBrowser) {
         <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">רכישות</a>
       }
-      @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
+      @if (isAuthenticated && isAdmin() && isBrowser) {
         <a routerLink="/admin/users" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול משתמשים</a>
       }
-      @if (isAuthenticated && isAdmin() && isBrowser) {
+      @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
         <a routerLink="/admin/events" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול אירועים</a>
       }
       @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
