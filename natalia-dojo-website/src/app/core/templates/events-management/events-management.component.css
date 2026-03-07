@@ -309,8 +309,183 @@
 }
 
 .events-management-th-actions {
-  min-width: 200px;
+  width: 1%;
+  min-width: 0;
 }
+
+/* View column (first column – לצפייה) */
+.events-management-th-view,
+.events-management-td-view {
+  width: 1%;
+  min-width: 0;
+  text-align: center;
+}
+
+/* כמות נרשמים: icon link + number in same cell */
+.events-management-reg-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Icon-only links (no button look – just icon with tooltip) */
+.events-management-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  color: #64748b;
+  text-decoration: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.events-management-icon-link i {
+  font-size: 1.2rem;
+}
+
+.events-management-icon-link:hover {
+  color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.08);
+}
+
+/* Registrations icon (inside כמות נרשמים) – green tint on hover */
+.events-management-reg-cell .events-management-icon-link:hover {
+  color: #16a34a;
+  background-color: rgba(22, 163, 74, 0.08);
+}
+
+/* Delete event icon (summary bar) – red, only visible when a row is selected */
+.events-management-icon-link--danger {
+  color: #b91c1c;
+}
+
+.events-management-icon-link--danger:hover:not(:disabled) {
+  color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.12);
+}
+
+  .events-management-icon-link--danger:disabled {
+    color: #94a3b8;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  /* Delete confirmation modal */
+  .events-management-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    cursor: pointer;
+  }
+
+  .events-management-confirm-dialog {
+    background: rgba(30, 41, 59, 0.98);
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    border-radius: 12px;
+    max-width: 400px;
+    width: 100%;
+    cursor: default;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .events-management-confirm-header {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 0;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.8);
+    padding-bottom: 1rem;
+  }
+
+  .events-management-confirm-title {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .events-management-confirm-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    line-height: 1;
+  }
+
+  .events-management-confirm-close:hover {
+    color: #ffffff;
+  }
+
+  .events-management-confirm-body {
+    padding: 1.5rem;
+  }
+
+  .events-management-confirm-message {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0 0 0.5rem;
+  }
+
+  .events-management-confirm-warning {
+    color: #f87171;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  .events-management-confirm-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 0 1.5rem 1.5rem;
+    flex-direction: row-reverse;
+  }
+
+  .events-management-confirm-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .events-management-confirm-btn--cancel {
+    background: rgba(51, 65, 85, 0.6);
+    color: #ffffff;
+    border: 1px solid rgba(100, 116, 139, 0.5);
+  }
+
+  .events-management-confirm-btn--cancel:hover {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: rgba(100, 116, 139, 0.7);
+  }
+
+  .events-management-confirm-btn--delete {
+    background: #dc2626;
+    color: #fff;
+  }
+
+  .events-management-confirm-btn--delete:hover:not(:disabled) {
+    background: #b91c1c;
+  }
+
+  .events-management-confirm-btn--delete:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 
 .events-management-td-title {
   font-weight: 500;
@@ -320,6 +495,7 @@
 
 .events-management-td-actions {
   white-space: nowrap;
+  width: 1%;
 }
 
 /* Badges */
@@ -437,6 +613,18 @@
 .events-management-btn--small {
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
+}
+
+/* Icon-only action buttons (with tooltip via title) */
+.events-management-btn--icon {
+  padding: 0.4rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  justify-content: center;
+}
+
+.events-management-btn--icon i {
+  font-size: 1.1rem;
 }
 
 /* Pagination */

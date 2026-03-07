@@ -53,6 +53,8 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
   registeredCountByEventId: Record<string, number> = {};
   isLoading = false;
   errorMessage = '';
+  /** True for admin (all events) or instructor (only their events – backend filters). */
+  canManageEvents = false;
   isAdmin = false;
   userInfo: UserInfo | null = null;
 
@@ -69,6 +71,8 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
 
   /** Row selection in table (for delete action). */
   selectedTableEvent: Event | null = null;
+  /** Event pending delete confirmation (modal open). */
+  deleteConfirmEvent: Event | null = null;
   deleteEventLoading = false;
 
   /** Resend-email modal */
@@ -112,8 +116,9 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
 
     this.userInfo = this.authService.getUserInfo();
     this.isAdmin = this.isAdminUser(this.userInfo);
+    this.canManageEvents = this.canManageEventsRole(this.userInfo);
 
-    if (this.isAdmin) {
+    if (this.canManageEvents) {
       this.loadEvents();
       const id = this.route.snapshot.paramMap.get('id');
       const eventId = id ? parseInt(id, 10) : NaN;
@@ -128,6 +133,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
     this.authSubscription = this.authService.token$.subscribe((token) => {
       if (!token) {
         this.pagedEvents = [];
+        this.canManageEvents = false;
         this.isAdmin = false;
       }
     });
@@ -135,7 +141,8 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
     this.userSubscription = this.authService.userInfo$.subscribe((userInfo) => {
       this.userInfo = userInfo;
       this.isAdmin = this.isAdminUser(userInfo);
-      if (this.isAdmin) this.loadEvents();
+      this.canManageEvents = this.canManageEventsRole(userInfo);
+      if (this.canManageEvents) this.loadEvents();
       else this.pagedEvents = [];
     });
   }
@@ -197,6 +204,12 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
   private isAdminUser(userInfo: UserInfo | null): boolean {
     const role = (userInfo?.role ?? '').trim().toLowerCase();
     return role === 'admin';
+  }
+
+  /** Admin sees all events; instructor sees only their events (backend filters by role). */
+  private canManageEventsRole(userInfo: UserInfo | null): boolean {
+    const role = (userInfo?.role ?? '').trim().toLowerCase();
+    return role === 'admin' || role === 'instructor';
   }
 
   setSort(field: typeof this.sortField): void {
@@ -302,17 +315,24 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
     this.selectedTableEvent = this.selectedTableEvent?.id === ev.id ? null : ev;
   }
 
-  get canDeleteSelectedEvent(): boolean {
-    if (!this.selectedTableEvent) return false;
-    return this.getRegisteredCount(this.selectedTableEvent.id) === 0;
+  /** Open delete confirmation modal (only if a row is selected and can be deleted). */
+  openDeleteConfirm(): void {
+    if (!this.selectedTableEvent || !this.canDeleteSelectedEvent) return;
+    this.deleteConfirmEvent = this.selectedTableEvent;
   }
 
-  deleteSelectedEvent(): void {
-    if (!this.selectedTableEvent || !this.canDeleteSelectedEvent) return;
+  cancelDeleteEvent(): void {
+    this.deleteConfirmEvent = null;
+  }
+
+  confirmDeleteEvent(): void {
+    const ev = this.deleteConfirmEvent;
+    if (!ev) return;
     this.deleteEventLoading = true;
     this.errorMessage = '';
-    this.eventsService.deleteEvent(this.selectedTableEvent.id).subscribe({
+    this.eventsService.deleteEvent(ev.id).subscribe({
       next: () => {
+        this.deleteConfirmEvent = null;
         this.selectedTableEvent = null;
         this.deleteEventLoading = false;
         this.loadEvents();
@@ -326,8 +346,14 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
         } else {
           this.errorMessage = 'שגיאה במחיקת האירוע. נסו שוב מאוחר יותר.';
         }
+        this.deleteConfirmEvent = null;
       },
     });
+  }
+
+  get canDeleteSelectedEvent(): boolean {
+    if (!this.selectedTableEvent) return false;
+    return this.getRegisteredCount(this.selectedTableEvent.id) === 0;
   }
 
   openResendModal(ev: Event): void {
