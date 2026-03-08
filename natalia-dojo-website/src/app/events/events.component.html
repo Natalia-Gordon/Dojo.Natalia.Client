@@ -87,7 +87,7 @@
                 </div>
                 <div class="event-card__body">
                   <div class="event-card__meta">
-                    @if (eventItem.instructorId) {
+                    @if (eventItem.instructorId || eventItem.instructorName) {
                       <div class="event-meta-item">
                         <i class="bi bi-person-badge"></i>
                         <span>מדריך: {{ getInstructorDisplayName(eventItem) }}</span>

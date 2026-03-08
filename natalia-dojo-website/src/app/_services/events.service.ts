@@ -25,7 +25,7 @@ export interface Event {
   description: string | null;
   eventType: EventType | string | null;
   instructorId: number | null;
-  /** Instructor display name from GET /api/events/{id} (avoids separate GET /api/instructors/{id}). */
+  /** Instructor display name from GET /api/events and GET /api/events/{id} responses. */
   instructorName?: string | null;
   status: EventStatus | string | null;
   startDateTime: string;
@@ -257,8 +257,13 @@ export class EventsService {
           return [];
         }
         try {
-          const parsed = JSON.parse(responseText) as Event[];
-          return Array.isArray(parsed) ? parsed : [];
+          const parsed = JSON.parse(responseText);
+          if (!Array.isArray(parsed)) return [];
+          // Map response to Event[] and set instructorName from API (camelCase or PascalCase)
+          return parsed.map((raw: any) => ({
+            ...raw,
+            instructorName: raw.instructorName ?? raw.InstructorName
+          })) as Event[];
         } catch (error) {
           console.error('Invalid events response format:', error);
           return [];
