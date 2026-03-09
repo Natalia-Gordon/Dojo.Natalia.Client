@@ -66,6 +66,13 @@
         <div class="menu-separator"></div>
         <!-- Menu Items -->
         <div class="menu-items">
+          <a href="#" class="menu-item" (click)="onCartClick(); $event.preventDefault()">
+            <span class="menu-icon">🛒</span>
+            <span>סל הקניות</span>
+            @if (cartItemCount > 0) {
+              <span class="user-menu-cart-badge">{{ cartItemCount }}</span>
+            }
+          </a>
           <a href="#" class="menu-item" (click)="onUserDetailsClick(); $event.preventDefault()">
             <span class="menu-icon">⚙️</span>
             <span>פרופיל משתמש</span>
@@ -86,14 +93,20 @@
               <span>ניהול אירועים</span>
             </a>
           }
+          @if (isAdminOrInstructor()) {
+            <a href="#" class="menu-item" (click)="onTeacherShopClick(); $event.preventDefault()">
+              <span class="menu-icon">🛍️</span>
+              <span>החנות שלי</span>
+            </a>
+          }
           @if (isTeacherOrInstructor()) {
             <a href="#" class="menu-item" (click)="onRegisterNewUserClick(); $event.preventDefault()">
               <span class="menu-icon">➕</span>
               <span>רישום משתמש חדש</span>
             </a>
           }
-          <a href="#" class="menu-item" (click)="closeMenu(); $event.preventDefault()">
-            <span class="menu-icon">🛒</span>
+          <a href="#" class="menu-item" (click)="onPurchasesClick(); $event.preventDefault()">
+            <span class="menu-icon">📦</span>
             <span>הרכישות שלי</span>
           </a>
         </div>

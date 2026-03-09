@@ -1,0 +1,83 @@
+<div class="marketplace-cart-hero" dir="rtl">
+  <a routerLink="/marketplace" class="marketplace-cart-hero__back"><i class="bi bi-arrow-right"></i> חזרה לשוק</a>
+  <h1 class="marketplace-cart-hero__title">סל הקניות</h1>
+</div>
+
+<div class="container-fluid px-2 px-md-5 py-2 py-md-3" dir="rtl">
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner-border text-danger" role="status"></div>
+      <p class="loading-text">טוען סל...</p>
+    </div>
+  }
+
+  @if (!isLoading && cart.items.length === 0) {
+    <div class="empty-state">
+      <div class="empty-state__icon"><i class="bi bi-cart-x"></i></div>
+      <h3 class="empty-state__title">הסל ריק</h3>
+      <p class="empty-state__text">עברי לשוק כדי להוסיף מוצרים לסל.</p>
+      <a routerLink="/marketplace" class="btn btn-danger">לשוק המוצרים</a>
+    </div>
+  }
+
+  @if (!isLoading && cart.items.length > 0) {
+    <div class="cart-layout">
+      <div class="cart-items">
+        @for (item of cart.items; track trackByItemId($index, item)) {
+          <div class="cart-item">
+            <div class="cart-item__image">
+              @if (item.productImageUrl) {
+                <img [src]="item.productImageUrl" [alt]="item.productName || 'מוצר'" />
+              } @else {
+                <div class="cart-item__placeholder"><i class="bi bi-image"></i></div>
+              }
+            </div>
+            <div class="cart-item__body">
+              <h3 class="cart-item__title">{{ item.productName || 'מוצר' }}</h3>
+              @if (item.teacherName) {
+                <p class="cart-item__teacher">מאת {{ item.teacherName }}</p>
+              }
+              <div class="cart-item__row">
+                <div class="cart-item__qty">
+                  <button type="button" class="btn btn-sm btn-outline-secondary" (click)="updateQty(item, -1)" [disabled]="item.quantity <= 1">−</button>
+                  <span class="cart-item__qty-num">{{ item.quantity }}</span>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" (click)="updateQty(item, 1)">+</button>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeItem(item)" aria-label="הסר"><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+            <div class="cart-item__price">
+              {{ formatPrice((item.price ?? 0) * item.quantity) }}
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="cart-summary">
+        <h3 class="cart-summary__title">סיכום</h3>
+        <div class="cart-summary__row">
+          <span>סכום ביניים</span>
+          <span>{{ formatPrice(cartTotal) }}</span>
+        </div>
+        <div class="cart-summary__row cart-summary__row--shipping">
+          <span>משלוח</span>
+          <span>חושב בתשלום</span>
+        </div>
+        <div class="cart-summary__row cart-summary__total">
+          <span>סה"כ</span>
+          <strong>{{ formatPrice(cartTotal) }}</strong>
+        </div>
+        <button type="button" class="btn btn-danger btn-lg w-100 mt-3" (click)="proceedToCheckout()">
+          <i class="bi bi-credit-card me-2"></i>
+          המשך לתשלום
+        </button>
+        <a routerLink="/marketplace" class="btn btn-outline-secondary mt-2 w-100">המשך קנייה</a>
+        <div class="cart-summary__trust">
+          <p><i class="bi bi-check-circle-fill"></i> תשלום מאובטח</p>
+          <p><i class="bi bi-check-circle-fill"></i> משלוח דיגיטלי מיידי</p>
+          <p><i class="bi bi-check-circle-fill"></i> החזר כספי עד 30 יום</p>
+        </div>
+      </div>
+    </div>
+  }
+</div>

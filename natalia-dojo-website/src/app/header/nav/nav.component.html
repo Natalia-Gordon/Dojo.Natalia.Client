@@ -50,6 +50,13 @@
       <a routerLink="/about" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">אודות</a>
       <a routerLink="/workouts" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">יומן אימונים</a>
       <a routerLink="/events" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">אירועים</a>
+      <a routerLink="/marketplace" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">שוק המוצרים</a>
+      <a routerLink="/marketplace/cart" class="nav-item nav-link nav-link-cart" (click)="closeMobileMenu()" aria-label="סל קניות">
+        <i class="bi bi-cart3"></i>
+        @if (isAuthenticated && cartItemCount > 0) {
+          <span class="nav-cart-badge">{{ cartItemCount }}</span>
+        }
+      </a>
       <a routerLink="/gallery" routerLinkActive="active" class="nav-item nav-link" (click)="closeMobileMenu()">גלריה</a>
       <div class="nav-item dropdown">
         <a href="#" class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">מאמרים</a>
@@ -68,13 +75,16 @@
         <a routerLink="/my-events" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">אירועים שלי</a>
       }
       @if (isAuthenticated && isBrowser) {
-        <a routerLink="/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">רכישות</a>
+        <a routerLink="/marketplace/purchases" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">רכישות</a>
       }
       @if (isAuthenticated && isAdmin() && isBrowser) {
         <a routerLink="/admin/users" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול משתמשים</a>
       }
       @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
         <a routerLink="/admin/events" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול אירועים</a>
+      }
+      @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
+        <a routerLink="/marketplace/teacher" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">החנות שלי</a>
       }
       @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
         <a href="#" class="nav-item nav-link d-lg-none" (click)="openRegisterNewUser(); closeMobileMenu(); $event.preventDefault()">רישום משתמש חדש</a>

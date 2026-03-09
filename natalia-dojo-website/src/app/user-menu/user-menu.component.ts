@@ -1,15 +1,16 @@
 import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService, UserInfo } from '../_services/auth.service';
 import { LoginModalService } from '../_services/login-modal.service';
+import { MarketplaceService } from '../_services/marketplace.service';
 import { Subscription } from 'rxjs';
 import { getDriveFileId, getProfileImageUrlForAttempt } from '../_utils/profile-image';
 
 @Component({
   selector: 'app-user-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './user-menu.component.html',
   styleUrl: './user-menu.component.css'
 })
@@ -17,17 +18,21 @@ export class UserMenuComponent implements OnInit, OnDestroy {
   userInfo: UserInfo | null = null;
   isMenuOpen = false;
   isBrowser = false;
+  /** Cart item count for badge in menu (real-time cart badge). */
+  cartItemCount = 0;
   /** When true, profile image failed to load – show initials instead. */
   avatarImageError = false;
   private avatarAttempt = 0;
   private avatarSrcOverride: string | null = null;
   private userSubscription?: Subscription;
+  private cartSubscription?: Subscription;
   private readonly mobileMaxWidth = 640;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private loginModalService: LoginModalService,
+    private marketplaceService: MarketplaceService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -41,6 +46,7 @@ export class UserMenuComponent implements OnInit, OnDestroy {
     
     // Get initial user info
     this.userInfo = this.authService.getUserInfo();
+    if (this.userInfo) this.loadCartCount();
     
     // Subscribe to user info changes
     this.userSubscription = this.authService.userInfo$.subscribe(userInfo => {
@@ -48,15 +54,27 @@ export class UserMenuComponent implements OnInit, OnDestroy {
       this.avatarImageError = false;
       this.avatarAttempt = 0;
       this.avatarSrcOverride = null;
+      if (userInfo) this.loadCartCount();
+      else this.cartItemCount = 0;
+    });
+  }
+
+  /** Load cart item count for menu badge. */
+  loadCartCount(): void {
+    this.cartSubscription?.unsubscribe();
+    this.cartSubscription = this.marketplaceService.getCart().subscribe(cart => {
+      this.cartItemCount = cart.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? 0;
     });
   }
 
   ngOnDestroy(): void {
     this.userSubscription?.unsubscribe();
+    this.cartSubscription?.unsubscribe();
   }
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
+    if (this.isMenuOpen && this.userInfo) this.loadCartCount();
   }
 
   onAvatarClick(): void {
@@ -95,6 +113,21 @@ export class UserMenuComponent implements OnInit, OnDestroy {
   onManageEventsClick(): void {
     this.closeMenu();
     this.router.navigate(['/admin/events']);
+  }
+
+  onPurchasesClick(): void {
+    this.closeMenu();
+    this.router.navigate(['/marketplace/purchases']);
+  }
+
+  onTeacherShopClick(): void {
+    this.closeMenu();
+    this.router.navigate(['/marketplace/teacher']);
+  }
+
+  onCartClick(): void {
+    this.closeMenu();
+    this.router.navigate(['/marketplace/cart']);
   }
 
   closeMenu(): void {
@@ -170,7 +203,7 @@ export class UserMenuComponent implements OnInit, OnDestroy {
 
   isAdminOrInstructor(): boolean {
     const role = (this.userInfo?.role || '').trim().toLowerCase();
-    return role === 'admin' || role === 'instructor';
+    return role === 'admin' || role === 'instructor' || role === 'teacher';
   }
 
   private isMobileView(): boolean {

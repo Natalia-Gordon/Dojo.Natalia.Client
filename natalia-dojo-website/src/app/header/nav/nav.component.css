@@ -77,6 +77,47 @@
 
 .dropdown-menu { text-align: right; }
 
+/* Cart link with badge (real-time cart badge in navigation) */
+.nav-link-cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nav-link-cart .bi-cart3 {
+  font-size: 1.25rem;
+}
+
+.nav-cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+@media (max-width: 991px) {
+  .nav-link-cart {
+    padding: 12px 20px !important;
+  }
+
+  .nav-cart-badge {
+    top: 8px;
+    right: 12px;
+  }
+}
+
 /* Add spacing between dropdown text and icon */
 .dropdown-toggle::after {
     margin-right: 3px !important;

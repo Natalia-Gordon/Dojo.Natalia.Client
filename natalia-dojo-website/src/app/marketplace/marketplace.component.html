@@ -1,0 +1,113 @@
+<app-marketplace-hero></app-marketplace-hero>
+<div class="container-fluid px-2 px-md-5 py-2 py-md-3" style="overflow-x: hidden; max-width: 100vw; width: 100%;">
+  <div class="row g-5" style="margin: 0;">
+    <div class="col-12" dir="rtl" style="padding: 0;">
+      <div class="marketplace-toolbar">
+        <p class="marketplace-toolbar__text">
+          גלו אמנות דיגיטלית, כלי אימון וציוד ממדריכים. חפשו לפי קטגוריה או לפי מילות מפתח.
+        </p>
+        <div class="marketplace-search">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            class="marketplace-search__input"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilters()"
+            placeholder="חיפוש מוצרים..."
+            aria-label="חיפוש מוצרים"
+          />
+        </div>
+      </div>
+
+      <div class="marketplace-content-card">
+        @if (errorMessage) {
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ errorMessage }}
+            <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="סגור"></button>
+          </div>
+        }
+
+        <div class="marketplace-tabs">
+          @for (tab of tabs; track tab.id) {
+            <button
+              type="button"
+              class="marketplace-tab"
+              [class.marketplace-tab--active]="activeTab === tab.id"
+              (click)="setTab(tab.id)">
+              {{ tab.label }}
+            </button>
+          }
+        </div>
+
+        @if (isLoading) {
+          <div class="loading-state">
+            <div class="loading-spinner">
+              <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">טוען...</span>
+              </div>
+            </div>
+            <p class="loading-text">טוען מוצרים...</p>
+          </div>
+        }
+
+        @if (!isLoading && filteredProducts.length === 0) {
+          <div class="empty-state">
+            <div class="empty-state__icon">
+              <i class="bi bi-bag-x"></i>
+            </div>
+            <h3 class="empty-state__title">לא נמצאו מוצרים</h3>
+            <p class="empty-state__text">אין מוצרים בקטגוריה או בתוצאות החיפוש. נסו לשנות סינון או חיפוש.</p>
+          </div>
+        }
+
+        @if (!isLoading && filteredProducts.length > 0) {
+          <div class="marketplace-grid">
+            @for (product of filteredProducts; track trackByProductId($index, product)) {
+              <a [routerLink]="['/marketplace/product', product.id]" class="product-card" [attr.aria-label]="'מוצר: ' + product.name">
+                <div class="product-card__image-wrap">
+          @if (product.imageUrl) {
+            <img [src]="product.imageUrl" [alt]="product.name" class="product-card__image" loading="lazy" />
+          } @else {
+            <div class="product-card__image product-card__image--placeholder">
+              <i class="bi bi-image"></i>
+            </div>
+          }
+                  <div class="product-card__badges">
+                    <span class="product-card__badge" [class.product-card__badge--digital]="product.isDigital" [class.product-card__badge--physical]="!product.isDigital">
+                      {{ product.isDigital ? 'דיגיטלי' : 'פיזי' }}
+                    </span>
+                    @if (isAuthenticated && isOwned(product.id)) {
+                      <span class="product-card__badge product-card__badge--owned">בבעלות</span>
+                    }
+                    @if (!product.inStock) {
+                      <span class="product-card__badge product-card__badge--out">אזל מהמלאי</span>
+                    }
+                  </div>
+                </div>
+                <div class="product-card__body">
+                  <h3 class="product-card__title">{{ product.name }}</h3>
+                  @if (product.description) {
+                    <p class="product-card__description">{{ product.description | slice:0:100 }}{{ product.description.length > 100 ? '…' : '' }}</p>
+                  }
+                  @if (product.teacherName) {
+                    <div class="product-card__meta">
+                      <i class="bi bi-person-badge"></i>
+                      <span>{{ product.teacherName }}</span>
+                    </div>
+                  }
+                  <div class="product-card__footer">
+                    <span class="product-card__price">{{ formatPrice(product.price) }}</span>
+                    <span class="product-card__link">
+                      לפרטים <i class="bi bi-arrow-left"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

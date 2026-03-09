@@ -55,6 +55,12 @@ import { EventRegistrationsComponent } from './core/templates/event-registration
 import { RegistrationApproveComponent } from './core/templates/registration-approve/registration-approve.component';
 import { MyEventsComponent } from './my-events/my-events.component';
 import { TermsOfUseComponent } from './terms-of-use/terms-of-use.component';
+import { MarketplaceComponent } from './marketplace/marketplace.component';
+import { MarketplaceProductDetailComponent } from './marketplace/marketplace-product-detail/marketplace-product-detail.component';
+import { MarketplaceCartComponent } from './marketplace/marketplace-cart/marketplace-cart.component';
+import { MarketplaceCheckoutComponent } from './marketplace/marketplace-checkout/marketplace-checkout.component';
+import { MarketplacePurchasesComponent } from './marketplace/marketplace-purchases/marketplace-purchases.component';
+import { MarketplaceTeacherShopComponent } from './marketplace/marketplace-teacher-shop/marketplace-teacher-shop.component';
 
 export const routes: Routes = [
   {
@@ -74,8 +80,14 @@ export const routes: Routes = [
       { path: 'events/create', component: EventCreateComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
       { path: 'events/:eventId/registrations/:registrationId/approve', component: RegistrationApproveComponent, data: { skipPrerender: true } },
       { path: 'events/:id', component: EventDetailComponent, data: { skipPrerender: true } },
+      { path: 'marketplace', component: MarketplaceComponent, data: { skipPrerender: true } },
+      { path: 'marketplace/product/:id', component: MarketplaceProductDetailComponent, data: { skipPrerender: true } },
+      { path: 'marketplace/cart', component: MarketplaceCartComponent, data: { skipPrerender: true } },
+      { path: 'marketplace/checkout', component: MarketplaceCheckoutComponent, data: { skipPrerender: true } },
+      { path: 'marketplace/purchases', component: MarketplacePurchasesComponent, data: { skipPrerender: true } },
+      { path: 'marketplace/teacher', component: MarketplaceTeacherShopComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
       { path: 'profile', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'purchases', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'purchases', redirectTo: 'marketplace/purchases', pathMatch: 'full' },
       { path: 'gallery', component: PhotoGalleryComponent },
       { path: 'about', component: AboutComponent },
       { path: 'contact', component: ContactComponent },

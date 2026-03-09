@@ -1,0 +1,94 @@
+<div class="marketplace-detail-hero">
+  <div class="marketplace-detail-hero__content" dir="rtl">
+    <a routerLink="/marketplace" class="marketplace-detail-hero__back"><i class="bi bi-arrow-right"></i> חזרה לשוק</a>
+  </div>
+</div>
+
+<div class="container-fluid px-2 px-md-5 py-2 py-md-3" dir="rtl">
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner-border text-danger" role="status"></div>
+      <p class="loading-text">טוען מוצר...</p>
+    </div>
+  }
+
+  @if (!isLoading && product) {
+    <div class="product-detail">
+      <div class="product-detail__grid">
+        <div class="product-detail__image-wrap">
+          @if (product.imageUrl) {
+            <img [src]="product.imageUrl" [alt]="product.name" class="product-detail__image" />
+          } @else {
+            <div class="product-detail__image product-detail__image--placeholder">
+              <i class="bi bi-image"></i>
+            </div>
+          }
+          <div class="product-detail__badges">
+            <span class="product-detail__badge" [class.product-detail__badge--digital]="product.isDigital" [class.product-detail__badge--physical]="!product.isDigital">
+              {{ product.isDigital ? 'דיגיטלי' : 'פיזי' }}
+            </span>
+            @if (isProductOwned) {
+              <span class="product-detail__badge product-detail__badge--owned">בבעלותך</span>
+            }
+            @if (!product.inStock) {
+              <span class="product-detail__badge product-detail__badge--out">אזל מהמלאי</span>
+            }
+          </div>
+        </div>
+
+        <div class="product-detail__info">
+          <h1 class="product-detail__title">{{ product.name }}</h1>
+          @if (product.teacherName) {
+            <div class="product-detail__teacher">
+              <i class="bi bi-person-badge"></i>
+              <span>מכירה: {{ product.teacherName }}</span>
+            </div>
+          }
+          <p class="product-detail__price">{{ formatPrice(product.price) }}</p>
+          @if (product.description) {
+            <div class="product-detail__description">
+              <h3>תיאור</h3>
+              <p>{{ product.description }}</p>
+            </div>
+          }
+
+          @if (addSuccess) {
+            <div class="alert alert-success">{{ addSuccess }}</div>
+          }
+
+          <div class="product-detail__actions">
+            @if (isProductOwned) {
+              <div class="product-detail__owned-msg">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>המוצר בבעלותך. ניתן לצפות ולהוריד בדף הרכישות שלי.</span>
+                <a routerLink="/marketplace/purchases" class="btn btn-outline-primary btn-lg mt-2">הרכישות שלי</a>
+              </div>
+            } @else if (product.inStock) {
+              @if (isAuthenticated) {
+                <button type="button" class="btn btn-danger btn-lg px-4" (click)="addToCart()">
+                  <i class="bi bi-cart-plus me-2"></i>
+                  הוסף לסל
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-lg" (click)="goToCart()">
+                  <i class="bi bi-cart3 me-2"></i>
+                  לסל
+                </button>
+              } @else {
+                <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/marketplace/product/' + product.id }" class="btn btn-danger btn-lg px-4">
+                  <i class="bi bi-box-arrow-in-left me-2"></i>
+                  התחברי להוספה לסל
+                </a>
+              }
+            } @else {
+              <span class="product-detail__out">המוצר אזל מהמלאי</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

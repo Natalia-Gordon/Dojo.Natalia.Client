@@ -1,0 +1,162 @@
+<div class="teacher-shop-hero" dir="rtl">
+  <h1 class="teacher-shop-hero__title">החנות שלי</h1>
+  <p class="teacher-shop-hero__subtitle">ניהול מוצרים וסטטיסטיקות מכירות</p>
+  <button type="button" class="btn btn-danger" (click)="openAdd()">
+    <i class="bi bi-plus-lg me-2"></i>
+    הוסף מוצר
+  </button>
+</div>
+
+<div class="container-fluid px-2 px-md-5 py-2 py-md-3" dir="rtl">
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <div class="teacher-shop-stats">
+    <div class="teacher-shop-stat">
+      <div class="teacher-shop-stat__content">
+        <span class="teacher-shop-stat__label">סך מוצרים</span>
+        <span class="teacher-shop-stat__value">{{ stats.totalProducts }}</span>
+      </div>
+      <div class="teacher-shop-stat__icon"><i class="bi bi-box-seam"></i></div>
+    </div>
+    <div class="teacher-shop-stat">
+      <div class="teacher-shop-stat__content">
+        <span class="teacher-shop-stat__label">פריטים שנמכרו</span>
+        <span class="teacher-shop-stat__value">{{ stats.totalSold }}</span>
+      </div>
+      <div class="teacher-shop-stat__icon"><i class="bi bi-graph-up-arrow"></i></div>
+    </div>
+    <div class="teacher-shop-stat">
+      <div class="teacher-shop-stat__content">
+        <span class="teacher-shop-stat__label">הכנסות</span>
+        <span class="teacher-shop-stat__value">{{ formatPrice(stats.totalRevenue) }}</span>
+      </div>
+      <div class="teacher-shop-stat__icon"><i class="bi bi-currency-dollar"></i></div>
+    </div>
+  </div>
+
+  <div class="teacher-shop-tabs">
+    <button type="button" class="teacher-shop-tab" [class.teacher-shop-tab--active]="activeTab === 'products'" (click)="setTab('products')">
+      המוצרים שלי ({{ products.length }})
+    </button>
+    <button type="button" class="teacher-shop-tab" [class.teacher-shop-tab--active]="activeTab === 'orders'" (click)="setTab('orders')">
+      הזמנות ({{ orders.length }})
+    </button>
+  </div>
+
+  @if (activeTab === 'products') {
+    @if (isLoading) {
+      <div class="loading-state">
+        <div class="spinner-border text-danger" role="status"></div>
+        <p class="loading-text">טוען...</p>
+      </div>
+    }
+    @if (!isLoading && products.length === 0) {
+      <div class="empty-state">
+        <p class="empty-state__text">עדיין אין מוצרים. הוסיפי מוצר ראשון.</p>
+        <button type="button" class="btn btn-danger" (click)="openAdd()">הוסף מוצר</button>
+      </div>
+    }
+    @if (!isLoading && products.length > 0) {
+      <div class="teacher-shop-grid">
+        @for (p of products; track trackByProductId($index, p)) {
+          <div class="teacher-shop-card">
+            @if (p.imageUrl) {
+              <img [src]="p.imageUrl" [alt]="p.name" class="teacher-shop-card__img" />
+            } @else {
+              <div class="teacher-shop-card__img teacher-shop-card__img--placeholder"><i class="bi bi-image"></i></div>
+            }
+            <div class="teacher-shop-card__body">
+              <h3 class="teacher-shop-card__title">{{ p.name }}</h3>
+              <p class="teacher-shop-card__meta">{{ getProductTypeLabel(p.type) }} · {{ formatPrice(p.price) }}</p>
+              <p class="teacher-shop-card__badge">{{ p.isDigital ? 'דיגיטלי' : 'פיזי' }} · {{ p.inStock ? 'במלאי' : 'אזל' }}</p>
+              <div class="teacher-shop-card__actions">
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="openEdit(p)">עריכה</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteProduct(p)">מחיקה</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  @if (activeTab === 'orders') {
+    @if (orders.length === 0) {
+      <div class="empty-state">
+        <p class="empty-state__text">אין עדיין הזמנות שמכילות את המוצרים שלך.</p>
+      </div>
+    } @else {
+      <div class="orders-list">
+        @for (o of orders; track trackByOrderId($index, o)) {
+          <div class="order-card">
+            <div class="order-card__header">
+              <span>הזמנה #{{ o.id }}</span>
+              <span class="order-card__date">{{ formatDate(o.createdAt) }}</span>
+              <strong>{{ formatPrice(o.total) }}</strong>
+            </div>
+            <ul class="order-card__items">
+              @for (item of o.items; track item.productId) {
+                <li>{{ item.productName }} × {{ item.quantity }} — {{ formatPrice(item.unitPrice * item.quantity) }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+@if (showForm) {
+  <div class="teacher-shop-modal-overlay" (click)="closeForm()">
+    <div class="teacher-shop-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <h2>{{ editingProduct ? 'עריכת מוצר' : 'הוספת מוצר' }}</h2>
+      <form (ngSubmit)="submitForm()">
+        <div class="mb-3">
+          <label class="form-label">שם המוצר</label>
+          <input type="text" class="form-control" [(ngModel)]="form.name" name="name" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">תיאור</label>
+          <textarea class="form-control" [(ngModel)]="form.description" name="description" rows="3"></textarea>
+        </div>
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label">סוג</label>
+            <select class="form-select" [(ngModel)]="form.type" name="type">
+              <option value="painting">אמנות דיגיטלית</option>
+              <option value="weapon">נשק</option>
+              <option value="tool">כלי אימון</option>
+              <option value="equipment">ציוד</option>
+              <option value="book">ספר</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label">מחיר (₪)</label>
+            <input type="number" class="form-control" [(ngModel)]="form.price" name="price" min="0" step="0.01" required />
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">קישור לתמונה</label>
+          <input type="url" class="form-control" [(ngModel)]="form.imageUrl" name="imageUrl" />
+        </div>
+        <div class="form-check mb-3">
+          <input type="checkbox" class="form-check-input" id="isDigital" [(ngModel)]="form.isDigital" name="isDigital" />
+          <label class="form-check-label" for="isDigital">מוצר דיגיטלי</label>
+        </div>
+        <div class="form-check mb-3">
+          <input type="checkbox" class="form-check-input" id="inStock" [(ngModel)]="form.inStock" name="inStock" />
+          <label class="form-check-label" for="inStock">במלאי</label>
+        </div>
+        <div class="teacher-shop-modal__actions">
+          <button type="button" class="btn btn-outline-secondary" (click)="closeForm()">ביטול</button>
+          <button type="submit" class="btn btn-danger">{{ editingProduct ? 'עדכן' : 'הוסף' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

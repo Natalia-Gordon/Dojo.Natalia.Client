@@ -11,7 +11,7 @@ export const adminOrInstructorGuard: CanActivateFn = () => {
   const router = inject(Router);
   const userInfo = auth.getUserInfo();
   const role = (userInfo?.role ?? '').toLowerCase();
-  const allowed = role === 'admin' || role === 'instructor';
+  const allowed = role === 'admin' || role === 'instructor' || role === 'teacher';
   if (allowed) return true;
   return router.createUrlTree(['/events']);
 };

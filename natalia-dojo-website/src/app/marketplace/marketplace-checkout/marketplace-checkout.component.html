@@ -1,0 +1,113 @@
+<div class="checkout-hero" dir="rtl">
+  <a routerLink="/marketplace/cart" class="checkout-hero__back"><i class="bi bi-arrow-right"></i> חזרה לסל</a>
+  <h1 class="checkout-hero__title">השלמת הזמנה</h1>
+</div>
+
+<div class="container-fluid px-2 px-md-5 py-2 py-md-3" dir="rtl">
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner-border text-danger" role="status"></div>
+      <p class="loading-text">טוען...</p>
+    </div>
+  }
+
+  @if (orderSuccess) {
+    <div class="checkout-success">
+      <div class="checkout-success__icon"><i class="bi bi-check-circle-fill"></i></div>
+      <h2 class="checkout-success__title">ההזמנה בוצעה בהצלחה</h2>
+      <p class="checkout-success__text">תודה. פרטי ההזמנה והרכישות שלך זמינים בדף הרכישות שלי.</p>
+      @if (orderId) {
+        <p class="checkout-success__id">מספר הזמנה: {{ orderId }}</p>
+      }
+      <div class="checkout-success__actions">
+        <button type="button" class="btn btn-danger" (click)="goToPurchases()">הרכישות שלי</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="goToMarketplace()">לשוק</button>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && !orderSuccess && cart.items.length > 0) {
+    <div class="checkout-layout">
+      <form class="checkout-form" (ngSubmit)="submitOrder()">
+        <div class="checkout-form__section">
+          <h3>פרטי חיוב</h3>
+          <div class="mb-3">
+            <label class="form-label">שם מלא</label>
+            <input type="text" class="form-control" [(ngModel)]="form.billingName" name="billingName" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">אימייל</label>
+            <input type="email" class="form-control" [(ngModel)]="form.billingEmail" name="billingEmail" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">כתובת</label>
+            <input type="text" class="form-control" [(ngModel)]="form.billingAddress" name="billingAddress" />
+          </div>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">עיר</label>
+              <input type="text" class="form-control" [(ngModel)]="form.billingCity" name="billingCity" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">מיקוד</label>
+              <input type="text" class="form-control" [(ngModel)]="form.billingZipCode" name="billingZipCode" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">מדינה</label>
+            <input type="text" class="form-control" [(ngModel)]="form.billingCountry" name="billingCountry" />
+          </div>
+        </div>
+
+        <div class="checkout-form__section">
+          <h3>כתובת למשלוח (אופציונלי)</h3>
+          <div class="mb-3">
+            <label class="form-label">שם</label>
+            <input type="text" class="form-control" [(ngModel)]="form.shippingName" name="shippingName" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">כתובת</label>
+            <input type="text" class="form-control" [(ngModel)]="form.shippingAddress" name="shippingAddress" />
+          </div>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">עיר</label>
+              <input type="text" class="form-control" [(ngModel)]="form.shippingCity" name="shippingCity" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">מיקוד</label>
+              <input type="text" class="form-control" [(ngModel)]="form.shippingZipCode" name="shippingZipCode" />
+            </div>
+          </div>
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger">{{ errorMessage }}</div>
+        }
+
+        <button type="submit" class="btn btn-danger btn-lg" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          }
+          אשר הזמנה — {{ formatPrice(cartTotal) }}
+        </button>
+      </form>
+
+      <div class="checkout-summary">
+        <h3>סיכום הזמנה</h3>
+        <ul class="checkout-summary__list">
+          @for (item of cart.items; track trackByItemId($index, item)) {
+            <li>
+              <span>{{ item.productName || 'מוצר' }} × {{ item.quantity }}</span>
+              <span>{{ formatPrice((item.price ?? 0) * item.quantity) }}</span>
+            </li>
+          }
+        </ul>
+        <div class="checkout-summary__total">
+          <span>סה"כ</span>
+          <strong>{{ formatPrice(cartTotal) }}</strong>
+        </div>
+      </div>
+    </div>
+  }
+</div>

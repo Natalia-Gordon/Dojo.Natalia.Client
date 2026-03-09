@@ -1,8 +1,10 @@
 import { Component, HostListener, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService, UserInfo } from '../../_services/auth.service';
 import { LoginModalService } from '../../_services/login-modal.service';
+import { MarketplaceService } from '../../_services/marketplace.service';
 import { UserMenuComponent } from '../../user-menu/user-menu.component';
 import { Subscription } from 'rxjs';
 import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
@@ -19,16 +21,20 @@ export class NavComponent implements OnInit, OnDestroy {
   userInfo: UserInfo | null = null;
   isMobileMenuOpen = false;
   isBrowser = false;
+  /** Cart item count for badge (authenticated users only). */
+  cartItemCount = 0;
   /** When true, profile image failed to load – show initials instead. */
   avatarImageError = false;
   private avatarAttempt = 0;
   private avatarSrcOverride: string | null = null;
   private authSubscription?: Subscription;
   private userInfoSubscription?: Subscription;
+  private cartSubscription?: Subscription;
 
   constructor(
     private authService: AuthService,
     private loginModalService: LoginModalService,
+    private marketplaceService: MarketplaceService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -138,12 +144,16 @@ export class NavComponent implements OnInit, OnDestroy {
     // Check initial authentication status
     this.isAuthenticated = this.authService.isAuthenticated();
     this.userInfo = this.authService.getUserInfo();
+    if (this.isAuthenticated) this.loadCartCount();
     
     // Subscribe to authentication changes
     this.authSubscription = this.authService.token$.subscribe(token => {
       this.isAuthenticated = !!token;
       if (!token) {
         this.userInfo = null;
+        this.cartItemCount = 0;
+      } else {
+        this.loadCartCount();
       }
     });
     
@@ -154,11 +164,27 @@ export class NavComponent implements OnInit, OnDestroy {
       this.avatarAttempt = 0;
       this.avatarSrcOverride = null;
     });
+
+    // Refresh cart badge when navigating (e.g. after cart/checkout changes)
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+    ).subscribe(() => {
+      if (this.isAuthenticated) this.loadCartCount();
+    });
+  }
+
+  /** Load cart item count for nav badge (real-time cart badge). */
+  loadCartCount(): void {
+    this.cartSubscription?.unsubscribe();
+    this.cartSubscription = this.marketplaceService.getCart().subscribe(cart => {
+      this.cartItemCount = cart.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? 0;
+    });
   }
 
   ngOnDestroy(): void {
     this.authSubscription?.unsubscribe();
     this.userInfoSubscription?.unsubscribe();
+    this.cartSubscription?.unsubscribe();
   }
 
   

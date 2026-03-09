@@ -1,0 +1,140 @@
+<div class="purchases-hero" dir="rtl">
+  <h1 class="purchases-hero__title">הרכישות שלי</h1>
+  <p class="purchases-hero__subtitle">צפי בהיסטוריית ההזמנות ובתכנים הדיגיטליים שבבעלותך</p>
+</div>
+
+<div class="container-fluid px-2 px-md-5 py-2 py-md-3" dir="rtl">
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner-border text-danger" role="status"></div>
+      <p class="loading-text">טוען רכישות...</p>
+    </div>
+  }
+
+  @if (!isLoading) {
+    <!-- Summary cards (Figma: Total Orders, Digital Art Owned, Physical Items) -->
+    <div class="purchases-summary-cards">
+      <div class="purchases-summary-card purchases-summary-card--orders">
+        <div class="purchases-summary-card__content">
+          <span class="purchases-summary-card__label">סה"כ הזמנות</span>
+          <span class="purchases-summary-card__value">{{ orders.length }}</span>
+        </div>
+        <div class="purchases-summary-card__icon"><i class="bi bi-bag-check"></i></div>
+      </div>
+      <div class="purchases-summary-card purchases-summary-card--digital">
+        <div class="purchases-summary-card__content">
+          <span class="purchases-summary-card__label">אמנות דיגיטלית בבעלותך</span>
+          <span class="purchases-summary-card__value">{{ digitalItems.length }}</span>
+        </div>
+        <div class="purchases-summary-card__icon"><i class="bi bi-image"></i></div>
+      </div>
+      <div class="purchases-summary-card purchases-summary-card--physical">
+        <div class="purchases-summary-card__content">
+          <span class="purchases-summary-card__label">מוצרים פיזיים</span>
+          <span class="purchases-summary-card__value">{{ physicalItems.length }}</span>
+        </div>
+        <div class="purchases-summary-card__icon"><i class="bi bi-box-seam"></i></div>
+      </div>
+    </div>
+
+    <div class="purchases-tabs">
+      <button type="button" class="purchases-tab" [class.purchases-tab--active]="activeTab === 'digital'" (click)="setTab('digital')">
+        תוכן דיגיטלי ({{ digitalItems.length }})
+      </button>
+      <button type="button" class="purchases-tab" [class.purchases-tab--active]="activeTab === 'physical'" (click)="setTab('physical')">
+        מוצרים פיזיים ({{ physicalItems.length }})
+      </button>
+      <button type="button" class="purchases-tab" [class.purchases-tab--active]="activeTab === 'orders'" (click)="setTab('orders')">
+        היסטוריית הזמנות ({{ orders.length }})
+      </button>
+    </div>
+
+    @if (activeTab === 'digital') {
+      @if (digitalItems.length === 0) {
+        <div class="empty-state">
+          <div class="empty-state__icon"><i class="bi bi-image"></i></div>
+          <h3 class="empty-state__title">אין עדיין תוכן דיגיטלי</h3>
+          <p class="empty-state__text">רכישות דיגיטליות יופיעו כאן.</p>
+          <a routerLink="/marketplace" class="btn btn-danger">לשוק</a>
+        </div>
+      } @else {
+        @if (downloadError) {
+          <div class="alert alert-danger">{{ downloadError }}</div>
+        }
+        <div class="purchases-grid">
+          @for (p of digitalItems; track trackByPurchaseId($index, p)) {
+            <div class="purchase-card">
+              @if (p.productImageUrl) {
+                <img [src]="p.productImageUrl" [alt]="p.productName || 'מוצר'" class="purchase-card__img" />
+              } @else {
+                <div class="purchase-card__img purchase-card__img--placeholder"><i class="bi bi-image"></i></div>
+              }
+              <div class="purchase-card__body">
+                <h3 class="purchase-card__title">{{ p.productName || 'מוצר' }}</h3>
+                <button type="button" class="btn btn-sm btn-primary" (click)="download(p)">
+                  <i class="bi bi-download me-1"></i>
+                  הורדה ברזולוציה גבוהה
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    @if (activeTab === 'physical') {
+      @if (physicalItems.length === 0) {
+        <div class="empty-state">
+          <div class="empty-state__icon"><i class="bi bi-box-seam"></i></div>
+          <h3 class="empty-state__title">אין עדיין מוצרים פיזיים</h3>
+          <p class="empty-state__text">רכישות פיזיות יופיעו כאן.</p>
+          <a routerLink="/marketplace" class="btn btn-danger">לשוק</a>
+        </div>
+      } @else {
+        <div class="purchases-grid">
+          @for (p of physicalItems; track trackByPurchaseId($index, p)) {
+            <div class="purchase-card">
+              @if (p.productImageUrl) {
+                <img [src]="p.productImageUrl" [alt]="p.productName || 'מוצר'" class="purchase-card__img" />
+              } @else {
+                <div class="purchase-card__img purchase-card__img--placeholder"><i class="bi bi-image"></i></div>
+              }
+              <div class="purchase-card__body">
+                <h3 class="purchase-card__title">{{ p.productName || 'מוצר' }}</h3>
+                <span class="purchase-card__date">נרכש: {{ formatDate(p.purchasedAt) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    @if (activeTab === 'orders') {
+      @if (orders.length === 0) {
+        <div class="empty-state">
+          <div class="empty-state__icon"><i class="bi bi-receipt"></i></div>
+          <h3 class="empty-state__title">אין הזמנות</h3>
+          <p class="empty-state__text">היסטוריית ההזמנות תופיע כאן.</p>
+          <a routerLink="/marketplace" class="btn btn-danger">לשוק</a>
+        </div>
+      } @else {
+        <div class="orders-list">
+          @for (o of orders; track trackByOrderId($index, o)) {
+            <div class="order-card">
+              <div class="order-card__header">
+                <span class="order-card__id">הזמנה #{{ o.id }}</span>
+                <span class="order-card__date">{{ formatDate(o.createdAt) }}</span>
+                <strong class="order-card__total">{{ formatPrice(o.total) }}</strong>
+              </div>
+              <ul class="order-card__items">
+                @for (item of o.items; track item.productId + item.quantity) {
+                  <li>{{ item.productName || 'מוצר' }} × {{ item.quantity }} — {{ formatPrice(item.unitPrice * item.quantity) }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      }
+    }
+  }
+</div>
