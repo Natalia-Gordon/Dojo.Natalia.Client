@@ -51,48 +51,6 @@
   margin-top: 0;
 }
 
-.admin-form-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 1.5rem 2rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .9));
-  border: 1px solid rgba(220, 38, 38, .3);
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
-}
-
-.admin-form-header__content {
-  color: #fff;
-}
-
-.admin-form-header__title {
-  margin: 0 0 .5rem;
-  font-weight: 800;
-  font-size: 1.5rem;
-}
-
-.admin-form-header__subtitle {
-  color: rgba(255, 255, 255, .85);
-  font-size: .95rem;
-  margin: 0;
-}
-
-.admin-form-header__badge {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  background: rgba(255, 255, 255, .15);
-  border: 1px solid rgba(255, 255, 255, .2);
-  color: #fff;
-  padding: .5rem 1rem;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: .9rem;
-}
-
 .seminar-form {
   display: grid;
   gap: 1.5rem;
@@ -188,46 +146,95 @@ textarea.seminar-form__input {
   font-size: .95rem;
 }
 
-.seminar-form__actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
+/* Card footer — visually separated like event card footer; edit: centered submit */
+.seminar-form__footer {
+  margin-top: 1.5rem;
+  margin-left: -2rem;
+  margin-right: -2rem;
+  margin-bottom: -2rem;
+  padding: 1.25rem 2rem 1.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(248, 250, 252, 0.85);
+  border-radius: 0 0 16px 16px;
 }
 
-.seminar-form__actions .btn {
-  padding: .875rem 2rem;
-  font-weight: 600;
-  border-radius: 12px;
+.seminar-form__footer--edit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.seminar-form__footer--create .seminar-form__footer__row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+
+/* Submit — icon + text spaced with gap (RTL-safe; no double margin from me-2) */
+.seminar-form__btn-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.35rem;
+  font-weight: 500;
   font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.seminar-form__btn-submit:hover:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+
+.seminar-form__btn-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Secondary reset — create flow only */
+.seminar-form__footer .seminar-form__btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: .65rem 1.25rem;
+  font-weight: 600;
+  border-radius: 10px;
+  font-size: 0.95rem;
   transition: all .3s ease;
 }
 
-.seminar-form__actions .btn:disabled {
+.seminar-form__footer .seminar-form__btn-secondary:disabled {
   opacity: .6;
   cursor: not-allowed;
 }
 
-.seminar-form__actions .btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
-}
-
-@media (max-width: 992px) {
-  .admin-form-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.seminar-form__footer .seminar-form__btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
 }
 
 @media (max-width: 768px) {
-  .events-content-card {
-    padding: 1.25rem;
+  .seminar-form__footer {
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+    margin-bottom: -1.25rem;
+    padding: 1rem 1.25rem 1.25rem;
   }
 
-  .admin-form-header {
+  .seminar-form__btn-submit {
+    padding: 0.75rem 1.25rem;
+    min-height: 48px;
+  }
+
+  .events-content-card {
     padding: 1.25rem;
   }
 
@@ -241,11 +248,20 @@ textarea.seminar-form__input {
 }
 
 @media (max-width: 480px) {
-  .events-content-card {
+  .seminar-form__footer {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    margin-bottom: -1rem;
     padding: 1rem;
   }
 
-  .admin-form-header {
+  .seminar-form__btn-submit {
+    padding: 0.65rem 1rem;
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+
+  .events-content-card {
     padding: 1rem;
   }
 

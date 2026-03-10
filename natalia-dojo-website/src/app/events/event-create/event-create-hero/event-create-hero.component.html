@@ -1,16 +1,39 @@
 <section class="event-create-hero">
   <div class="event-create-hero__overlay">
     <div class="event-create-hero__content" dir="rtl">
-      <h1 class="event-create-hero__title">יצירת סמינר חדש</h1>
-      <p class="event-create-hero__subtitle">
-        בנו חוויה מקצועית למתאמנים – פרטים מדויקים, תמחור ברור, והרשמה פשוטה
-      </p>
+      @if (isEditMode) {
+        <div class="event-create-hero__title-row">
+          <h1 class="event-create-hero__title">עריכת אירוע</h1>
+          <span class="event-create-hero__badge" title="אזור מוגבל — מנהלים ומדריכים בלבד">
+            <i class="bi bi-shield-check" aria-hidden="true"></i>
+            מנהל/מדריך
+          </span>
+        </div>
+        <p class="event-create-hero__subtitle">
+          עדכני פרטי אירוע קיים — תאריכים, תיאור, מחיר והרשמה
+        </p>
+      } @else {
+        <div class="event-create-hero__title-row">
+          <h1 class="event-create-hero__title">יצירת סמינר חדש</h1>
+          <span class="event-create-hero__badge" title="אזור מוגבל — מנהלים ומדריכים בלבד">
+            <i class="bi bi-shield-check" aria-hidden="true"></i>
+            מנהל/מדריך
+          </span>
+        </div>
+        <p class="event-create-hero__subtitle">
+          בנו חוויה מקצועית למתאמנים – פרטים מדויקים, תמחור ברור, והרשמה פשוטה
+        </p>
+      }
       <div class="event-create-hero__breadcrumbs">
         <a routerLink="/home">דף הבית</a>
         <span class="divider">/</span>
         <a routerLink="/events">אירועים</a>
         <span class="divider">/</span>
-        <span class="current-page">יצירת סמינר חדש</span>
+        @if (isEditMode) {
+          <span class="current-page">עריכת אירוע</span>
+        } @else {
+          <span class="current-page">יצירת סמינר חדש</span>
+        }
       </div>
     </div>
   </div>

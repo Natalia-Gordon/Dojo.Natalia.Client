@@ -72,6 +72,7 @@ export const routes: Routes = [
       { path: 'my-events', component: MyEventsComponent, data: { skipPrerender: true } },
       { path: 'events', component: EventsComponent, data: { skipPrerender: true } },
       { path: 'events/create', component: EventCreateComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
+      { path: 'events/edit/:eventId', component: EventCreateComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
       { path: 'events/:eventId/registrations/:registrationId/approve', component: RegistrationApproveComponent, data: { skipPrerender: true } },
       { path: 'events/:id', component: EventDetailComponent, data: { skipPrerender: true } },
       { path: 'profile', redirectTo: 'home', pathMatch: 'full' },

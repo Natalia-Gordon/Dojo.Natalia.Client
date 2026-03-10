@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -8,4 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './event-create-hero.component.html',
   styleUrl: './event-create-hero.component.css'
 })
-export class EventCreateHeroComponent {}
+export class EventCreateHeroComponent {
+  @Input() isEditMode = false;
+}

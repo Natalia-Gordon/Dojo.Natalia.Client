@@ -1,4 +1,4 @@
-<app-event-create-hero></app-event-create-hero>
+<app-event-create-hero [isEditMode]="isEditMode"></app-event-create-hero>
 <div class="container-fluid px-2 px-md-5 py-2 py-md-3" style="overflow-x: hidden; max-width: 100vw; width: 100%;">
   <div class="row g-5" style="margin: 0;">
     <div class="col-12" dir="rtl" style="padding: 0;">
@@ -18,18 +18,16 @@
           </div>
         }
 
-        <div class="admin-section">
-          <div class="admin-form-header">
-            <div class="admin-form-header__content">
-              <h3 class="admin-form-header__title">יצירת סמינר חדש</h3>
-              <p class="admin-form-header__subtitle">בנו חוויה מקצועית למתאמנים – פרטים מדויקים, תמחור ברור, והרשמה פשוטה.</p>
-            </div>
-            <div class="admin-form-header__badge">
-              <i class="bi bi-shield-check"></i>
-              מנהל/מדריך
-            </div>
+        @if (isLoadingEvent) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-danger" role="status"></div>
+            <p class="mt-2">טוען אירוע לעריכה...</p>
           </div>
-          <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="seminar-form">
+        }
+
+        @if (!isLoadingEvent) {
+        <div class="admin-section">
+          <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="seminar-form" [attr.aria-busy]="isLoadingEvent">
             <div class="seminar-form__section">
               <h5 class="seminar-form__title">
                 <i class="bi bi-journal-text me-2"></i>
@@ -60,7 +58,12 @@
                 </div>
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">מדריך</label>
-                  <select class="form-control seminar-form__input" formControlName="instructorId" [disabled]="isLoadingInstructors">
+                  <select
+                    class="form-control seminar-form__input"
+                    formControlName="instructorId"
+                    [disabled]="isLoadingInstructors || instructorIdLocked"
+                    [attr.aria-readonly]="instructorIdLocked"
+                    >
                     <option value="">-- אנא בחרי מדריך --</option>
                     @for (inst of instructors; track inst.instructorId) {
                       <option [value]="inst.instructorId">
@@ -68,7 +71,10 @@
                       </option>
                     }
                   </select>
-                  @if (!isLoadingInstructors) {
+                  @if (instructorIdLocked) {
+                    <small class="seminar-form__hint text-muted">שדה מדריך לא ניתן לשינוי בעריכה על ידי מדריך — רק מנהל יכול לשנות.</small>
+                  }
+                  @if (!instructorIdLocked && !isLoadingInstructors) {
                     <small class="seminar-form__hint">אנא בחרי מדריך לאירוע (אופציונלי)</small>
                   }
                   @if (isLoadingInstructors) {
@@ -165,26 +171,54 @@
                 </div>
               </div>
             </div>
-            <div class="seminar-form__actions">
-              <button class="btn btn-danger px-5 py-3" type="submit" [disabled]="isCreating || createForm.invalid" [attr.aria-busy]="isCreating">
+            @if (isEditMode) {
+            <div class="seminar-form__footer seminar-form__footer--edit">
+              <button
+                class="btn btn-outline-danger seminar-form__btn-primary seminar-form__btn-submit"
+                type="submit"
+                [disabled]="isCreating || createForm.invalid"
+                [attr.aria-busy]="isCreating"
+                >
                 @if (isCreating) {
-                  <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
                 }
                 @if (!isCreating) {
-                  <i class="bi bi-check-lg me-2"></i>
+                  <i class="bi bi-floppy2" aria-hidden="true"></i>
                 }
-                @if (!isCreating) { <span>צור סמינר</span> }
-                @if (isCreating) { <span>שומר...</span> }
-              </button>
-              <button type="button" class="btn btn-outline-secondary px-4 py-3 ms-2"
-                (click)="createForm.reset(); createForm.patchValue({eventType: 'Seminar', registrationOpen: true, isPublished: true, price: 0})"
-                [disabled]="isCreating">
-                <i class="bi bi-arrow-counterclockwise me-2"></i>
-                איפוס
+                @if (!isCreating) { <span>שמרי שינויים</span> }
+                @if (isCreating) { <span>שומרת...</span> }
               </button>
             </div>
+            } @else {
+            <div class="seminar-form__footer seminar-form__footer--create">
+              <div class="seminar-form__footer__row">
+                <button
+                  class="btn btn-outline-danger seminar-form__btn-primary seminar-form__btn-submit"
+                  type="submit"
+                  [disabled]="isCreating || createForm.invalid"
+                  [attr.aria-busy]="isCreating"
+                  >
+                  @if (isCreating) {
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  }
+                  @if (!isCreating) {
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                  }
+                  @if (!isCreating) { <span>צרי סמינר</span> }
+                  @if (isCreating) { <span>יוצרת...</span> }
+                </button>
+                <button type="button" class="btn btn-outline-secondary seminar-form__btn-secondary"
+                  (click)="createForm.reset(); createForm.patchValue({eventType: 'Seminar', registrationOpen: true, isPublished: true, price: 0})"
+                  [disabled]="isCreating">
+                  <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                  אפסי טופס
+                </button>
+              </div>
+            </div>
+            }
           </form>
         </div>
+        }
       </div>
     </div>
   </div>

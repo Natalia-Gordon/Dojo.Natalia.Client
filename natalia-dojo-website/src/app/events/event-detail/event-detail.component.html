@@ -170,6 +170,17 @@
                     </div>
                   }
                 </div>
+                @if (canEditEvent && event) {
+                  <div class="event-detail-edit-bar mb-3" dir="rtl">
+                    <a
+                      [routerLink]="['/events/edit', event.id]"
+                      class="btn btn-outline-danger event-detail-edit-btn"
+                      >
+                      <i class="bi bi-pencil-square me-2"></i>
+                      עדכני אירוע
+                    </a>
+                  </div>
+                }
                 <!-- Enroll Button -->
                 <div class="event-detail-actions">
                   <button

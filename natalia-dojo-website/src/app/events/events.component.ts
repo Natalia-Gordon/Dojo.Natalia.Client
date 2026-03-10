@@ -94,14 +94,20 @@ export class EventsComponent implements OnInit, OnDestroy {
         type: 'Seminar'
       }).subscribe({
         next: (events) => {
-          this.events = events || [];
-          this.isLoading = false;
-          // Load instructor names (and payment methods) for admin/instructor; others use event.instructorName from API when present
-          if (this.isAdminOrInstructor) {
-            this.loadInstructorsForEvents(this.events);
-            this.loadRegisteredCountsForEvents(this.events);
+          const list = events || [];
+          // Instructor/teacher (non-admin) sees only events where they are the assigned instructor
+          if (this.isInstructorOnly() && this.userInfo) {
+            this.instructorsService.getInstructors(false).subscribe({
+              next: (instructors) => {
+                const mine = instructors.find((i) => i.userId === this.userInfo!.userId);
+                const filtered =
+                  mine != null ? list.filter((e) => e.instructorId === mine.instructorId) : [];
+                this.applyEventsList(filtered);
+              },
+              error: () => this.applyEventsList(list)
+            });
           } else {
-            this.registeredCountByEventId = {};
+            this.applyEventsList(list);
           }
         },
         error: (error) => {
@@ -258,9 +264,33 @@ export class EventsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * After events are fetched: set list, load instructor names and registration counts when applicable.
+   */
+  private applyEventsList(list: Event[]): void {
+    this.events = list;
+    this.isLoading = false;
+    if (this.isAdminOrInstructor && list.length > 0) {
+      this.loadInstructorsForEvents(this.events);
+      this.loadRegisteredCountsForEvents(this.events);
+    } else {
+      if (!this.isAdminOrInstructor) {
+        this.registeredCountByEventId = {};
+      }
+    }
+  }
+
+  /** Instructor or teacher but not admin — manage only own events. */
+  private isInstructorOnly(): boolean {
+    if (!this.userInfo) return false;
+    const role = (this.userInfo.role || '').toLowerCase();
+    if (role === 'admin') return false;
+    return role === 'instructor' || role === 'teacher';
+  }
+
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {
     const role = (userInfo?.role || '').toLowerCase();
-    return role === 'admin' || role === 'instructor';
+    return role === 'admin' || role === 'instructor' || role === 'teacher';
   }
 
   /**

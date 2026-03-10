@@ -304,6 +304,24 @@ export class EventsService {
     );
   }
 
+  /**
+   * Update existing event via PUT. Backend treats this PATCH-style: only properties
+   * that are present/have values are applied (e.g. InstructorId only when HasValue).
+   * Sending the same instructorId again is a no-op; omitting or null means "don't change".
+   * Clearing instructor is not possible with null (no HasValue) — would need a separate convention.
+   * Caller must be admin or event instructor; full body is fine; partial body also works if API supports it per field.
+   */
+  updateEvent(eventId: number, request: CreateEventRequest): Observable<Event> {
+    return this.http.put<Event>(`${this.apiUrl}/events/${eventId}`, request, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(error => {
+        console.error('Update event error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   getEventById(eventId: number, requireAuth: boolean = false): Observable<Event> {
     // Public endpoint - no auth required by default
     // But if requireAuth is true (admin/instructor), send auth headers to see unpublished events or more details

@@ -5,6 +5,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { EventsService, Event } from '../../_services/events.service';
 import { AuthService, UserInfo } from '../../_services/auth.service';
+import { InstructorsService } from '../../_services/instructors.service';
 import { LoginModalService } from '../../_services/login-modal.service';
 import { EventDetailHeroComponent } from './event-detail-hero/event-detail-hero.component';
 import { EventRegistrationDialogComponent } from '../../core/templates/event-registration-dialog/event-registration-dialog.component';
@@ -34,6 +35,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   fromEventsManagement = false;
   /** When true, breadcrumb shows "אירועים שלי" link back to my-events (from query param from=my-events). */
   fromMyEvents = false;
+  /** True when current user may open edit page (admin or event's instructor). */
+  canEditEvent = false;
 
   private routeSubscription?: Subscription;
   private queryParamSubscription?: Subscription;
@@ -46,6 +49,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     private eventsService: EventsService,
     private authService: AuthService,
     private loginModalService: LoginModalService,
+    private instructorsService: InstructorsService,
     private sanitizer: DomSanitizer,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
@@ -119,7 +123,9 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       this.eventsService.getEventById(eventId, requireAuth).subscribe({
       next: (event) => {
         this.event = event;
+        this.canEditEvent = false;
         this.instructorName = event.instructorName ?? null;
+        this.computeCanEditEvent(event);
         // Support both camelCase and snake_case from API
         const imageUrl = event.imageUrl ?? (event as { image_url?: string | null }).image_url ?? null;
         if (event && !(event as { imageUrl?: string | null }).imageUrl && imageUrl) {
@@ -361,6 +367,26 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {
     const role = (userInfo?.role || '').toLowerCase();
-    return role === 'admin' || role === 'instructor';
+    return role === 'admin' || role === 'instructor' || role === 'teacher';
+  }
+
+  private isAdmin(userInfo: UserInfo | null): boolean {
+    return (userInfo?.role || '').toLowerCase() === 'admin';
+  }
+
+  private computeCanEditEvent(event: Event): void {
+    if (!this.userInfo) return;
+    if (this.isAdmin(this.userInfo)) {
+      this.canEditEvent = true;
+      return;
+    }
+    const role = (this.userInfo.role || '').toLowerCase();
+    if (role !== 'instructor' && role !== 'teacher') return;
+    if (event.instructorId == null) return;
+    this.instructorsService.getInstructorById(event.instructorId).subscribe({
+      next: (inst) => {
+        if (inst.userId === this.userInfo!.userId) this.canEditEvent = true;
+      }
+    });
   }
 }
