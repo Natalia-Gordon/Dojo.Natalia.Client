@@ -10,8 +10,7 @@
     "test": "ng test --watch=false",
     "test:ci": "ng test --watch=false",
     "test:runtime": "node scripts/smoke-runtime.mjs",
-    "serve:ssr:natalia-dojo-website": "node dist/natalia-dojo-website/server/server.mjs",
-    "postinstall": "patch-package"
+    "serve:ssr:natalia-dojo-website": "node dist/natalia-dojo-website/server/server.mjs"
   },
   "private": true,
   "dependencies": {
@@ -46,7 +45,6 @@
     "@types/jquery": "^3.5.29",
     "@types/node": "^18.18.0",
     "jsdom": "^28.1.0",
-    "patch-package": "^8.0.1",
     "typescript": "~5.8.0",
     "vitest": "^3.2.4"
   },

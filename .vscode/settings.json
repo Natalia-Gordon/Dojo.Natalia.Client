@@ -1,0 +1,10 @@
+{
+  // Reduce noise when the repo root isn't the Angular app.
+  // Angular app lives in natalia-dojo-website (Angular 20).
+  "files.watcherExclude": {
+    "**/Ninjutsu Training Platform/node_modules/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true
+  }
+}
