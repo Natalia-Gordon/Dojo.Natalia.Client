@@ -44,7 +44,11 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
   filterLastName = '';
   filterPhone = '';
 
+  /** Breadcrumb: when user opened this page from /events (badge), show אירועים in trail. */
+  breadcrumbFromEvents = false;
+
   private routeSubscription?: Subscription;
+  private queryParamSubscription?: Subscription;
   private authSubscription?: Subscription;
 
   constructor(
@@ -60,6 +64,11 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
 
     this.userInfo = this.authService.getUserInfo();
     this.isAdminOrInstructor = this.canApprovePayments(this.userInfo);
+
+    this.breadcrumbFromEvents = this.route.snapshot.queryParams['from'] === 'events';
+    this.queryParamSubscription = this.route.queryParams.subscribe((q) => {
+      this.breadcrumbFromEvents = q['from'] === 'events';
+    });
 
     this.routeSubscription = this.route.paramMap.subscribe((params) => {
       const id = params.get('eventId') ?? params.get('id');
@@ -87,6 +96,7 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
+    this.queryParamSubscription?.unsubscribe();
     this.authSubscription?.unsubscribe();
   }
 

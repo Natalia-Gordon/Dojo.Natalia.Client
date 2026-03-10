@@ -13,8 +13,13 @@
         <div class="event-registrations__hero-breadcrumbs">
           <a routerLink="/home">דף הבית</a>
           <span class="divider">/</span>
-          <a routerLink="/admin/events">ניהול אירועים</a>
-          <span class="divider">/</span>
+          @if (breadcrumbFromEvents) {
+            <a routerLink="/events">אירועים</a>
+            <span class="divider">/</span>
+          } @else {
+            <a routerLink="/admin/events">ניהול אירועים</a>
+            <span class="divider">/</span>
+          }
           <span class="current-page">נרשמו לאירוע</span>
         </div>
         @if (isAdminOrInstructor && eventId != null && event) {

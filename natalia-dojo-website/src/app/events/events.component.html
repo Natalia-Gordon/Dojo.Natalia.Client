@@ -74,10 +74,17 @@
                   <h3 class="event-card__title">{{ eventItem.title || 'אירוע' }}</h3>
                   <div class="event-card__badges">
                     @if (isAdminOrInstructor) {
-                      <span class="event-card__badge event-card__badge--reg-count" [attr.title]="'מספר נרשמים לאירוע'">
-                        <i class="bi bi-people-fill"></i>
+                      <a
+                        [routerLink]="['/admin/events', eventItem.id, 'registrations']"
+                        [queryParams]="{ from: 'events' }"
+                        class="event-card__badge event-card__badge--reg-count event-card__badge--reg-count-link"
+                        title="לחצי לצפייה ברשימת הנרשמים"
+                        [attr.aria-label]="'נרשמים לאירוע: ' + getRegisteredCount(eventItem.id) + ' — פתיחת רשימת נרשמים'"
+                        (click)="$event.stopPropagation()"
+                        >
+                        <i class="bi bi-people-fill" aria-hidden="true"></i>
                         {{ getRegisteredCount(eventItem.id) }}
-                      </span>
+                      </a>
                     }
                     @if (eventItem.eventType) {
                       <span class="event-card__badge event-card__badge--type">
