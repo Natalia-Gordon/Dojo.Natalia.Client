@@ -30,6 +30,8 @@ export class EventsComponent implements OnInit, OnDestroy {
   instructorNamesMap: Record<number, string> = {};
   /** instructorId -> payment types (bit, bank_transfer); cash shown when price > 0. */
   instructorPaymentMethodsMap: Record<number, ('bit' | 'bank_transfer')[]> = {};
+  /** Event ID -> registered count (loaded via admin API for admin/instructor only). */
+  registeredCountByEventId: Record<string, number> = {};
 
   private authSubscription?: Subscription;
   private userSubscription?: Subscription;
@@ -97,6 +99,9 @@ export class EventsComponent implements OnInit, OnDestroy {
           // Load instructor names (and payment methods) for admin/instructor; others use event.instructorName from API when present
           if (this.isAdminOrInstructor) {
             this.loadInstructorsForEvents(this.events);
+            this.loadRegisteredCountsForEvents(this.events);
+          } else {
+            this.registeredCountByEventId = {};
           }
         },
         error: (error) => {
@@ -256,5 +261,39 @@ export class EventsComponent implements OnInit, OnDestroy {
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {
     const role = (userInfo?.role || '').toLowerCase();
     return role === 'admin' || role === 'instructor';
+  }
+
+  /**
+   * Registered count for event (admin/instructor only; from getAdminEvents registeredCountByEventId).
+   */
+  getRegisteredCount(eventId: number): number {
+    return this.registeredCountByEventId[String(eventId)] ?? 0;
+  }
+
+  /**
+   * Fetch registration counts for current event list (admin API returns map for paged items).
+   * Uses a large pageSize so counts align with listed events when possible.
+   */
+  private loadRegisteredCountsForEvents(events: Event[]): void {
+    if (events.length === 0) {
+      this.registeredCountByEventId = {};
+      return;
+    }
+    this.eventsService
+      .getAdminEvents({
+        type: 'seminar',
+        page: 1,
+        pageSize: Math.max(200, events.length + 50),
+        sortBy: 'startDate',
+        sortOrder: 'desc'
+      })
+      .subscribe({
+        next: (res) => {
+          this.registeredCountByEventId = res.registeredCountByEventId ?? {};
+        },
+        error: () => {
+          this.registeredCountByEventId = {};
+        }
+      });
   }
 }
