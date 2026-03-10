@@ -48,19 +48,15 @@ export class AuthInterceptor implements HttpInterceptor {
       !req.url.includes('/events/') &&
       !req.url.includes('/registrations') &&
       !req.headers.has('Authorization');
-    const isRefreshTokenRequest = req.url.includes('/refresh-token');
     const isRegistrationRequest = req.url.includes('/registrations');
 
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (
-          error.status === 401 &&
-          !isPublicEventsListRequest &&
-          !isRefreshTokenRequest &&
-          isBrowser
-        ) {
-          // Global 401 treatment: clear session, redirect to home, open login modal.
-          // Do not propagate 401 to components so they don't show page-specific login messages.
+        // Global 401: clear session, redirect to home, open login. Include refresh-token 401 so user is sent home on session timeout.
+        if (error.status === 401 && isBrowser) {
+          if (isPublicEventsListRequest) {
+            return throwError(() => this.normalizeNetworkError(error));
+          }
           if (isRegistrationRequest && !token) {
             return throwError(() => this.normalizeNetworkError(error));
           }

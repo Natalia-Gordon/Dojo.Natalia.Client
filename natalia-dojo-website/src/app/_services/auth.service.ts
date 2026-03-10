@@ -786,9 +786,12 @@ export class AuthService {
       }),
       catchError(error => {
         console.error('Refresh token error:', error);
-        // If refresh fails, clear tokens
+        // If refresh fails, clear tokens and redirect to home (session timeout / invalid refresh)
         this.clearToken();
         this.clearUserInfo();
+        if (isPlatformBrowser(this.platformId) && this.router) {
+          this.router.navigate(['/home']);
+        }
         return throwError(() => error);
       })
     );

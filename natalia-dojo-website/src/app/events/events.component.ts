@@ -33,6 +33,9 @@ export class EventsComponent implements OnInit, OnDestroy {
   /** Event ID -> registered count (loaded via admin API for admin/instructor only). */
   registeredCountByEventId: Record<string, number> = {};
 
+  /** User-typed search query; filters events client-side. */
+  searchQuery = '';
+
   private authSubscription?: Subscription;
   private userSubscription?: Subscription;
 
@@ -132,6 +135,29 @@ export class EventsComponent implements OnInit, OnDestroy {
 
   trackByEventId(index: number, eventItem: Event): number {
     return eventItem.id;
+  }
+
+  /**
+   * Events filtered by searchQuery (title, description, location, event type label, instructor name).
+   * Case-insensitive, trims query; empty query returns all events.
+   */
+  get filteredEvents(): Event[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) return this.events;
+    return this.events.filter((e) => {
+      const title = (e.title ?? '').toLowerCase();
+      const desc = (e.description ?? '').toLowerCase();
+      const location = (e.location ?? '').toLowerCase();
+      const typeLabel = this.getEventTypeLabel(e.eventType).toLowerCase();
+      const instructor = this.getInstructorDisplayName(e).toLowerCase();
+      return (
+        title.includes(q) ||
+        desc.includes(q) ||
+        location.includes(q) ||
+        typeLabel.includes(q) ||
+        instructor.includes(q)
+      );
+    });
   }
 
   /** Hebrew label for event type. */

@@ -12,9 +12,32 @@
       }
       @if (!isLoading && events.length > 0) {
         <div class="events-toolbar">
-          <p class="events-toolbar__text">
-            אירועים שמחכים לך — כל הפרטים במקום אחד. בחרי את מה שמתאים לך והרשמי בקליק.
-          </p>
+          <div class="events-toolbar__search">
+            <label for="events-search" class="events-toolbar__search-label">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              חיפוש אירועים
+            </label>
+            <input
+              id="events-search"
+              type="search"
+              class="form-control events-toolbar__search-input"
+              [value]="searchQuery"
+              (input)="searchQuery = $any($event.target).value"
+              placeholder="לפי כותרת, מקום, סוג אירוע, מדריך..."
+              [attr.aria-label]="'חיפוש אירועים לפי כותרת, מקום, סוג אירוע או מדריך'"
+              autocomplete="off"
+            />
+            @if (searchQuery.trim()) {
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm events-toolbar__search-clear"
+                (click)="searchQuery = ''"
+                aria-label="נקה חיפוש"
+              >
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+            }
+          </div>
           @if (isAdminOrInstructor) {
             <a routerLink="/events/create" class="btn btn-danger px-4 py-3 events-toolbar__btn">
               <i class="bi bi-plus-lg me-2"></i>
@@ -67,8 +90,18 @@
         }
 
         @if (!isLoading && events.length > 0) {
+          @if (filteredEvents.length === 0) {
+            <div class="events-search-empty">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              <p class="events-search-empty__text">לא נמצאו אירועים התואמים את החיפוש.</p>
+              <button type="button" class="btn btn-outline-primary btn-sm" (click)="searchQuery = ''">
+                נקי חיפוש
+              </button>
+            </div>
+          }
+          @if (filteredEvents.length > 0) {
           <div class="events-list">
-            @for (eventItem of events; track trackByEventId($index, eventItem)) {
+            @for (eventItem of filteredEvents; track trackByEventId($index, eventItem)) {
               <div class="event-card" [attr.aria-label]="'אירוע: ' + (eventItem.title || 'אירוע')">
                 <div class="event-card__header">
                   <h3 class="event-card__title">{{ eventItem.title || 'אירוע' }}</h3>
@@ -155,6 +188,7 @@
               </div>
             }
           </div>
+          }
         }
       </div>
 
