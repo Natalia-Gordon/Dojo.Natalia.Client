@@ -44,7 +44,7 @@
               class="user-management__btn-bank"
               (click)="openBankDetailsForm()"
             >
-              עידכון פרטי חשבון בנק
+              עדכון שיטות תשלום
             </button>
           }
         }
@@ -265,128 +265,174 @@
       </div>
     }
 
-    <!-- Bank details popup -->
+    <!-- Bank / payment methods popup (same functionality as שיטות תשלום שלי in פרטי משתמש) -->
     @if (bankDetailsUser) {
       <div
         class="user-management__confirm-overlay"
         (click)="closeBankDetailsForm()"
         role="button"
         tabindex="0"
-        aria-label="סגור עידכון פרטי בנק"
+        aria-label="סגור שיטות תשלום"
         dir="rtl">
-        <div class="user-management__bank-dialog" (click)="$event.stopPropagation()">
+        <div class="user-management__bank-dialog user-management__bank-dialog--payment-methods" (click)="$event.stopPropagation()">
           <div class="user-management__confirm-header">
-            <h3 class="user-management__confirm-title">עידכון פרטי חשבון בנק</h3>
+            <h3 class="user-management__confirm-title">עדכון שיטות תשלום</h3>
             <button type="button" class="user-management__confirm-close" (click)="closeBankDetailsForm()" aria-label="סגור">&times;</button>
           </div>
-          <form class="user-management__bank-form" (ngSubmit)="saveBankDetails()">
-            <div class="user-management__bank-body">
-              <div class="form-group">
-                <label for="bank-account-holder" class="form-label">שם בעל החשבון</label>
-                <div class="input-wrapper">
-                  <input
-                    id="bank-account-holder"
-                    type="text"
-                    [(ngModel)]="bankForm.accountHolderName"
-                    name="accountHolderName"
-                    class="form-input"
-                    placeholder="הזן שם בעל החשבון">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="bank-name" class="form-label">שם הבנק</label>
-                <div class="input-wrapper">
-                  <input
-                    id="bank-name"
-                    type="text"
-                    [(ngModel)]="bankForm.bankName"
-                    name="bankName"
-                    class="form-input"
-                    placeholder="הזן שם הבנק">
-                </div>
-              </div>
-              <div class="register-grid">
-                <div class="form-group">
-                  <label for="bank-number" class="form-label">מספר הבנק</label>
-                  <div class="input-wrapper">
-                    <input
-                      id="bank-number"
-                      type="text"
-                      [(ngModel)]="bankForm.bankNumber"
-                      name="bankNumber"
-                      class="form-input"
-                      placeholder="מס' בנק">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="branch-name" class="form-label">שם הסניף</label>
-                  <div class="input-wrapper">
-                    <input
-                      id="branch-name"
-                      type="text"
-                      [(ngModel)]="bankForm.branchName"
-                      name="branchName"
-                      class="form-input"
-                      placeholder="שם סניף">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="bank-branch" class="form-label">מספר הסניף</label>
-                  <div class="input-wrapper">
-                    <input
-                      id="bank-branch"
-                      type="text"
-                      [(ngModel)]="bankForm.branchNumber"
-                      name="branchNumber"
-                      class="form-input"
-                      placeholder="מס' סניף">
-                  </div>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="bank-account" class="form-label">מספר החשבון</label>
-                <div class="input-wrapper">
-                  <input
-                    id="bank-account"
-                    type="text"
-                    [(ngModel)]="bankForm.accountNumber"
-                    name="accountNumber"
-                    class="form-input"
-                    placeholder="הזן מספר חשבון">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="bank-address" class="form-label">כתובת הבנק</label>
-                <div class="input-wrapper">
-                  <input
-                    id="bank-address"
-                    type="text"
-                    [(ngModel)]="bankForm.bankAddress"
-                    name="bankAddress"
-                    class="form-input"
-                    placeholder="הזן כתובת הבנק">
-                </div>
-              </div>
-              @if (bankFormError) {
-                <div class="alert-error">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  <span>{{ bankFormError }}</span>
+          <div class="user-management__payment-methods-add-wrap">
+            <button
+              type="button"
+              class="payment-methods-card__btn-add payment-methods-card__btn-add--secondary"
+              (click)="openAddPaymentMethod()">
+              <i class="bi bi-plus-lg"></i>
+              הוספת שיטת תשלום
+            </button>
+          </div>
+          <div class="payment-methods-card payment-methods-card--popup">
+            <div class="payment-methods-card__body">
+              @if (paymentMethodError) {
+                <div class="payment-methods-card__alert payment-methods-card__alert--error" [textContent]="paymentMethodError"></div>
+              }
+              @if (isLoadingPaymentMethods) {
+                <div class="payment-methods-card__loading">
+                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  <span>טוען שיטות תשלום...</span>
                 </div>
               }
+              @if (!isLoadingPaymentMethods) {
+                @if (paymentMethods.length === 0 && !showPaymentMethodForm) {
+                  <div class="payment-methods-card__empty">
+                    <i class="bi bi-wallet2"></i>
+                    <p class="payment-methods-card__empty-text">אין שיטות תשלום. הוסיפי ביט או העברה בנקאית.</p>
+                  </div>
+                }
+                @if (paymentMethods.length > 0 || showPaymentMethodForm) {
+                  <div class="payment-methods-list">
+                    @for (pm of paymentMethods; track pm.id) {
+                      <article class="payment-method-item">
+                        <div class="payment-method-item__main">
+                          <span class="payment-method-item__badge" [ngClass]="pm.paymentType === 'bit' ? 'payment-method-item__badge--bit' : 'payment-method-item__badge--bank'" [textContent]="getPaymentTypeLabel(pm)"></span>
+                          @if (pm.isDefault) {
+                            <span class="payment-method-item__separator" aria-hidden="true"> - </span>
+                            <span class="payment-method-item__default">ברירת מחדל</span>
+                          }
+                          <p class="payment-method-item__details" [textContent]="getPaymentMethodDisplayText(pm)"></p>
+                        </div>
+                        <div class="payment-method-item__actions">
+                          <button type="button" class="payment-method-item__btn payment-method-item__btn--edit" (click)="openEditPaymentMethod(pm)" title="עריכה" aria-label="עריכה">
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                          <button type="button" class="payment-method-item__btn payment-method-item__btn--delete" (click)="deletePaymentMethod(pm.id)" title="מחיקה" aria-label="מחיקה">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </article>
+                      @if (showPaymentMethodForm && editingPaymentMethod?.id === pm.id) {
+                        <div class="payment-method-form-card">
+                          <h6 class="payment-method-form-card__title" [textContent]="paymentMethodFormTitle"></h6>
+                          <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
+                            <div class="payment-method-form__row">
+                              <div class="payment-method-form__field">
+                                <label class="payment-method-form__label">סוג</label>
+                                <select class="payment-method-form__input form-select" formControlName="paymentType">
+                                  <option value="bank_transfer">העברה בנקאית</option>
+                                  <option value="bit">ביט (Bit)</option>
+                                </select>
+                              </div>
+                              <div class="payment-method-form__field payment-method-form__field--checkbox">
+                                <div class="form-check">
+                                  <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefaultEditPopup">
+                                  <label class="form-check-label" for="pmDefaultEditPopup">ברירת מחדל</label>
+                                </div>
+                              </div>
+                            </div>
+                            @if (paymentTypeFormValue === 'bit') {
+                              <div class="payment-method-form__field">
+                                <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                                <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
+                              </div>
+                            }
+                            @if (paymentTypeFormValue === 'bank_transfer') {
+                              <div class="payment-method-form__grid">
+                                <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
+                                <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
+                                <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
+                                <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
+                                <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
+                                <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
+                                <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
+                                <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
+                                <div class="payment-method-form__field payment-method-form__field--full"><label class="payment-method-form__label">כתובת הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankAddress"></div>
+                              </div>
+                            }
+                            <div class="payment-method-form__actions">
+                              <button type="submit" class="btn btn-danger" [disabled]="isSavingPaymentMethod">
+                                @if (isSavingPaymentMethod) {
+                                  <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                                }
+                                שמרי
+                              </button>
+                              <button type="button" class="btn btn-outline-secondary" (click)="closePaymentMethodForm()">ביטול</button>
+                            </div>
+                          </form>
+                        </div>
+                      }
+                    }
+                  </div>
+                  @if (showPaymentMethodForm && !editingPaymentMethod) {
+                    <div class="payment-method-form-card">
+                      <h6 class="payment-method-form-card__title" [textContent]="paymentMethodFormTitle"></h6>
+                      <form (ngSubmit)="savePaymentMethod()" [formGroup]="paymentMethodForm" class="payment-method-form">
+                        <div class="payment-method-form__row">
+                          <div class="payment-method-form__field">
+                            <label class="payment-method-form__label">סוג</label>
+                            <select class="payment-method-form__input form-select" formControlName="paymentType">
+                              <option value="bank_transfer">העברה בנקאית</option>
+                              <option value="bit">ביט (Bit)</option>
+                            </select>
+                          </div>
+                          <div class="payment-method-form__field payment-method-form__field--checkbox">
+                            <div class="form-check">
+                              <input type="checkbox" class="form-check-input" formControlName="isDefault" id="pmDefaultPopup">
+                              <label class="form-check-label" for="pmDefaultPopup">ברירת מחדל</label>
+                            </div>
+                          </div>
+                        </div>
+                        @if (paymentTypeFormValue === 'bit') {
+                          <div class="payment-method-form__field">
+                            <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                            <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
+                          </div>
+                        }
+                        @if (paymentTypeFormValue === 'bank_transfer') {
+                          <div class="payment-method-form__grid">
+                            <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
+                            <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
+                            <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
+                            <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
+                            <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
+                            <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
+                            <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
+                            <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
+                            <div class="payment-method-form__field payment-method-form__field--full"><label class="payment-method-form__label">כתובת הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankAddress"></div>
+                          </div>
+                        }
+                        <div class="payment-method-form__actions">
+                          <button type="submit" class="btn btn-danger" [disabled]="isSavingPaymentMethod">
+                            @if (isSavingPaymentMethod) {
+                              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                            }
+                            שמרי
+                          </button>
+                          <button type="button" class="btn btn-outline-secondary" (click)="closePaymentMethodForm()">ביטול</button>
+                        </div>
+                      </form>
+                    </div>
+                  }
+                }
+              }
             </div>
-            <div class="user-management__confirm-actions">
-              <button type="button" class="user-management__confirm-btn user-management__confirm-btn--cancel" (click)="closeBankDetailsForm()">
-                ביטול
-              </button>
-              <button type="submit" class="user-management__confirm-btn user-management__confirm-btn--save" [disabled]="isBankFormLoading">
-                {{ isBankFormLoading ? 'שומר...' : 'שמירה' }}
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     }

@@ -4,6 +4,7 @@ import { Observable, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
+import { CreateOrUpdatePaymentMethodRequest } from './payment-methods.service';
 
 export interface Instructor {
   instructorId: number;
@@ -117,6 +118,61 @@ export class InstructorsService {
     }).pipe(
       catchError(error => {
         console.error('Update instructor bank details error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /** GET /api/instructors/{id}/payment-methods — list payment methods for an instructor (admin). */
+  getInstructorPaymentMethods(instructorId: number): Observable<InstructorPaymentMethodDto[]> {
+    return this.http.get<InstructorPaymentMethodDto[]>(
+      `${this.apiUrl}/instructors/${instructorId}/payment-methods`,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError(error => {
+        if (error.status === 404 || error.status === 403) return of([]);
+        console.error('Get instructor payment methods error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /** POST /api/instructors/{id}/payment-methods — add payment method for an instructor (admin). */
+  createInstructorPaymentMethod(instructorId: number, request: CreateOrUpdatePaymentMethodRequest): Observable<InstructorPaymentMethodDto> {
+    return this.http.post<InstructorPaymentMethodDto>(
+      `${this.apiUrl}/instructors/${instructorId}/payment-methods`,
+      request,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError(error => {
+        console.error('Create instructor payment method error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /** PUT /api/instructors/{id}/payment-methods/{methodId} — update (admin). */
+  updateInstructorPaymentMethod(instructorId: number, methodId: number, request: CreateOrUpdatePaymentMethodRequest): Observable<InstructorPaymentMethodDto> {
+    return this.http.put<InstructorPaymentMethodDto>(
+      `${this.apiUrl}/instructors/${instructorId}/payment-methods/${methodId}`,
+      request,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError(error => {
+        console.error('Update instructor payment method error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /** DELETE /api/instructors/{id}/payment-methods/{methodId} — delete (admin). */
+  deleteInstructorPaymentMethod(instructorId: number, methodId: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}/instructors/${instructorId}/payment-methods/${methodId}`,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError(error => {
+        console.error('Delete instructor payment method error:', error);
         return throwError(() => error);
       })
     );

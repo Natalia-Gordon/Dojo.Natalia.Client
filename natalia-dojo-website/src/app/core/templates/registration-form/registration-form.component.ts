@@ -19,7 +19,7 @@ import {
 
 import { FormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
-import { AuthService } from '../../../_services/auth.service';
+import { AuthService, UpdateUserRequest } from '../../../_services/auth.service';
 import { Rank, RanksService } from '../../../_services/ranks.service';
 import { LoginModalService, UserToEdit } from '../../../_services/login-modal.service';
 import { Subscription } from 'rxjs';
@@ -272,20 +272,29 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     this.isRegisterLoading = true;
     this.registerError = '';
 
-    const { confirmPassword, username, ...updateRequest } = this.registerForm.value;
+    // Same logic as user-details onSubmit(): build UpdateUserRequest from form and call PUT /api/users/{userId}
+    const formValue = this.registerForm.getRawValue();
 
-    if (updateRequest.rankId !== null && updateRequest.rankId !== undefined) {
-      updateRequest.currentRankId = updateRequest.rankId;
-    }
-    delete updateRequest.rankId;
+    const updateRequest: UpdateUserRequest = {
+      email: formValue.email || null,
+      password: (formValue.password && String(formValue.password).trim()) ? formValue.password : null,
+      firstName: formValue.firstName || null,
+      lastName: formValue.lastName || null,
+      displayName: formValue.displayName || null,
+      phone: formValue.phone || null,
+      profileImageUrl: (formValue.profileImageUrl && String(formValue.profileImageUrl).trim()) ? formValue.profileImageUrl.trim() : null,
+      bio: formValue.bio || null,
+      dateOfBirth: (formValue.dateOfBirth && String(formValue.dateOfBirth).trim()) ? formValue.dateOfBirth.trim() : null,
+      isActive: formValue.isActive !== false,
+      currentRankId: (formValue.rankId != null && formValue.rankId !== '') ? formValue.rankId : null
+    };
 
-    if (typeof updateRequest.dateOfBirth === 'string' && updateRequest.dateOfBirth.trim() === '') {
-      delete updateRequest.dateOfBirth;
-    }
-
-    if (!updateRequest.password || String(updateRequest.password).trim() === '') {
-      delete updateRequest.password;
-    }
+    // Remove null/empty values to keep request clean (same as user-details)
+    Object.keys(updateRequest).forEach(key => {
+      if (updateRequest[key as keyof UpdateUserRequest] === null || updateRequest[key as keyof UpdateUserRequest] === '') {
+        delete updateRequest[key as keyof UpdateUserRequest];
+      }
+    });
 
     this.authService.updateUser(this.registeredUserId, updateRequest).subscribe({
       next: updatedUser => {
