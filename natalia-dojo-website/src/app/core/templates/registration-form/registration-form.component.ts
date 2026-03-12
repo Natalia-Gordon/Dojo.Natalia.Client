@@ -51,6 +51,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
   private registeredUserSnapshot: Record<string, string | null> | null = null;
   private userInfoSubscription?: Subscription;
   private userTypeSubscription?: Subscription;
+  private emailToUsernameSubscription?: Subscription;
 
   constructor(
     @Inject(FormBuilder) private fb: FormBuilder,
@@ -100,11 +101,22 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     if (this.showRankSelect) {
       this.loadRanks();
     }
+
+    if (this.isGuestRegistration) {
+      this.emailToUsernameSubscription = this.registerForm.get('email')?.valueChanges.subscribe(email => {
+        const usernameControl = this.registerForm.get('username');
+        const currentUsername = (usernameControl?.value || '').trim();
+        if (email && typeof email === 'string' && !currentUsername) {
+          usernameControl?.setValue(email.trim(), { emitEvent: false });
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
     this.userInfoSubscription?.unsubscribe();
     this.userTypeSubscription?.unsubscribe();
+    this.emailToUsernameSubscription?.unsubscribe();
   }
 
   closeModal(): void {
@@ -211,6 +223,10 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
       request.CurrentRankId = request.rankId;
     }
     delete request.rankId;
+
+    if (this.isGuestRegistration && (!request.username || String(request.username).trim() === '') && request.email) {
+      request.username = request.email;
+    }
 
     if (typeof request.dateOfBirth === 'string' && request.dateOfBirth.trim() === '') {
       delete request.dateOfBirth;
@@ -343,6 +359,11 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
   /** Show update button when editing existing user from user management */
   get showEditUserUpdateButton(): boolean {
     return !!this.registeredUserId && this.isAdminConnected && !this.showLoginTab;
+  }
+
+  /** Guest creating account from login modal — show minimal fields for fast registration. */
+  get isGuestRegistration(): boolean {
+    return !!this.showLoginTab && !this.isAdminConnected && !this.isInstructorConnected && !this.userToEdit;
   }
 
   get showRankSelect(): boolean {
