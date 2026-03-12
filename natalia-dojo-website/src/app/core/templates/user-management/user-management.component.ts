@@ -66,6 +66,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   editingPaymentMethod: InstructorPaymentMethodDto | null = null;
   isSavingPaymentMethod = false;
   paymentMethodForm!: FormGroup;
+  /** Payment method pending delete confirmation (shown above עדכון שיטות תשלום popup) */
+  deletePaymentMethodConfirm: InstructorPaymentMethodDto | null = null;
 
   /** Per-user avatar URL overrides when primary Google Drive format fails (fallback attempts) */
   avatarSrcOverride: Record<number, string> = {};
@@ -574,6 +576,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.paymentMethodError = null;
     this.showPaymentMethodForm = false;
     this.editingPaymentMethod = null;
+    this.deletePaymentMethodConfirm = null;
   }
 
   loadPaymentMethodsForBankPopup(): void {
@@ -721,15 +724,30 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  deletePaymentMethod(id: number): void {
+  openDeletePaymentMethodConfirm(pm: InstructorPaymentMethodDto): void {
+    this.deletePaymentMethodConfirm = pm;
+  }
+
+  cancelDeletePaymentMethod(): void {
+    this.deletePaymentMethodConfirm = null;
+  }
+
+  confirmDeletePaymentMethod(): void {
+    const pm = this.deletePaymentMethodConfirm;
     const instructorId = this.bankDetailsInstructorId;
-    if (instructorId == null || !confirm('למחוק שיטת תשלום זו?')) return;
-    this.instructorsService.deleteInstructorPaymentMethod(instructorId, id).subscribe({
+    if (!pm || instructorId == null) return;
+    this.deletePaymentMethodConfirm = null;
+    this.instructorsService.deleteInstructorPaymentMethod(instructorId, pm.id).subscribe({
       next: () => this.loadPaymentMethodsForBankPopup(),
       error: (err) => {
         this.paymentMethodError = err?.error?.message || 'שגיאה במחיקת שיטת התשלום';
       }
     });
+  }
+
+  deletePaymentMethod(id: number): void {
+    const pm = this.paymentMethods.find(m => m.id === id);
+    if (pm) this.openDeletePaymentMethodConfirm(pm);
   }
 
   openImagePopup(src: string): void {
@@ -807,7 +825,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.deleteConfirmUser) {
+    if (this.deletePaymentMethodConfirm) {
+      this.cancelDeletePaymentMethod();
+    } else if (this.deleteConfirmUser) {
       this.cancelDeleteUser();
     } else if (this.bankDetailsUser) {
       this.closeBankDetailsForm();

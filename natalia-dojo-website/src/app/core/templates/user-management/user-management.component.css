@@ -330,6 +330,10 @@
   cursor: pointer;
 }
 
+.user-management__confirm-overlay--on-top {
+  z-index: 10000;
+}
+
 .user-management__confirm-dialog {
   background: rgba(30, 41, 59, 0.98);
   border: 1px solid rgba(51, 65, 85, 0.8);

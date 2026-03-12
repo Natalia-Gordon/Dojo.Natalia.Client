@@ -322,7 +322,7 @@
                           <button type="button" class="payment-method-item__btn payment-method-item__btn--edit" (click)="openEditPaymentMethod(pm)" title="עריכה" aria-label="עריכה">
                             <i class="bi bi-pencil"></i>
                           </button>
-                          <button type="button" class="payment-method-item__btn payment-method-item__btn--delete" (click)="deletePaymentMethod(pm.id)" title="מחיקה" aria-label="מחיקה">
+                          <button type="button" class="payment-method-item__btn payment-method-item__btn--delete" (click)="openDeletePaymentMethodConfirm(pm)" title="מחיקה" aria-label="מחיקה">
                             <i class="bi bi-trash"></i>
                           </button>
                         </div>
@@ -432,6 +432,38 @@
                 }
               }
             </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Delete payment method confirmation (above עדכון שיטות תשלום popup) -->
+    @if (deletePaymentMethodConfirm) {
+      <div
+        class="user-management__confirm-overlay user-management__confirm-overlay--on-top"
+        (click)="cancelDeletePaymentMethod()"
+        role="button"
+        tabindex="0"
+        aria-label="סגור אישור מחיקה"
+        dir="rtl">
+        <div class="user-management__confirm-dialog" (click)="$event.stopPropagation()">
+          <div class="user-management__confirm-header">
+            <h3 class="user-management__confirm-title">אישור מחיקה</h3>
+            <button type="button" class="user-management__confirm-close" (click)="cancelDeletePaymentMethod()" aria-label="סגור">&times;</button>
+          </div>
+          <div class="user-management__confirm-body">
+            <p class="user-management__confirm-message">
+              האם למחוק את שיטת התשלום "{{ getPaymentMethodDisplayText(deletePaymentMethodConfirm) }}"?
+            </p>
+            <p class="user-management__confirm-warning">פעולה זו אינה ניתנת לשחזור.</p>
+          </div>
+          <div class="user-management__confirm-actions">
+            <button type="button" class="user-management__confirm-btn user-management__confirm-btn--cancel" (click)="cancelDeletePaymentMethod()">
+              ביטול
+            </button>
+            <button type="button" class="user-management__confirm-btn user-management__confirm-btn--delete" (click)="confirmDeletePaymentMethod()">
+              מחיקה
+            </button>
           </div>
         </div>
       </div>
