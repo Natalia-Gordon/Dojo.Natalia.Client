@@ -24,6 +24,8 @@ export interface OpenOptions {
   prefillUsername?: string | null;
   /** Open register tab in edit mode for this user */
   userToEdit?: UserToEdit | null;
+  /** Show this message when login/refresh failed due to email not verified (403 + code email_not_verified) */
+  emailNotVerifiedMessage?: string | null;
 }
 
 @Injectable({
@@ -36,6 +38,7 @@ export class LoginModalService {
   public activeTab$: Observable<LoginModalTab> = this.activeTabSubject.asObservable();
   private prefillUsernameSubject = new BehaviorSubject<string | null>(null);
   private userToEditSubject = new BehaviorSubject<UserToEdit | null>(null);
+  private emailNotVerifiedMessageSubject = new BehaviorSubject<string | null>(null);
   public userToEdit$ = this.userToEditSubject.asObservable();
   private reconnectSuccessSubject = new Subject<void>();
   /** Emits when user successfully logs in from reconnect flow (401/403 recovery) */
@@ -49,6 +52,7 @@ export class LoginModalService {
       this.prefillUsernameSubject.next(null);
     }
     this.userToEditSubject.next(options?.userToEdit ?? null);
+    this.emailNotVerifiedMessageSubject.next(options?.emailNotVerifiedMessage ?? null);
     this.isOpenSubject.next(true);
   }
 
@@ -87,9 +91,18 @@ export class LoginModalService {
     this.userToEditSubject.next(null);
   }
 
+  get emailNotVerifiedMessage(): string | null {
+    return this.emailNotVerifiedMessageSubject.value;
+  }
+
+  clearEmailNotVerifiedMessage(): void {
+    this.emailNotVerifiedMessageSubject.next(null);
+  }
+
   close(): void {
     this.isOpenSubject.next(false);
     this.userToEditSubject.next(null);
+    this.emailNotVerifiedMessageSubject.next(null);
   }
 
   get isOpen(): boolean {

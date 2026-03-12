@@ -47,6 +47,11 @@ export class LoginComponent implements OnInit, OnDestroy {
         if (isOpen) {
           document.body.classList.add('modal-open');
           const username = this.loginModalService.prefillUsername;
+          const emailNotVerifiedMsg = this.loginModalService.emailNotVerifiedMessage;
+          if (emailNotVerifiedMsg) {
+            this.errorMessage = emailNotVerifiedMsg;
+            this.loginModalService.clearEmailNotVerifiedMessage();
+          }
           if (username) {
             this.isReconnectMode = true;
             this.activeTab = 'login';
@@ -151,7 +156,9 @@ export class LoginComponent implements OnInit, OnDestroy {
         console.error('Login error:', error);
         
         // Handle different error scenarios
-        if (error.status === 401 || error.status === 400) {
+        if (error.status === 403 && error.error?.code === 'email_not_verified') {
+          this.errorMessage = error.error?.message || 'נא לאמת את כתובת המייל לפני ההתחברות. בדקי את תיבת הדואר ולחצי על הקישור ששלחנו.';
+        } else if (error.status === 401 || error.status === 400) {
           this.errorMessage = 'שם משתמש או סיסמה שגויים';
         } else if (error.status === 503) {
           // Service Unavailable: backend up but dependency (e.g. DB) down

@@ -792,6 +792,11 @@ export class AuthService {
         if (isPlatformBrowser(this.platformId) && this.router) {
           this.router.navigate(['/home']);
         }
+        // If backend returned 403 email_not_verified, open login so user sees the message and can verify
+        if (isPlatformBrowser(this.platformId) && this.loginModalService && error?.status === 403 && error?.error?.code === 'email_not_verified') {
+          const msg = error?.error?.message || 'נא לאמת את כתובת המייל לפני ההתחברות. בדקי את תיבת הדואר ולחצי על הקישור ששלחנו.';
+          this.loginModalService.open('login', { emailNotVerifiedMessage: msg });
+        }
         return throwError(() => error);
       })
     );
