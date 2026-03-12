@@ -165,6 +165,40 @@
   position: relative;
 }
 
+.input-wrapper--password .form-input {
+  padding-inline-end: 2.75rem;
+}
+
+/* Eye button: same look as password input so it blends */
+.password-toggle {
+  position: absolute;
+  inset-inline-end: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: rgba(51, 65, 85, 0.6);
+  border: 1px solid rgba(100, 116, 139, 0.5);
+  color: #e2e8f0;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: #ffffff;
+  background: rgba(51, 65, 85, 0.85);
+  border-color: rgba(100, 116, 139, 0.6);
+}
+
+.password-toggle svg {
+  flex-shrink: 0;
+}
+
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;

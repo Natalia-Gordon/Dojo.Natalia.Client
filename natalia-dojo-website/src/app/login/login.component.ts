@@ -21,6 +21,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   errorMessage = '';
   activeTab: 'login' | 'register' = 'login';
   showModal = false;
+  /** Toggle to show login password as plain text */
+  showLoginPassword = false;
   /** When true, show login form even if user appears authenticated (reconnect after 401/403) */
   isReconnectMode = false;
   /** User to edit when opening register tab from user management */
@@ -111,6 +113,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   closeModal(): void {
     this.loginModalService.close();
     this.errorMessage = '';
+    this.showLoginPassword = false;
     this.loginForm.reset();
   }
 
@@ -187,6 +190,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   setActiveTab(tab: LoginModalTab): void {
     this.activeTab = tab;
     this.errorMessage = '';
+    this.showLoginPassword = false;
     if (tab === 'login') {
       this.loginForm.reset();
     }
