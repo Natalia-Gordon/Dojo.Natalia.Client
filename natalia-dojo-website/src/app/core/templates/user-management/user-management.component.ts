@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, Inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AuthService, User, UserInfo } from '../../../_services/auth.service';
@@ -11,7 +12,7 @@ import { CreateOrUpdatePaymentMethodRequest } from '../../../_services/payment-m
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.css'
 })

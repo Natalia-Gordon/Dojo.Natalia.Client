@@ -1,7 +1,25 @@
 <section class="user-management" dir="rtl">
+  <!-- Hero – same style as ניהול אירועים -->
+  <section class="user-management-hero">
+    <div class="user-management-hero__overlay">
+      <div class="user-management-hero__content" dir="rtl">
+        <h1 class="user-management-hero__title">ניהול משתמשים</h1>
+        <p class="user-management-hero__subtitle">צפייה ועריכת משתמשים והרשאות</p>
+        <div class="user-management-hero__breadcrumbs">
+          <a routerLink="/home">דף הבית</a>
+          <span class="divider">/</span>
+          <span>ניהול משתמשים</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-fluid user-management-container px-2 px-md-5" dir="rtl" style="overflow-x: hidden; max-width: 100vw; width: 100%;">
+    <div class="row g-5" style="margin: 0;">
+      <div class="col-12" style="padding: 0;">
+        <div class="user-management-content-card">
   <div class="user-management__header">
     <div class="user-management__header-row">
-      <h1 class="user-management__title">ניהול משתמשים</h1>
       @if (isAdmin && !isUnauthorized) {
         <div class="user-management__search-wrap">
           <span class="user-management__search-icon" aria-hidden="true">
@@ -232,6 +250,10 @@
         }
       </div>
     }
+        </div>
+      </div>
+    </div>
+  </div>
 
     <!-- Delete confirmation popup -->
     @if (deleteConfirmUser) {
