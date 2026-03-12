@@ -47,6 +47,10 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
   isRegisterLoading = false;
   registerError = '';
   registerSuccess = '';
+  /** Toggle to show password field as plain text */
+  showPassword = false;
+  /** Toggle to show confirm password field as plain text */
+  showConfirmPassword = false;
   private registeredUserId: number | null = null;
   private registeredUserSnapshot: Record<string, string | null> | null = null;
   private userInfoSubscription?: Subscription;
@@ -129,6 +133,8 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     this.registerSuccess = '';
     this.registeredUserId = null;
     this.registeredUserSnapshot = null;
+    this.showPassword = false;
+    this.showConfirmPassword = false;
     this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null, isActive: true });
     this.setRegisterModeValidators();
     this.updateRegisterControlStates();
@@ -142,6 +148,8 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     }
     this.registerError = '';
     this.registerSuccess = '';
+    this.showPassword = false;
+    this.showConfirmPassword = false;
     this.registeredUserId = user.id;
     const userType = this.mapRoleToUserType(user.role);
     this.registerForm.patchValue({
@@ -333,6 +341,47 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
 
   get registerConfirmPassword() {
     return this.registerForm.get('confirmPassword');
+  }
+
+  /** Password strength for display only (does not block registration). */
+  get passwordStrength(): 'empty' | 'weak' | 'medium' | 'strong' {
+    const p = (this.registerForm.get('password')?.value ?? '') as string;
+    return this.getPasswordStrength(p);
+  }
+
+  getPasswordStrength(p: string): 'empty' | 'weak' | 'medium' | 'strong' {
+    if (!p || p.length === 0) return 'empty';
+    const hasUpper = /[A-Z]/.test(p);
+    const hasLower = /[a-z]/.test(p);
+    const hasDigit = /\d/.test(p);
+    const hasSpecial = /[^A-Za-z0-9]/.test(p);
+    const typeCount = [hasUpper, hasLower, hasDigit, hasSpecial].filter(Boolean).length;
+    if (p.length < 8) return 'weak';
+    if (p.length >= 10 && typeCount >= 3) return 'strong';
+    if (p.length >= 8 && typeCount >= 2) return 'medium';
+    return 'weak';
+  }
+
+  /** Generate a strong password and set it in password + confirmPassword. */
+  generateStrongPassword(): void {
+    const length = 14;
+    const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const lower = 'abcdefghjkmnpqrstuvwxyz';
+    const digits = '23456789';
+    const special = '!@#$%&*';
+    const all = upper + lower + digits + special;
+    let p = '';
+    p += upper[Math.floor(Math.random() * upper.length)];
+    p += lower[Math.floor(Math.random() * lower.length)];
+    p += digits[Math.floor(Math.random() * digits.length)];
+    p += special[Math.floor(Math.random() * special.length)];
+    for (let i = p.length; i < length; i++) {
+      p += all[Math.floor(Math.random() * all.length)];
+    }
+    p = p.split('').sort(() => Math.random() - 0.5).join('');
+    this.registerForm.patchValue({ password: p, confirmPassword: p });
+    this.registerForm.get('password')?.markAsTouched();
+    this.registerForm.get('confirmPassword')?.markAsTouched();
   }
 
   get showConnectedRegistrationSuccess(): boolean {
