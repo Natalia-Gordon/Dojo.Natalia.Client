@@ -39,6 +39,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   editingPaymentMethod: InstructorPaymentMethodDto | null = null;
   isSavingPaymentMethod = false;
   paymentMethodForm!: FormGroup;
+  /** Payment method pending delete confirmation (אישור מחיקה popup) */
+  deletePaymentMethodConfirm: InstructorPaymentMethodDto | null = null;
 
   /** Instructor ID for current user (when role is instructor). Used for certificate upload. */
   instructorId: number | null = null;
@@ -627,9 +629,19 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  deletePaymentMethod(id: number): void {
-    if (!confirm('למחוק שיטת תשלום זו?')) return;
-    this.paymentMethodsService.delete(id)
+  openDeletePaymentMethodConfirm(pm: InstructorPaymentMethodDto): void {
+    this.deletePaymentMethodConfirm = pm;
+  }
+
+  cancelDeletePaymentMethod(): void {
+    this.deletePaymentMethodConfirm = null;
+  }
+
+  confirmDeletePaymentMethod(): void {
+    const pm = this.deletePaymentMethodConfirm;
+    if (!pm) return;
+    this.deletePaymentMethodConfirm = null;
+    this.paymentMethodsService.delete(pm.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => this.loadPaymentMethods(),

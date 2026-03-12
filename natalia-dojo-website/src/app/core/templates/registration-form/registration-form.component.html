@@ -444,7 +444,7 @@
       @if (showConnectedRegistrationUpdateButton || showEditUserUpdateButton) {
         <button
           type="button"
-          class="submit-button"
+          class="submit-button submit-button--save"
           [disabled]="isRegisterLoading || registerForm.invalid"
           (click)="onUpdateRegisteredUser()">
           @if (!isRegisterLoading) {

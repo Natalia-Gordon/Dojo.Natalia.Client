@@ -232,6 +232,16 @@
   margin-top: 0.5rem;
 }
 
+.submit-button--save {
+  background: #059669;
+}
+
+.submit-button--save:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
+
 .submit-button:hover:not(:disabled) {
   background: #b91c1c;
   transform: translateY(-1px);
