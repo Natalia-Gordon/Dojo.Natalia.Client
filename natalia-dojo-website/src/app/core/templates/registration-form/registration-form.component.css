@@ -71,6 +71,37 @@
   position: relative;
 }
 
+.input-wrapper--password .form-input {
+  padding-inline-end: 2.75rem;
+}
+
+.password-toggle {
+  position: absolute;
+  inset-inline-end: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.password-toggle svg {
+  flex-shrink: 0;
+}
+
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -108,6 +139,55 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+}
+
+/* Password strength indicator — display only, does not block submit */
+.password-strength {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+.password-strength__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.password-strength__bar {
+  height: 4px;
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.password-strength__fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+.password-strength--weak .password-strength__label { color: #f87171; }
+.password-strength--weak .password-strength__fill { background-color: #f87171; }
+.password-strength--medium .password-strength__label { color: #fbbf24; }
+.password-strength--medium .password-strength__fill { background-color: #fbbf24; }
+.password-strength--strong .password-strength__label { color: #22c55e; }
+.password-strength--strong .password-strength__fill { background-color: #22c55e; }
+
+.password-generator-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+.password-generator-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: #94a3b8;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.password-generator-btn:hover {
+  color: #22c55e;
 }
 
 .alert-error {
