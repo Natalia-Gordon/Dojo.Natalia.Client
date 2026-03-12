@@ -233,3 +233,14 @@ h6,
 }
 
 /*font-family: 'Moses', 'NarkisBlock';*/
+
+/* Required field asterisk + generic danger text */
+.required-asterisk,
+.text-danger {
+    color: #f674c9 !important;
+    font-weight: 700;
+}
+
+.required-asterisk {
+    margin-inline-start: 4px;
+}

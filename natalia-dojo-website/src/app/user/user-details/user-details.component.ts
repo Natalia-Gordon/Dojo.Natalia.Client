@@ -87,6 +87,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       branchName: [''],
       branchNumber: ['']
     });
+
+    this.applyPaymentMethodValidators(this.paymentMethodForm.get('paymentType')?.value ?? 'bank_transfer');
+    this.paymentMethodForm.get('paymentType')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((pt) => this.applyPaymentMethodValidators((pt ?? 'bank_transfer') as 'bit' | 'bank_transfer'));
   }
 
   ngOnInit(): void {
@@ -114,6 +119,34 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private applyPaymentMethodValidators(paymentType: 'bit' | 'bank_transfer'): void {
+    const phone = this.paymentMethodForm.get('phoneNumber');
+    const bankName = this.paymentMethodForm.get('bankName');
+    const bankNumber = this.paymentMethodForm.get('bankNumber');
+    const branchNumber = this.paymentMethodForm.get('branchNumber');
+    const accountNumber = this.paymentMethodForm.get('accountNumber');
+
+    if (paymentType === 'bit') {
+      phone?.setValidators([Validators.required]);
+      bankName?.clearValidators();
+      bankNumber?.clearValidators();
+      branchNumber?.clearValidators();
+      accountNumber?.clearValidators();
+    } else {
+      phone?.clearValidators();
+      bankName?.setValidators([Validators.required]);
+      bankNumber?.setValidators([Validators.required]);
+      branchNumber?.setValidators([Validators.required]);
+      accountNumber?.setValidators([Validators.required]);
+    }
+
+    phone?.updateValueAndValidity({ emitEvent: false });
+    bankName?.updateValueAndValidity({ emitEvent: false });
+    bankNumber?.updateValueAndValidity({ emitEvent: false });
+    branchNumber?.updateValueAndValidity({ emitEvent: false });
+    accountNumber?.updateValueAndValidity({ emitEvent: false });
   }
 
   loadUserDetails(userId: number): void {
@@ -579,6 +612,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       if (!phone) return null;
       return { paymentType: 'bit', isDefault: !!v.isDefault, phoneNumber: phone };
     }
+
+    const requiredBankName = (v.bankName || '').trim();
+    const requiredBankNumber = (v.bankNumber || '').trim();
+    const requiredBranchNumber = (v.branchNumber || '').trim();
+    const requiredAccountNumber = (v.accountNumber || '').trim();
+    if (!requiredBankName || !requiredBankNumber || !requiredBranchNumber || !requiredAccountNumber) return null;
+
     const bank: CreateOrUpdatePaymentMethodRequest = {
       paymentType: 'bank_transfer',
       isDefault: !!v.isDefault,
@@ -594,11 +634,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     set('iban', v.iban);
     set('swiftBic', v.swiftBic);
     set('bankAddress', v.bankAddress);
-    set('bankNumber', v.bankNumber);
+    set('bankNumber', requiredBankNumber);
     set('branchName', v.branchName);
-    set('branchNumber', v.branchNumber);
-    const hasBank = !!(bank.bankName || bank.accountHolderName || bank.accountNumber || bank.iban || bank.bankNumber || bank.branchName || bank.branchNumber);
-    if (!hasBank) return null;
+    set('branchNumber', requiredBranchNumber);
     return bank;
   }
 
@@ -608,7 +646,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       const pt = this.editingPaymentMethod?.paymentType ?? this.paymentMethodForm.value.paymentType;
       this.paymentMethodError = pt === 'bit'
         ? 'יש להזין מספר טלפון לביט'
-        : 'יש למלא לפחות שדה אחד של פרטי בנק';
+        : 'יש למלא פרטי בנק חובה: שם הבנק, מספר בנק, מספר סניף, מספר חשבון';
       return;
     }
     this.isSavingPaymentMethod = true;
