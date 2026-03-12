@@ -237,7 +237,7 @@
                         </div>
                         <!-- Email -->
                         <div class="user-details-form__field">
-                          <label class="user-details-form__label">כתובת דוא&quot;ל <span class="text-danger">*</span></label>
+                          <label class="user-details-form__label">כתובת דוא&quot;ל <span class="required-asterisk">*</span></label>
                           <input
                             type="email"
                             class="user-details-form__input"
@@ -517,7 +517,7 @@
                                               @if (paymentMethods.length === 0 && !showPaymentMethodForm) {
                                                 <div class="payment-methods-card__empty">
                                                   <i class="bi bi-wallet2"></i>
-                                                  <p class="payment-methods-card__empty-text">אין שיטות תשלום. אנא הוסיפי ביט או העברה בנקאית כדי שמשתתפים יוכלו לשלם.</p>
+                                                  <p class="payment-methods-card__empty-text">אין שיטות תשלום. אנא הוסיפי <strong>ביט</strong> או <strong>העברה בנקאית</strong> כדי שמשתתפים יוכלו לשלם.</p>
                                                 </div>
                                               }
                                               @if (paymentMethods.length > 0 || showPaymentMethodForm) {
@@ -548,8 +548,8 @@
                                                             <div class="payment-method-form__field">
                                                               <label class="payment-method-form__label">סוג</label>
                                                               <select class="payment-method-form__input form-select" formControlName="paymentType">
-                                                                <option value="bank_transfer">העברה בנקאית</option>
-                                                                <option value="bit">ביט (Bit)</option>
+                                                                <option value="bank_transfer"><strong>העברה בנקאית</strong></option>
+                                                                <option value="bit"><strong>ביט (Bit)</strong></option>
                                                               </select>
                                                             </div>
                                                             <div class="payment-method-form__field payment-method-form__field--checkbox">
@@ -561,17 +561,17 @@
                                                           </div>
                                                           @if (paymentTypeFormValue === 'bit') {
                                                             <div class="payment-method-form__field">
-                                                              <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                                                              <label class="payment-method-form__label">מספר טלפון (ביט) <span class="required-asterisk">*</span></label>
                                                               <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
                                                             </div>
                                                           }
                                                           @if (paymentTypeFormValue === 'bank_transfer') {
                                                             <div class="payment-method-form__grid">
-                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
-                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק <span class="required-asterisk">*</span></label><input type="text" class="payment-method-form__input form-control" formControlName="bankName" required></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק <span class="required-asterisk">*</span></label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber" required></div>
                                                               <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
-                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
-                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף <span class="required-asterisk">*</span></label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber" required></div>
+                                                              <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון <span class="required-asterisk">*</span></label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber" required></div>
                                                               <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
                                                               <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
                                                               <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>
@@ -600,8 +600,8 @@
                                                         <div class="payment-method-form__field">
                                                           <label class="payment-method-form__label">סוג</label>
                                                           <select class="payment-method-form__input form-select" formControlName="paymentType">
-                                                            <option value="bank_transfer">העברה בנקאית</option>
-                                                            <option value="bit">ביט (Bit)</option>
+                                                            <option value="bank_transfer"><strong>העברה בנקאית</strong></option>
+                                                            <option value="bit"><strong>ביט (Bit)</strong></option>
                                                           </select>
                                                         </div>
                                                         <div class="payment-method-form__field payment-method-form__field--checkbox">
@@ -613,17 +613,17 @@
                                                       </div>
                                                       @if (paymentTypeFormValue === 'bit') {
                                                         <div class="payment-method-form__field">
-                                                          <label class="payment-method-form__label">מספר טלפון (ביט) <span class="text-danger">*</span></label>
+                                                          <label class="payment-method-form__label">מספר טלפון (ביט) <span class="required-asterisk">*</span></label>
                                                           <input type="tel" class="payment-method-form__input form-control" formControlName="phoneNumber" placeholder="למשל 050-1234567">
                                                         </div>
                                                       }
                                                       @if (paymentTypeFormValue === 'bank_transfer') {
                                                         <div class="payment-method-form__grid">
-                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankName"></div>
-                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק</label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">שם הבנק <span class="required-asterisk">*</span></label><input type="text" class="payment-method-form__input form-control" formControlName="bankName" required></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר בנק <span class="required-asterisk">*</span></label><input type="text" class="payment-method-form__input form-control" formControlName="bankNumber" required></div>
                                                           <div class="payment-method-form__field"><label class="payment-method-form__label">סניף / שם סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchName"></div>
-                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף</label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber"></div>
-                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber"></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר סניף <span class="required-asterisk">*</span></label><input type="text" class="payment-method-form__input form-control" formControlName="branchNumber" required></div>
+                                                          <div class="payment-method-form__field"><label class="payment-method-form__label">מספר חשבון <span class="required-asterisk">*</span></label><input type="text" class="payment-method-form__input form-control" formControlName="accountNumber" required></div>
                                                           <div class="payment-method-form__field"><label class="payment-method-form__label">שם בעל החשבון</label><input type="text" class="payment-method-form__input form-control" formControlName="accountHolderName"></div>
                                                           <div class="payment-method-form__field"><label class="payment-method-form__label">IBAN</label><input type="text" class="payment-method-form__input form-control" formControlName="iban"></div>
                                                           <div class="payment-method-form__field"><label class="payment-method-form__label">SWIFT/BIC</label><input type="text" class="payment-method-form__input form-control" formControlName="swiftBic"></div>

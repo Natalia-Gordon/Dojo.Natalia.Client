@@ -631,9 +631,9 @@
 }
 
 .user-management__bank-dialog--payment-methods .payment-methods-card__alert--error {
-  background: rgba(220, 38, 38, 0.15);
-  color: #fecaca;
-  border: 1px solid rgba(220, 38, 38, 0.4);
+  background: rgba(220, 38, 38, 0.32);
+  color: #fee2e2;
+  border: 1px solid rgba(220, 38, 38, 0.75);
 }
 
 .user-management__bank-dialog--payment-methods .payment-methods-card__loading {
@@ -656,9 +656,14 @@
 }
 
 .user-management__bank-dialog--payment-methods .payment-method-item__badge,
-.user-management__bank-dialog--payment-methods .payment-method-item__default,
 .user-management__bank-dialog--payment-methods .payment-method-item__separator {
   color: #ffffff;
+}
+
+/* Keep existing badge background; just make text red + bold */
+.user-management__bank-dialog--payment-methods .payment-method-item__default {
+  color: #da3131;
+  font-weight: 700;
 }
 
 .user-management__bank-dialog--payment-methods .payment-method-item__btn--edit {
@@ -712,7 +717,7 @@
 }
 
 .user-management__bank-dialog--payment-methods .text-danger {
-  color: #dc2626;
+  color: #7e677f;
 }
 
 .user-management__bank-dialog--payment-methods .btn-danger {
