@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, Inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AuthService, User, UserInfo } from '../../../_services/auth.service';
@@ -88,12 +88,16 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   });
   private rankNameById = new Map<number, string>();
 
+  /** When true, we have already triggered logout+redirect for no-permission (avoid duplicate). */
+  private hasRedirectedNoPermission = false;
+
   constructor(
     private authService: AuthService,
     private loginModalService: LoginModalService,
     private ranksService: RanksService,
     private instructorsService: InstructorsService,
     private fb: FormBuilder,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.paymentMethodForm = this.fb.group({
@@ -124,6 +128,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.userInfo = this.authService.getUserInfo();
     this.isAdmin = this.isAdminUser(this.userInfo);
 
+    if (!this.isAdmin && this.userInfo != null) this.logoutAndRedirectToHome();
     if (this.isAdmin) {
       if (this.authService.isTokenExpired()) {
         this.isUnauthorized = true;
@@ -143,6 +148,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         }
         this.isAdmin = false;
         this.isLoading = false;
+        if (!this.isUnauthorized) this.logoutAndRedirectToHome();
       }
     });
 
@@ -156,6 +162,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         this.loadUsers();
       } else if (!this.isAdmin) {
         this.users = [];
+        if (userInfo != null && !this.isUnauthorized) this.logoutAndRedirectToHome();
       }
     });
 
@@ -803,8 +810,28 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   /** Open login modal for re-authentication (401/403 recovery) */
+  /** When user would see "no permission" message: auto logout and redirect to home (like 401). */
+  private logoutAndRedirectToHome(): void {
+    if (this.hasRedirectedNoPermission) return;
+    this.hasRedirectedNoPermission = true;
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/home']),
+      error: () => this.router.navigate(['/home'])
+    });
+  }
+
   openLoginModal(): void {
     this.loginModalService.openForReconnect(this.authService.getUserInfo()?.username ?? null);
+  }
+
+  /** Navigate to home (used from restricted view and elsewhere). */
+  goToHome(): void {
+    this.router.navigate(['/home']);
+  }
+
+  /** Logout and navigate to home (used from restricted view). */
+  onLogoutAndGoHome(): void {
+    this.logoutAndRedirectToHome();
   }
 
   getSelectedUser(): User | null {

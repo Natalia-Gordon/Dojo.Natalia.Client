@@ -188,9 +188,71 @@
 }
 
 .event-registrations__restricted {
-  padding: 20px;
+  padding: 2rem;
   text-align: center;
-  color: #6b7280;
+  color: #64748b;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.95));
+  border: 2px dashed rgba(148, 163, 184, 0.3);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+}
+
+.event-registrations__restricted-text {
+  margin: 0 0 1.5rem;
+  font-size: 1.1rem;
+}
+
+.event-registrations__restricted-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.event-registrations__restricted-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  color: inherit;
+  font-family: inherit;
+}
+
+.event-registrations__restricted-btn--primary {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+.event-registrations__restricted-btn--primary:hover {
+  background: linear-gradient(135deg, #b91c1c, #991b1b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  color: #fff;
+}
+
+.event-registrations__restricted-btn--secondary {
+  background: rgba(100, 116, 139, 0.15);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.event-registrations__restricted-btn--secondary:hover {
+  background: #64748b;
+  color: #fff;
+  border-color: #64748b;
+}
+
+.event-registrations__restricted-btn .bi {
+  font-size: 1.1rem;
 }
 
 .event-registrations__content {

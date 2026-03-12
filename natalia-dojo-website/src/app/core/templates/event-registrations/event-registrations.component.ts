@@ -47,6 +47,9 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
   /** Breadcrumb: when user opened this page from /events (badge), show אירועים in trail. */
   breadcrumbFromEvents = false;
 
+  /** When true, we have already triggered logout+redirect for no-permission (avoid duplicate). */
+  private hasRedirectedNoPermission = false;
+
   private routeSubscription?: Subscription;
   private queryParamSubscription?: Subscription;
   private authSubscription?: Subscription;
@@ -64,6 +67,8 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
 
     this.userInfo = this.authService.getUserInfo();
     this.isAdminOrInstructor = this.canApprovePayments(this.userInfo);
+
+    if (!this.isAdminOrInstructor && this.userInfo != null) this.logoutAndRedirectToHome();
 
     this.breadcrumbFromEvents = this.route.snapshot.queryParams['from'] === 'events';
     this.queryParamSubscription = this.route.queryParams.subscribe((q) => {
@@ -87,9 +92,11 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
       if (!token) {
         this.registrations = [];
         this.isAdminOrInstructor = false;
+        this.logoutAndRedirectToHome();
       } else {
         this.userInfo = this.authService.getUserInfo();
         this.isAdminOrInstructor = this.canApprovePayments(this.userInfo);
+        if (!this.isAdminOrInstructor && this.userInfo != null) this.logoutAndRedirectToHome();
       }
     });
   }
@@ -154,8 +161,28 @@ export class EventRegistrationsComponent implements OnInit, OnDestroy {
     this.loadRegistrations();
   }
 
+  /** When user would see "no permission" message: auto logout and redirect to home (like 401). */
+  private logoutAndRedirectToHome(): void {
+    if (this.hasRedirectedNoPermission) return;
+    this.hasRedirectedNoPermission = true;
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/home']),
+      error: () => this.router.navigate(['/home'])
+    });
+  }
+
   goBack(): void {
     this.router.navigate(['/admin/events']);
+  }
+
+  /** Navigate to home (used from restricted view). */
+  goToHome(): void {
+    this.router.navigate(['/home']);
+  }
+
+  /** Logout and navigate to home (used from restricted view). */
+  onLogoutAndGoHome(): void {
+    this.logoutAndRedirectToHome();
   }
 
   exportCsv(): void {

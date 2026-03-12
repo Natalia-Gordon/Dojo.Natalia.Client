@@ -45,7 +45,7 @@
   }
 
   @if (!isAdminOrInstructor) {
-    <div class="event-registrations__restricted">אין לך הרשאה לצפות בעמוד זה.</div>
+    <!-- No permission: logout and redirect to home (handled in component, like 401) -->
   }
 
   @if (isAdminOrInstructor && eventId != null) {

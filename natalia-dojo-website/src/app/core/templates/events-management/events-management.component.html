@@ -20,9 +20,7 @@
     <div class="col-12" style="padding: 0;">
       <div class="events-management-content-card">
         @if (!canManageEvents) {
-          <div class="events-management-restricted">
-            אין לך הרשאה לצפות בעמוד זה.
-          </div>
+          <!-- No permission: logout and redirect to home (handled in component, like 401) -->
         }
 
         @if (canManageEvents) {

@@ -97,6 +97,9 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
     { value: 'both' as const, label: 'שניהם' },
   ] as const;
 
+  /** When true, we have already triggered logout+redirect for no-permission (avoid duplicate). */
+  private hasRedirectedNoPermission = false;
+
   private authSubscription?: Subscription;
   private userSubscription?: Subscription;
   /** Polling interval for registrations (email-sent timestamps) while modal is open. */
@@ -118,6 +121,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
     this.isAdmin = this.isAdminUser(this.userInfo);
     this.canManageEvents = this.canManageEventsRole(this.userInfo);
 
+    if (!this.canManageEvents && this.userInfo != null) this.logoutAndRedirectToHome();
     if (this.canManageEvents) {
       this.loadEvents();
       const id = this.route.snapshot.paramMap.get('id');
@@ -135,6 +139,7 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
         this.pagedEvents = [];
         this.canManageEvents = false;
         this.isAdmin = false;
+        this.logoutAndRedirectToHome();
       }
     });
 
@@ -143,7 +148,10 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
       this.isAdmin = this.isAdminUser(userInfo);
       this.canManageEvents = this.canManageEventsRole(userInfo);
       if (this.canManageEvents) this.loadEvents();
-      else this.pagedEvents = [];
+      else {
+        this.pagedEvents = [];
+        if (userInfo != null && !this.canManageEventsRole(userInfo)) this.logoutAndRedirectToHome();
+      }
     });
   }
 
@@ -305,6 +313,29 @@ export class EventsManagementComponent implements OnInit, OnDestroy {
   getRegisteredCount(eventId: number): number {
     const key = String(eventId);
     return this.registeredCountByEventId[key] ?? 0;
+  }
+
+  /** When user would see "no permission" message: auto logout and redirect to home (like 401). */
+  private logoutAndRedirectToHome(): void {
+    if (this.hasRedirectedNoPermission) return;
+    this.hasRedirectedNoPermission = true;
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/home']),
+      error: () => this.router.navigate(['/home'])
+    });
+  }
+
+  /** Navigate to home (used from restricted view). */
+  goToHome(): void {
+    this.router.navigate(['/home']);
+  }
+
+  /** Logout and navigate to home (used from restricted view). */
+  onLogoutAndGoHome(): void {
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/home']),
+      error: () => this.router.navigate(['/home'])
+    });
   }
 
   goToEvent(id: number): void {

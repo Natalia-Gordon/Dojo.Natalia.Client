@@ -101,6 +101,64 @@
   border-radius: 16px;
 }
 
+.events-management-restricted__text {
+  margin: 0 0 1.5rem;
+  font-size: 1.1rem;
+}
+
+.events-management-restricted__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.events-management-restricted__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  color: inherit;
+  font-family: inherit;
+}
+
+.events-management-restricted__btn--primary {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+.events-management-restricted__btn--primary:hover {
+  background: linear-gradient(135deg, #b91c1c, #991b1b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  color: #fff;
+}
+
+.events-management-restricted__btn--secondary {
+  background: rgba(100, 116, 139, 0.15);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.events-management-restricted__btn--secondary:hover {
+  background: #64748b;
+  color: #fff;
+  border-color: #64748b;
+}
+
+.events-management-restricted__btn .bi {
+  font-size: 1.1rem;
+}
+
 /* Alerts */
 .alert {
   border-radius: 12px;

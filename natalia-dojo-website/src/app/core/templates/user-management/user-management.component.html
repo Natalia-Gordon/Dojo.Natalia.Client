@@ -94,9 +94,7 @@
   </div>
 
   @if (!isAdmin && !isUnauthorized) {
-    <div class="user-management__restricted">
-      אין לך הרשאה לצפות בעמוד זה.
-    </div>
+    <!-- No permission: logout and redirect to home (handled in component, like 401) -->
   }
 
   @if (isAdmin && !isUnauthorized) {
