@@ -156,9 +156,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.userInfo = userInfo;
       this.isAdmin = this.isAdminUser(userInfo);
       if (this.isAdmin && !this.authService.isTokenExpired() && !this.isUnauthorized) {
-        if (!this.ranks.length && !this.isRanksLoading) {
-          this.loadRanks();
-        }
         this.loadUsers();
       } else if (!this.isAdmin) {
         this.users = [];

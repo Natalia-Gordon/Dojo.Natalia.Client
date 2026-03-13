@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { shareReplay, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -26,6 +27,8 @@ export interface Rank {
 })
 export class RanksService {
   private apiUrl = environment.apiUrl;
+  /** Cache per rankType so multiple components share one HTTP request per page load. */
+  private cache = new Map<string, Observable<Rank[]>>();
 
   constructor(
     private http: HttpClient,
@@ -33,9 +36,23 @@ export class RanksService {
   ) {}
 
   getRanks(rankType?: string): Observable<Rank[]> {
-    const query = rankType ? `?rankType=${encodeURIComponent(rankType)}` : '';
-    const headers = this.getAuthHeaders();
-    return this.http.get<Rank[]>(`${this.apiUrl}/ranks${query}`, { headers });
+    const key = rankType ?? '';
+    let obs = this.cache.get(key);
+    if (!obs) {
+      const query = rankType ? `?rankType=${encodeURIComponent(rankType)}` : '';
+      const headers = this.getAuthHeaders();
+      obs = this.http.get<Rank[]>(`${this.apiUrl}/ranks${query}`, { headers }).pipe(
+        shareReplay(1),
+        catchError(() => of([]))
+      );
+      this.cache.set(key, obs);
+    }
+    return obs;
+  }
+
+  /** Clear cache (e.g. on logout) so next request after login is fresh. */
+  clearCache(): void {
+    this.cache.clear();
   }
 
   private getAuthHeaders(): HttpHeaders {

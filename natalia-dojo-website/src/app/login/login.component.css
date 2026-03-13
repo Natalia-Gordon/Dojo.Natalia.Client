@@ -169,7 +169,7 @@
   padding-inline-end: 2.75rem;
 }
 
-/* Eye button: same look as password input so it blends */
+/* Eye button: same as registration form */
 .password-toggle {
   position: absolute;
   inset-inline-end: 0.5rem;
@@ -199,6 +199,7 @@
   flex-shrink: 0;
 }
 
+/* Same as registration form .form-input – unified for both username and password */
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -210,13 +211,16 @@
   transition: all 0.3s ease;
 }
 
-.form-textarea {
-  resize: vertical;
-  min-height: 96px;
-}
-
-.form-input::placeholder {
-  color: #64748b;
+/* Unify background in Edge/Chrome for text and password (autofill) */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus,
+.form-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 100vmax rgba(51, 65, 85, 0.6) inset !important;
+  box-shadow: 0 0 0 100vmax rgba(51, 65, 85, 0.6) inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  transition: background-color 5000s ease 0s;
 }
 
 .form-input:focus {
@@ -224,6 +228,20 @@
   border-color: #dc2626;
   background: rgba(51, 65, 85, 0.8);
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-input:focus:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100vmax rgba(51, 65, 85, 0.8) inset !important;
+  box-shadow: 0 0 0 100vmax rgba(51, 65, 85, 0.8) inset !important;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.form-input::placeholder {
+  color: #64748b;
 }
 
 .form-input.error {

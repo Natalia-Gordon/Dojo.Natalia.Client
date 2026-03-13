@@ -53,6 +53,8 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
   showConfirmPassword = false;
   private registeredUserId: number | null = null;
   private registeredUserSnapshot: Record<string, string | null> | null = null;
+  /** Full list from API; re-filtered locally when user type or role changes (no refetch). */
+  private allRanks: Rank[] = [];
   private userInfoSubscription?: Subscription;
   private userTypeSubscription?: Subscription;
   private emailToUsernameSubscription?: Subscription;
@@ -83,7 +85,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
       this.setUserTypeControlState();
       this.setPhoneValidators();
       if (this.showRankSelect) {
-        this.loadRanks();
+        this.applyRankFilterFromCache();
       } else {
         this.ranks = [];
         this.setRankValidators();
@@ -94,7 +96,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
       this.setRankControlState();
       this.setPhoneValidators();
       if (this.showRankSelect) {
-        this.loadRanks();
+        this.applyRankFilterFromCache();
       } else {
         this.ranks = [];
         this.setRankValidators();
@@ -491,6 +493,10 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     return 'guest';
   }
 
+  /**
+   * Fetch ranks only when registration form is shown and needs them (local trigger).
+   * Called from ngOnInit and when opening for edit (setUserToEdit) when showRankSelect.
+   */
   private loadRanks(): void {
     this.isRanksLoading = true;
     this.ranksError = '';
@@ -498,8 +504,10 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     this.setRankControlState();
     this.ranksService.getRanks().subscribe({
       next: ranks => {
-        const filteredRanks = this.filterRanksByRole(ranks || []);
-        this.ranks = [...filteredRanks].sort((a, b) => {
+        const raw = ranks || [];
+        this.allRanks = raw;
+        const filtered = this.filterRanksByRole(raw);
+        this.ranks = [...filtered].sort((a, b) => {
           const aOrder = a.display_order ?? 0;
           const bOrder = b.display_order ?? 0;
           return aOrder - bOrder;
@@ -513,6 +521,23 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
         this.setRankControlState();
       }
     });
+  }
+
+  /** Re-apply role/userType filter from already-fetched allRanks (no API call). */
+  private applyRankFilterFromCache(): void {
+    if (this.allRanks.length === 0) {
+      this.setRankValidators();
+      this.setRankControlState();
+      return;
+    }
+    const filtered = this.filterRanksByRole(this.allRanks);
+    this.ranks = [...filtered].sort((a, b) => {
+      const aOrder = a.display_order ?? 0;
+      const bOrder = b.display_order ?? 0;
+      return aOrder - bOrder;
+    });
+    this.setRankValidators();
+    this.setRankControlState();
   }
 
   private filterRanksByRole(ranks: Rank[]): Rank[] {
