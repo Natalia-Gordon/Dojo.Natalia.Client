@@ -45,18 +45,23 @@
           </button>
           <div class="user-info">
             <div class="user-name">{{ userInfo.displayName || userInfo.username }}</div>
+            @if (userInfo.joinDate) {
+              <div class="user-join-date">
+                תאריך הצטרפות: {{ formatJoinDate(userInfo.joinDate) }}
+              </div>
+            }
             @if (userInfo.lastLoginAt) {
               <div class="user-last-login">
                 התחברות אחרונה: {{ formatLastLogin(userInfo.lastLoginAt) }}
               </div>
             }
             <div class="user-badges">
-              <span class="badge" [ngClass]="getLevelColor(userInfo.level)">
-                {{ userInfo.level || 'User' }}
+              <span class="badge badge-role">
+                {{ getRoleLabelHebrew(userInfo.role) }}
               </span>
-              @if (userInfo.role) {
-                <span class="badge badge-role">
-                  {{ userInfo.role }}
+              @if (userInfo.level) {
+                <span class="badge" [ngClass]="getLevelColor(userInfo.level)">
+                  {{ userInfo.level }}
                 </span>
               }
             </div>

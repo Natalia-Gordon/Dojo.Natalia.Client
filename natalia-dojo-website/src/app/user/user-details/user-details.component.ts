@@ -11,6 +11,7 @@ import { PaymentMethodsService, CreateOrUpdatePaymentMethodRequest } from '../..
 import { InstructorCertificate, InstructorPaymentMethodDto } from '../../_services/instructors.service';
 import { InstructorsService } from '../../_services/instructors.service';
 import { getDriveFileId, getProfileImageUrlForAttempt } from '../../_utils/profile-image';
+import { getRoleLabelHebrew } from '../../_utils/role-labels';
 
 @Component({
   selector: 'app-user-details',
@@ -455,6 +456,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       console.error('Error formatting date:', error);
       return '';
     }
+  }
+
+  getRoleLabelHebrew(role: string | null | undefined): string {
+    return getRoleLabelHebrew(role);
   }
 
   formatLastLogin(lastLoginAt: string | null | undefined): string {

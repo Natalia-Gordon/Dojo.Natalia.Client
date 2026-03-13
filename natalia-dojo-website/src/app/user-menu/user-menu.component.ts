@@ -5,6 +5,7 @@ import { AuthService, UserInfo } from '../_services/auth.service';
 import { LoginModalService } from '../_services/login-modal.service';
 import { Subscription } from 'rxjs';
 import { getDriveFileId, getProfileImageUrlForAttempt } from '../_utils/profile-image';
+import { getRoleLabelHebrew } from '../_utils/role-labels';
 
 @Component({
   selector: 'app-user-menu',
@@ -206,6 +207,23 @@ export class UserMenuComponent implements OnInit, OnDestroy {
       console.error('Error formatting last login date:', error);
       return '';
     }
+  }
+
+  formatJoinDate(joinDate: string | null | undefined): string {
+    if (!joinDate) return '';
+    try {
+      const date = new Date(joinDate);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch {
+      return '';
+    }
+  }
+
+  getRoleLabelHebrew(role: string | null | undefined): string {
+    return getRoleLabelHebrew(role);
   }
 
   @HostListener('document:click', ['$event'])

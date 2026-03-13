@@ -73,6 +73,7 @@ export interface UserInfo {
   level: string | null;
   lastLoginAt?: string | null;
   profileImageUrl?: string | null;
+  joinDate?: string | null;
 }
 
 export interface User {
@@ -649,7 +650,11 @@ export class AuthService {
       tap((user: User) => {
         const current = this.getUserInfo();
         if (current && current.userId === userId) {
-          this.setUserInfo({ ...current, profileImageUrl: user.profileImageUrl ?? null });
+          this.setUserInfo({
+            ...current,
+            profileImageUrl: user.profileImageUrl ?? null,
+            joinDate: user.joinDate ?? current.joinDate ?? null
+          });
         }
       }),
       catchError((error: any) => {
@@ -704,7 +709,8 @@ export class AuthService {
             role: updatedUser.role,
             level: updatedUser.level,
             lastLoginAt: updatedUser.lastLoginAt || null,
-            profileImageUrl: updatedUser.profileImageUrl ?? currentUserInfo.profileImageUrl ?? null
+            profileImageUrl: updatedUser.profileImageUrl ?? currentUserInfo.profileImageUrl ?? null,
+            joinDate: updatedUser.joinDate ?? currentUserInfo.joinDate ?? null
           };
           this.setUserInfo(updatedUserInfo);
         }
@@ -779,7 +785,8 @@ export class AuthService {
             role: response.role,
             level: response.level,
             lastLoginAt: response.lastLoginAt || null,
-            profileImageUrl: (response as TokenResponse & { profileImageUrl?: string | null }).profileImageUrl ?? current?.profileImageUrl ?? null
+            profileImageUrl: (response as TokenResponse & { profileImageUrl?: string | null }).profileImageUrl ?? current?.profileImageUrl ?? null,
+            joinDate: current?.joinDate ?? null
           };
           this.setUserInfo(userInfo);
         }

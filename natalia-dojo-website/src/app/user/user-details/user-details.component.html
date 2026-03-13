@@ -74,7 +74,7 @@
                   <div class="info-item__label">תפקיד</div>
                   <div class="info-item__value">
                     @if (user.role) {
-                      <span class="badge badge-role">{{ user.role }}</span>
+                      <span class="badge badge-role">{{ getRoleLabelHebrew(user.role) }}</span>
                     }
                     @if (!user.role) {
                       <span class="text-muted small">לא הוגדר</span>

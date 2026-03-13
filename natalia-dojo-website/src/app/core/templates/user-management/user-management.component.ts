@@ -8,6 +8,7 @@ import { LoginModalService } from '../../../_services/login-modal.service';
 import { Rank, RanksService } from '../../../_services/ranks.service';
 import { InstructorsService, Instructor, InstructorPaymentMethodDto } from '../../../_services/instructors.service';
 import { CreateOrUpdatePaymentMethodRequest } from '../../../_services/payment-methods.service';
+import { getRoleLabelHebrew } from '../../../_utils/role-labels';
 
 @Component({
   selector: 'app-user-management',
@@ -471,6 +472,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     if (!currentRankId) return '—';
     const rankName = this.rankNameById.get(currentRankId);
     return rankName ? rankName : '—';
+  }
+
+  getRoleLabelHebrew(role: string | null | undefined): string {
+    return getRoleLabelHebrew(role);
   }
 
   /** Extract Google Drive file ID from various URL formats. */
