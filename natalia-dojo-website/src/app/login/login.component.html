@@ -122,8 +122,8 @@
               </div>
             }
 
-            <!-- Register Form (hidden in reconnect mode) -->
-            @if (activeTab === 'register' && !isReconnectMode) {
+            <!-- Register Form: only when modal is open and register tab is active (avoids /api/ranks on page refresh) -->
+            @if (showModal && activeTab === 'register' && !isReconnectMode) {
               <app-registration-form
                 [showLoginTab]="showLoginTab"
                 [userToEdit]="userToEditForForm"
