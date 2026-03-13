@@ -5,6 +5,8 @@ export interface GalleryImage {
   src: string;
   alt: string;
   title?: string;
+  /** Optional longer description for the slider. */
+  description?: string;
   loaded?: boolean;
   error?: boolean;
 }
@@ -25,8 +27,7 @@ export class GalleryImageComponent implements OnInit, OnDestroy {
   @Output() imageError = new EventEmitter<{event: Event, index: number}>();
 
   selectedImage: GalleryImage | null = null;
-  showModal = false;
-  showFullImageModal = false;
+  showFullscreen = false;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
@@ -42,32 +43,18 @@ export class GalleryImageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cleanup if needed (e.g., clear specific timeouts if they were stored per instance)
+    if (this.showFullscreen && isPlatformBrowser(this.platformId)) {
+      document.body.style.overflow = '';
+    }
   }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    if (!this.showModal && !this.showFullImageModal) return;
+    if (!this.showFullscreen) return;
 
-    switch (event.key) {
-      case 'Escape':
-        if (this.showFullImageModal) {
-          this.closeFullImageModal();
-        } else {
-          this.closeModal();
-        }
-        break;
-      case 'ArrowLeft':
-        if (this.showModal && !this.showFullImageModal) {
-          this.nextImage();
-        }
-        break;
-      case 'ArrowRight':
-        if (this.showModal && !this.showFullImageModal) {
-          this.previousImage();
-        }
-        break;
+    if (event.key === 'Escape') {
+      this.closeFullscreen();
     }
   }
 
@@ -91,10 +78,17 @@ export class GalleryImageComponent implements OnInit, OnDestroy {
 
   onImageClick(): void {
     this.selectedImage = this.image;
-    this.showModal = true;
-    this.showFullImageModal = false;
+    this.showFullscreen = true;
     if (isPlatformBrowser(this.platformId)) {
       document.body.style.overflow = 'hidden';
+    }
+  }
+
+  closeFullscreen(): void {
+    this.showFullscreen = false;
+    this.selectedImage = null;
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.style.overflow = '';
     }
   }
 
@@ -108,40 +102,5 @@ export class GalleryImageComponent implements OnInit, OnDestroy {
     this.image.error = true;
     this.image.loaded = false;
     this.imageError.emit({ event, index: this.index });
-  }
-
-  closeModal(): void {
-    this.showModal = false;
-    this.showFullImageModal = false;
-    this.selectedImage = null;
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.style.overflow = 'auto';
-    }
-  }
-
-  viewFullImage(): void {
-    this.showFullImageModal = true;
-    this.showModal = false;
-  }
-
-  closeFullImageModal(): void {
-    this.showFullImageModal = false;
-    this.showModal = true;
-  }
-
-  nextImage(): void {
-    if (this.selectedImage && this.allImages.length > 0) {
-      const currentIndex = this.allImages.findIndex(img => img.src === this.selectedImage?.src);
-      const nextIndex = (currentIndex + 1) % this.allImages.length;
-      this.selectedImage = this.allImages[nextIndex];
-    }
-  }
-
-  previousImage(): void {
-    if (this.selectedImage && this.allImages.length > 0) {
-      const currentIndex = this.allImages.findIndex(img => img.src === this.selectedImage?.src);
-      const prevIndex = currentIndex === 0 ? this.allImages.length - 1 : currentIndex - 1;
-      this.selectedImage = this.allImages[prevIndex];
-    }
   }
 } 

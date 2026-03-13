@@ -1,56 +1,271 @@
-/* Add your custom styles for the photo gallery here */
-::ng-deep ngx-gallery {
-    border-radius: 12px;
+/* Gallery hero: same style as events page, same image (home.jpg) as before */
+.gallery-hero {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  background-image: linear-gradient(rgba(34, 36, 41, 0.8), rgba(34, 36, 41, 0.8)), url('/assets/img/home.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.gallery-hero__overlay {
+  width: 100%;
+  padding: 4rem 1.5rem;
+}
+
+.gallery-hero__content {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: right;
+  color: #ffffff;
+}
+
+.gallery-hero__title {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-hero__subtitle {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-hero__breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(26, 26, 26, 0.7);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.gallery-hero__breadcrumbs a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.gallery-hero__breadcrumbs a:hover {
+  color: #fff;
+}
+
+.gallery-hero__breadcrumbs .divider {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media (max-width: 768px) {
+  .gallery-hero {
+    min-height: 300px;
   }
-   
-  ::ng-deep .ngx-gallery-preview-img {
-    cursor: zoom-in;
+
+  .gallery-hero__overlay {
+    padding: 3rem 1.25rem;
   }
+
+  .gallery-hero__breadcrumbs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    row-gap: 0.25rem;
+    justify-content: center;
+  }
+}
+
+/* Photo slider: full-width image with arrows overlaid on the image */
+.gallery-slider-section {
+  margin: 2rem 0 3rem;
+  padding: 0;
+  width: 100%;
+}
+
+.gallery-slider {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gallery-slider__image-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.gallery-slider__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.gallery-slider__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.gallery-slider__arrow:hover {
+  background: rgba(220, 38, 38, 0.9);
+  color: #fff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.gallery-slider__arrow:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.gallery-slider__arrow--next {
+  inset-inline-start: 1rem;
+}
+
+.gallery-slider__arrow--prev {
+  inset-inline-end: 1rem;
+}
+
+.gallery-slider__caption {
+  text-align: center;
+  padding: 1.25rem 1rem 0;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.gallery-slider__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.gallery-slider__description {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .gallery-slider-section {
+    margin: 1.5rem 0 2rem;
+  }
+
+  .gallery-slider__img {
+    max-height: 50vh;
+  }
+
+  .gallery-slider__arrow {
+    width: 44px;
+    height: 44px;
+  }
+
+  .gallery-slider__arrow--next {
+    inset-inline-start: 0.75rem;
+  }
+
+  .gallery-slider__arrow--prev {
+    inset-inline-end: 0.75rem;
+  }
+
+  .gallery-slider__arrow svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .gallery-slider__caption {
+    padding: 1rem 0.75rem 0;
+  }
+
+  .gallery-slider__title {
+    font-size: 1.1rem;
+  }
+
+  .gallery-slider__description {
+    font-size: 0.875rem;
+  }
+}
 
 .gallery-container {
-    padding: 20px;
-    direction: rtl;
-    text-align: right;
+  padding: 20px;
+  direction: rtl;
+  text-align: right;
 }
 
-/* Hero section RTL adjustments - local to this component only */
-.gallery-container .bg-hero h1,
-.gallery-container .bg-hero p {
-    font-family: 'Rubik', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.4;
+.gallery-event-section {
+  margin-bottom: 2.5rem;
+  width: 100%;
 }
 
-.gallery-container .bg-hero h1 {
-    font-weight: 700;
+.gallery-event-section .row {
+  width: 100%;
 }
 
-.gallery-container .bg-hero p {
-    font-weight: 400;
-    font-size: 1.1rem;
+.gallery-event-section .col-md-3,
+.gallery-event-section .col-sm-6 {
+  min-width: 0;
 }
 
-/* Responsive adjustments */
+.gallery-event-section:last-child {
+  margin-bottom: 0;
+}
+
+.gallery-event-header {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.gallery-event-name {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.gallery-event-date {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: #64748b;
+}
+
+/* Add your custom styles for the photo gallery here */
+::ng-deep ngx-gallery {
+  border-radius: 12px;
+}
+
+::ng-deep .ngx-gallery-preview-img {
+  cursor: zoom-in;
+}
+
 @media (max-width: 768px) {
-    .gallery-container {
-        padding: 15px;
-    }
-    
-    .gallery-container .bg-hero h1 {
-        font-size: 2.5rem;
-    }
-    
-    .gallery-container .bg-hero p {
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .gallery-container .bg-hero h1 {
-        font-size: 2rem;
-    }
-    
-    .gallery-container .bg-hero p {
-        font-size: 0.9rem;
-    }
+  .gallery-container {
+    padding: 15px;
+  }
 }
   

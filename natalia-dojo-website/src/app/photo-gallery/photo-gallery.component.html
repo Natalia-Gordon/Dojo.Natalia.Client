@@ -1,35 +1,77 @@
-<!-- Hero Start -->
-<div class="container-fluid bg-primary p-5 bg-hero mb-5">
-  <div class="row py-5">
-    <div class="col-12 text-center">
-      <h1 class="display-3 text-light mb-0">רגעים מהאימונים</h1>
-      <p class="text-light mt-4">כאן תוכלו לראות תמונות מאימונים, סדנאות ואירועים מיוחדים של הדוג'ו. הצטרפו אלינו למסע של למידה, התפתחות וגילוי עצמי.</p>
-      <a href="home" class="btn btn-primary py-md-3 px-md-5 me-3">דף הבית</a>&nbsp;
-      <a href="gallery" class="btn btn-light py-md-3 px-md-5">גלריה</a>
+<!-- Hero: same style as events page, same image (home.jpg) -->
+<section class="gallery-hero">
+  <div class="gallery-hero__overlay">
+    <div class="gallery-hero__content" dir="rtl">
+      <h1 class="gallery-hero__title">רגעים מהאימונים</h1>
+      <p class="gallery-hero__subtitle">
+        כאן תוכלו לראות תמונות מאימונים, סדנאות ואירועים מיוחדים של הדוג'ו. הצטרפו אלינו למסע של למידה, התפתחות וגילוי עצמי.
+      </p>
+      <div class="gallery-hero__breadcrumbs">
+        <a routerLink="/home">דף הבית</a>
+        <span class="divider">/</span>
+        <span>גלריה</span>
+      </div>
     </div>
   </div>
-</div>
-<!-- Hero End -->
+</section>
 
-<!-- Gallery Start -->
+<!-- Photo Slider: full-width image with arrows on the image -->
+@if (galleryImages.length > 0) {
+  <section class="gallery-slider-section" dir="rtl">
+    <div class="gallery-slider">
+      <div class="gallery-slider__image-wrap">
+        <img
+          [src]="currentSliderImage?.src"
+          [alt]="currentSliderImage?.alt"
+          class="gallery-slider__img">
+        <button type="button" class="gallery-slider__arrow gallery-slider__arrow--next" (click)="sliderNext()" aria-label="הבא">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+        <button type="button" class="gallery-slider__arrow gallery-slider__arrow--prev" (click)="sliderPrev()" aria-label="הקודם">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="gallery-slider__caption">
+        <h3 class="gallery-slider__title">{{ currentSliderImage?.title }}</h3>
+        @if (currentSliderImage?.description) {
+          <p class="gallery-slider__description">{{ currentSliderImage?.description }}</p>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<!-- Gallery: grouped by event name and date -->
 <div class="container-fluid p-0" style="margin: 90px 0;">
   <div class="row g-0">
     <div class="col-lg-12">
       <div class="gallery-container shadow-lg p-3 bg-white rounded">
-        <div class="row g-3">
-          @for (image of galleryImages; track image; let i = $index) {
-            <div class="col-md-3 col-sm-6">
-              <app-gallery-image
-                [image]="image"
-                [index]="i"
-                [allImages]="galleryImages"
-                (imageClick)="onImageClick($event)"
-                (imageLoad)="onImageLoad($event)"
-                (imageError)="onImageError($event)">
-              </app-gallery-image>
+        @for (event of galleryEvents; track event.eventName + event.eventDate) {
+          <section class="gallery-event-section">
+            <header class="gallery-event-header">
+              <h2 class="gallery-event-name">{{ event.eventName }}</h2>
+              <p class="gallery-event-date">{{ event.eventDate }}</p>
+            </header>
+            <div class="row g-3">
+              @for (image of event.images; track image.src; let j = $index) {
+                <div class="col-md-3 col-sm-6">
+                  <app-gallery-image
+                    [image]="image"
+                    [index]="event.startIndex + j"
+                    [allImages]="galleryImages"
+                    (imageClick)="onImageClick($event)"
+                    (imageLoad)="onImageLoad($event)"
+                    (imageError)="onImageError($event)">
+                  </app-gallery-image>
+                </div>
+              }
             </div>
-          }
-        </div>
+          </section>
+        }
       </div>
     </div>
   </div>

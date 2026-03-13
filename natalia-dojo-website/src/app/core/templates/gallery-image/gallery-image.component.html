@@ -2,7 +2,7 @@
   <div class="image-container">
     <img [src]="image.src" [alt]="image.alt" class="img-fluid rounded shadow-sm gallery-image"
       (load)="onImageLoad($event)" (error)="onImageError($event)"
-      style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;">
+      style="cursor: pointer;">
       @if (!image.loaded && !image.error) {
         <div class="image-loading">
           <div class="spinner-border text-primary" role="status">
@@ -22,55 +22,17 @@
     </div>
   </div>
 
-  <!-- Modal for full-size image -->
-  @if (showModal) {
-    <div class="modal fade show" [class.d-block]="showModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="btn-close" (click)="closeModal()"></button>
-            <h5 class="modal-title">{{ selectedImage?.title }}</h5>
-            <button type="button" class="btn btn-outline-primary btn-sm" (click)="viewFullImage()" title="צפה בתמונה מלאה">
-              <i class="fas fa-expand"></i>
-            </button>
-          </div>
-          <div class="modal-body text-center">
-            <img [src]="selectedImage?.src" [alt]="selectedImage?.alt" class="img-fluid">
-          </div>
-          <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-secondary" (click)="previousImage()">
-              <i class="fas fa-chevron-right"></i> הקודם
-            </button>
-            <div class="text-muted small">
-              <i class="fas fa-keyboard"></i> מקשי מקלדת: ← → לניווט, ESC לסגירה
-            </div>
-            <button type="button" class="btn btn-secondary" (click)="nextImage()">
-              הבא <i class="fas fa-chevron-left"></i>
-            </button>
-          </div>
+  <!-- Fullscreen overlay: click image opens here, Escape or backdrop closes -->
+  @if (showFullscreen && selectedImage) {
+    <div class="gallery-fullscreen-backdrop" (click)="closeFullscreen()" role="button" tabindex="0">
+      <div class="gallery-fullscreen-content" (click)="$event.stopPropagation()">
+        <button type="button" class="gallery-fullscreen-close" (click)="closeFullscreen()" aria-label="סגור">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="gallery-fullscreen-image-wrap">
+          <img [src]="selectedImage.src" [alt]="selectedImage.alt" class="gallery-fullscreen-img">
         </div>
+        <p class="gallery-fullscreen-title">{{ selectedImage.title }}</p>
       </div>
     </div>
-  }
-
-  <!-- Full Image Modal -->
-  @if (showFullImageModal) {
-    <div class="modal fade show" [class.d-block]="showFullImageModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="btn-close" (click)="closeFullImageModal()"></button>
-            <h5 class="modal-title">{{ selectedImage?.title }} - תמונה מלאה</h5>
-          </div>
-          <div class="modal-body text-center p-0">
-            <img [src]="selectedImage?.src" [alt]="selectedImage?.alt" class="img-fluid w-100 h-100" style="object-fit: contain;">
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- Modal backdrop -->
-  @if (showModal || showFullImageModal) {
-    <div class="modal-backdrop fade show" (click)="closeModal()"></div>
   }
