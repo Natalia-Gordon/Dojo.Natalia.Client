@@ -1,14 +1,60 @@
 <nav class="navbar navbar-expand-lg bg-dark navbar-dark p-3 p-lg-0 px-lg-0">
-  <!-- Mobile Layout: Logo in center, hamburger on right -->
-  <div class="d-flex d-lg-none w-100 justify-content-between align-items-center">
-    <div class="flex-grow-1 d-flex justify-content-center order-2">
-      <a href="#" class="navbar-brand m-0">
+  <!-- Mobile Layout: Hamburger | Logo (center) | User + Login/Logout -->
+  <div class="d-flex d-lg-none w-100 align-items-center nav-mobile-top">
+    <div class="nav-mobile-left">
+      <button type="button" class="navbar-toggler" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-controls="navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+    <div class="nav-mobile-center">
+      <a routerLink="/home" class="navbar-brand m-0">
         <img src="/assets/img/logo.svg" alt="Dojo Natalia">
       </a>
     </div>
-    <button type="button" class="navbar-toggler order-1" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-controls="navbarCollapse">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <div class="nav-mobile-right">
+      @if (isAuthenticated && userInfo && isBrowser) {
+        <button
+          type="button"
+          class="nav-mobile-user-btn"
+          (click)="openUserDetails()"
+          title="פרטי משתמש">
+          @let avatarSrc = getAvatarSrc();
+          @if (avatarSrc && !avatarImageError) {
+            <img
+              [src]="avatarSrc"
+              alt=""
+              class="nav-mobile-user-btn__img"
+              (error)="onAvatarError($event)">
+          }
+          @if (!avatarSrc || avatarImageError) {
+            <span class="nav-mobile-user-initial">{{ getUserInitials() }}</span>
+          }
+        </button>
+        <button
+          type="button"
+          class="nav-mobile-icon-btn nav-mobile-logout-btn"
+          (click)="onLogout()"
+          title="התנתקות">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      } @else if (isBrowser) {
+        <button
+          type="button"
+          class="nav-mobile-icon-btn nav-mobile-login-btn"
+          (click)="openLoginModal()"
+          title="התחברות">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+        </button>
+      }
+    </div>
   </div>
 
   <div class="collapse navbar-collapse" [class.show]="isMobileMenuOpen" id="navbarCollapse">
