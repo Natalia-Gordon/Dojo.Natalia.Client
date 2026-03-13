@@ -199,40 +199,48 @@
   flex-shrink: 0;
 }
 
-/* Same as registration form .form-input – unified for both username and password */
-.form-input {
+/* Login popup: match modal background so inputs don’t show a separate gray box */
+.login-form .form-input,
+.login-modal-content .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: rgba(51, 65, 85, 0.6);
-  border: 1px solid rgba(100, 116, 139, 0.5);
+  background-color: rgba(30, 41, 59, 0.98) !important;
+  border: 1px solid rgba(100, 116, 139, 0.4);
   border-radius: 6px;
   color: #ffffff;
   font-size: 0.875rem;
   transition: all 0.3s ease;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-/* Unify background in Edge/Chrome for text and password (autofill) */
-.form-input:-webkit-autofill,
-.form-input:-webkit-autofill:hover,
-.form-input:-webkit-autofill:focus,
-.form-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 100vmax rgba(51, 65, 85, 0.6) inset !important;
-  box-shadow: 0 0 0 100vmax rgba(51, 65, 85, 0.6) inset !important;
+.login-form .form-input:-webkit-autofill,
+.login-form .form-input:-webkit-autofill:hover,
+.login-form .form-input:-webkit-autofill:focus,
+.login-form .form-input:-webkit-autofill:active,
+.login-modal-content .form-input:-webkit-autofill,
+.login-modal-content .form-input:-webkit-autofill:hover,
+.login-modal-content .form-input:-webkit-autofill:focus,
+.login-modal-content .form-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 100vmax rgba(30, 41, 59, 0.98) inset !important;
+  box-shadow: 0 0 0 100vmax rgba(30, 41, 59, 0.98) inset !important;
   -webkit-text-fill-color: #ffffff !important;
   caret-color: #ffffff;
   transition: background-color 5000s ease 0s;
 }
 
-.form-input:focus {
+.login-form .form-input:focus,
+.login-modal-content .form-input:focus {
   outline: none;
   border-color: #dc2626;
-  background: rgba(51, 65, 85, 0.8);
+  background-color: rgba(30, 41, 59, 0.98) !important;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
-.form-input:focus:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 100vmax rgba(51, 65, 85, 0.8) inset !important;
-  box-shadow: 0 0 0 100vmax rgba(51, 65, 85, 0.8) inset !important;
+.login-form .form-input:focus:-webkit-autofill,
+.login-modal-content .form-input:focus:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100vmax rgba(30, 41, 59, 0.98) inset !important;
+  box-shadow: 0 0 0 100vmax rgba(30, 41, 59, 0.98) inset !important;
 }
 
 .form-textarea {
