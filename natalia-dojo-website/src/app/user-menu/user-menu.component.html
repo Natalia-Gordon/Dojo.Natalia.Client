@@ -25,24 +25,27 @@
       <div class="user-menu-dropdown">
         <!-- User Header Section -->
         <div class="user-menu-header">
-          <button
-            type="button"
-            class="user-avatar-large-btn"
-            (click)="onMenuAvatarClick()"
-            title="פרטי משתמש">
-            <div class="user-avatar-large">
-              @if (avatarSrc && !avatarImageError) {
-                <img
-                  [src]="avatarSrc"
-                  alt=""
-                  class="user-avatar-large__img"
-                  (error)="onAvatarError($event)">
-              }
-              @if (!avatarSrc || avatarImageError) {
-                <span class="avatar-initial-large">{{ getInitials() }}</span>
-              }
-            </div>
-          </button>
+          <div class="user-avatar-block">
+            <button
+              type="button"
+              class="user-avatar-large-btn"
+              (click)="onMenuAvatarClick()"
+              title="פרטי משתמש">
+              <div class="user-avatar-large">
+                @if (avatarSrc && !avatarImageError) {
+                  <img
+                    [src]="avatarSrc"
+                    alt=""
+                    class="user-avatar-large__img"
+                    (error)="onAvatarError($event)">
+                }
+                @if (!avatarSrc || avatarImageError) {
+                  <span class="avatar-initial-large">{{ getInitials() }}</span>
+                }
+              </div>
+            </button>
+            <div class="user-role-under-avatar">{{ getRoleLabelHebrew(userInfo.role) }}</div>
+          </div>
           <div class="user-info">
             <div class="user-name">{{ userInfo.displayName || userInfo.username }}</div>
             @if (userInfo.joinDate) {
@@ -55,16 +58,13 @@
                 התחברות אחרונה: {{ formatLastLogin(userInfo.lastLoginAt) }}
               </div>
             }
-            <div class="user-badges">
-              <span class="badge badge-role">
-                {{ getRoleLabelHebrew(userInfo.role) }}
-              </span>
-              @if (userInfo.level) {
+            @if (userInfo.level) {
+              <div class="user-badges">
                 <span class="badge" [ngClass]="getLevelColor(userInfo.level)">
                   {{ userInfo.level }}
                 </span>
-              }
-            </div>
+              </div>
+            }
           </div>
         </div>
         <!-- Separator -->
