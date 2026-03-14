@@ -31,12 +31,12 @@
             <div class="seminar-form__section">
               <h5 class="seminar-form__title">
                 <i class="bi bi-journal-text me-2"></i>
-                פרטי סמינר
+                פרטי אירוע
               </h5>
               <div class="row g-4">
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">כותרת <span class="text-danger">*</span></label>
-                  <input class="form-control seminar-form__input" type="text" formControlName="title" placeholder="כותרת לסמינר"
+                  <input class="form-control seminar-form__input" type="text" formControlName="title" placeholder="כותרת לאירוע"
                     [class.is-invalid]="createForm.get('title')?.invalid && createForm.get('title')?.touched">
                   @if (createForm.get('title')?.invalid && createForm.get('title')?.touched) {
                     <div class="invalid-feedback">כותרת נדרשת</div>
@@ -46,7 +46,7 @@
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">סוג אירוע</label>
                   <select class="form-control seminar-form__input" formControlName="eventType">
-                    <option value="Seminar">סמינר</option>
+                    <option value="Seminar">אירוע</option>
                     <option value="Workshop">סדנה</option>
                     <option value="Masterclass">כיתת אמן</option>
                     <option value="Grading">מבחן דרגה</option>
@@ -58,53 +58,65 @@
                 </div>
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">מדריך</label>
-                  <select
-                    class="form-control seminar-form__input"
-                    formControlName="instructorId"
-                    [disabled]="isLoadingInstructors || instructorIdLocked"
-                    [attr.aria-readonly]="instructorIdLocked"
-                    >
-                    <option value="">-- אנא בחרי מדריך --</option>
-                    @for (inst of instructors; track inst.instructorId) {
-                      <option [value]="inst.instructorId">
-                        {{ inst.displayName || inst.username || 'מדריך ' + inst.instructorId }}
-                      </option>
-                    }
-                  </select>
                   @if (instructorIdLocked) {
-                    <small class="seminar-form__hint text-muted">שדה מדריך לא ניתן לשינוי בעריכה על ידי מדריך — רק מנהל יכול לשנות.</small>
-                  }
-                  @if (!instructorIdLocked && !isLoadingInstructors) {
-                    <small class="seminar-form__hint">אנא בחרי מדריך לאירוע (אופציונלי)</small>
-                  }
-                  @if (isLoadingInstructors) {
-                    <small class="seminar-form__hint text-muted">
-                      <span class="spinner-border spinner-border-sm me-1"></span>
-                      טוען מדריכים...
-                    </small>
+                    <input type="hidden" formControlName="instructorId">
+                    <div class="seminar-form__instructor-name">
+                      @if (isLoadingInstructors) {
+                        <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                        <span>טוען...</span>
+                      } @else if (currentInstructor) {
+                        <span>{{ currentInstructor.displayName || currentInstructor.username || 'מדריך' }}</span>
+                      }
+                    </div>
+                    <small class="seminar-form__hint text-muted">מדריך יכול ליצור או לערוך אירוע רק עבור עצמו — רק מנהל יכול לבחור מדריך אחר.</small>
+                  } @else {
+                    <select
+                      class="form-control seminar-form__input"
+                      formControlName="instructorId"
+                      [disabled]="isLoadingInstructors"
+                      >
+                      <option value="">-- אנא בחרי מדריך --</option>
+                      @for (inst of instructors; track inst.instructorId) {
+                        <option [value]="inst.instructorId">
+                          {{ inst.displayName || inst.username || 'מדריך ' + inst.instructorId }}
+                        </option>
+                      }
+                    </select>
+                    @if (!isLoadingInstructors) {
+                      <small class="seminar-form__hint">אנא בחרי מדריך לאירוע (אופציונלי)</small>
+                    }
+                    @if (isLoadingInstructors) {
+                      <small class="seminar-form__hint text-muted">
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        טוען מדריכים...
+                      </small>
+                    }
                   }
                 </div>
                 <div class="col-12">
                   <label class="form-label seminar-form__label">תיאור</label>
                   <textarea class="form-control seminar-form__input" rows="3" formControlName="description" placeholder="תיאור קצר"></textarea>
-                  <small class="seminar-form__hint">ספרו למשתתפים למה הסמינר מיועד ולמי הוא מתאים.</small>
+                  <small class="seminar-form__hint">ספרו למשתתפים למה האירוע מיועד ולמי הוא מתאים.</small>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">תאריך התחלה</label>
                   <input class="form-control seminar-form__input" type="datetime-local" formControlName="startDateTime">
+                  <small class="seminar-form__hint">פורמט: יום/חודש/שנה שעה:דקה (24 שעות)</small>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">תאריך סיום</label>
                   <input class="form-control seminar-form__input" type="datetime-local" formControlName="endDateTime">
+                  <small class="seminar-form__hint">פורמט: יום/חודש/שנה שעה:דקה (24 שעות)</small>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">מיקום</label>
                   <input class="form-control seminar-form__input" type="text" formControlName="location">
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label seminar-form__label">קישור למיקום</label>
-                  <input class="form-control seminar-form__input" type="url" formControlName="locationUrl" placeholder="https://maps.google.com/..." (click)="openGoogleMapsIfEmpty()">
-                  <small class="seminar-form__hint">הדבק/י קישור למיקום מ-Google Maps.</small>
+                  <label class="form-label seminar-form__label">קישור למיקום או לאירוע אונליין</label>
+                  <input class="form-control seminar-form__input" type="url" formControlName="locationUrl" placeholder="https://maps.google.com/... או https://zoom.us/...">
+                  <small class="seminar-form__hint">קישור למיקום פיזי (למשל Google Maps) או לאירוע אונליין (למשל Zoom).</small>
+                  <a href="#" class="seminar-form__link" (click)="openLocationLink($event)">פתח קישור (Google Maps או הקישור שהוזן)</a>
                 </div>
                 <div class="col-12">
                   <label class="form-label seminar-form__label">קישור לתמונה</label>
@@ -141,13 +153,16 @@
                   <label class="form-label seminar-form__label">מחיר הרשמה מוקדמת</label>
                   <input class="form-control seminar-form__input" type="number" formControlName="earlyBirdPrice" min="0" step="1">
                 </div>
+                @if (showEarlyBirdDeadline) {
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">תאריך יעד להרשמה מוקדמת</label>
                   <input class="form-control seminar-form__input" type="date" formControlName="earlyBirdDeadline">
                 </div>
+                }
                 <div class="col-md-6">
                   <label class="form-label seminar-form__label">דדליין הרשמה</label>
                   <input class="form-control seminar-form__input" type="datetime-local" formControlName="registrationDeadline">
+                  <small class="seminar-form__hint">פורמט: יום/חודש/שנה שעה:דקה (24 שעות)</small>
                 </div>
               </div>
             </div>
@@ -204,7 +219,7 @@
                   @if (!isCreating) {
                     <i class="bi bi-plus-lg" aria-hidden="true"></i>
                   }
-                  @if (!isCreating) { <span>צרי סמינר</span> }
+                  @if (!isCreating) { <span>צרי אירוע</span> }
                   @if (isCreating) { <span>יוצרת...</span> }
                 </button>
                 <button type="button" class="btn btn-outline-secondary seminar-form__btn-secondary"

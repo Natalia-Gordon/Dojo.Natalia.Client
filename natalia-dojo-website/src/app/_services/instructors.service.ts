@@ -68,6 +68,20 @@ export class InstructorsService {
     private authService: AuthService
   ) {}
 
+  /** Current user's instructor record when logged in as instructor. GET /api/instructors/me */
+  getCurrentInstructor(): Observable<Instructor> {
+    return this.http.get<Instructor>(`${this.apiUrl}/instructors/me`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(error => {
+        if (error.status !== 0 && error.status !== 503) {
+          console.error('Get current instructor error:', error);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
   getInstructors(includeUnavailable: boolean = false): Observable<Instructor[]> {
     const params = new HttpParams().set('includeUnavailable', includeUnavailable.toString());
     return this.http.get<Instructor[]>(`${this.apiUrl}/instructors`, {

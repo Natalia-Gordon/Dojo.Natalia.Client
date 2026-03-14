@@ -36,6 +36,10 @@ export class EventsComponent implements OnInit, OnDestroy {
   /** User-typed search query; filters events client-side. */
   searchQuery = '';
 
+  /** Event selected for delete; when set, confirmation popup is shown. */
+  eventToDelete: Event | null = null;
+  deleteEventLoading = false;
+
   private authSubscription?: Subscription;
   private userSubscription?: Subscription;
 
@@ -93,8 +97,7 @@ export class EventsComponent implements OnInit, OnDestroy {
 
     try {
       this.eventsService.getEvents({
-        includeUnpublished: this.isAdminOrInstructor, // Only admin/instructor can see unpublished events
-        type: 'Seminar'
+        includeUnpublished: false // Only published events; all event types
       }).subscribe({
         next: (events) => {
           const list = events || [];
@@ -324,6 +327,40 @@ export class EventsComponent implements OnInit, OnDestroy {
    */
   getRegisteredCount(eventId: number): number {
     return this.registeredCountByEventId[String(eventId)] ?? 0;
+  }
+
+  /** Show delete only when no participants (כמות משתתפים === 0). */
+  canDeleteEvent(eventItem: Event): boolean {
+    return this.isAdminOrInstructor && this.getRegisteredCount(eventItem.id) === 0;
+  }
+
+  openDeleteConfirm(eventItem: Event, e: MouseEvent): void {
+    e.preventDefault();
+    e.stopPropagation();
+    this.eventToDelete = eventItem;
+  }
+
+  cancelDelete(): void {
+    this.eventToDelete = null;
+  }
+
+  confirmDeleteEvent(): void {
+    if (!this.eventToDelete) return;
+    const idToRemove = this.eventToDelete.id;
+    this.deleteEventLoading = true;
+    this.eventsService.deleteEvent(idToRemove).subscribe({
+      next: () => {
+        this.deleteEventLoading = false;
+        this.eventToDelete = null;
+        this.events = this.events.filter((e) => e.id !== idToRemove);
+        this.successMessage = 'האירוע נמחק בהצלחה.';
+        setTimeout(() => (this.successMessage = ''), 4000);
+      },
+      error: () => {
+        this.deleteEventLoading = false;
+        this.errorMessage = 'לא ניתן למחוק את האירוע. ייתכן שיש נרשמים.';
+      }
+    });
   }
 
   /**

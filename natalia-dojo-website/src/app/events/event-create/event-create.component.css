@@ -80,6 +80,18 @@
   margin-bottom: .5rem;
 }
 
+.seminar-form__instructor-name {
+  display: flex;
+  align-items: center;
+  min-height: 45px;
+  padding: 0.5rem 0.75rem;
+  background: rgba(241, 245, 249, .8);
+  border: 1px solid rgba(203, 213, 225, .5);
+  border-radius: 10px;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
 .seminar-form__input {
   background: #fff;
   border: 1px solid #cbd5e1;
@@ -119,6 +131,19 @@ textarea.seminar-form__input {
   margin-top: .5rem;
   color: #64748b;
   font-size: .85rem;
+}
+
+.seminar-form__link {
+  display: inline-block;
+  margin-top: .35rem;
+  font-size: .85rem;
+  color: #dc2626;
+  text-decoration: none;
+}
+
+.seminar-form__link:hover {
+  text-decoration: underline;
+  color: #b91c1c;
 }
 
 .seminar-form__input::placeholder {
@@ -198,17 +223,20 @@ textarea.seminar-form__input {
   cursor: not-allowed;
 }
 
-/* Secondary reset — create flow only */
+/* Secondary reset — same text style as submit (צרי אירוע) */
 .seminar-form__footer .seminar-form__btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: .65rem 1.25rem;
-  font-weight: 600;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  transition: all .3s ease;
+  padding: 0.65rem 1.35rem;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 .seminar-form__footer .seminar-form__btn-secondary:disabled {

@@ -106,6 +106,17 @@
                 <div class="event-card__header">
                   <h3 class="event-card__title">{{ eventItem.title || 'אירוע' }}</h3>
                   <div class="event-card__badges">
+                    @if (canDeleteEvent(eventItem)) {
+                      <button
+                        type="button"
+                        class="event-card__badge event-card__badge--delete"
+                        title="מחיקת אירוע"
+                        aria-label="מחיקת אירוע"
+                        (click)="openDeleteConfirm(eventItem, $event)"
+                      >
+                        <i class="bi bi-trash" aria-hidden="true"></i>
+                      </button>
+                    }
                     @if (isAdminOrInstructor) {
                       <a
                         [routerLink]="['/admin/events', eventItem.id, 'registrations']"
@@ -195,3 +206,20 @@
     </div>
   </div>
 </div>
+
+@if (eventToDelete) {
+  <div class="events-delete-overlay" (click)="cancelDelete()" role="dialog" aria-modal="true" aria-labelledby="events-delete-title">
+    <div class="events-delete-modal" (click)="$event.stopPropagation()">
+      <h4 id="events-delete-title" class="events-delete-title">מחיקת אירוע</h4>
+      <p class="events-delete-message">האם למחוק את האירוע "{{ eventToDelete.title || 'אירוע' }}"?</p>
+      <p class="events-delete-warning">פעולה זו אינה ניתנת לשחזור.</p>
+      <div class="events-delete-actions">
+        <button type="button" class="events-delete-btn events-delete-btn--cancel" (click)="cancelDelete()">ביטול</button>
+        <button type="button" class="events-delete-btn events-delete-btn--delete" [disabled]="deleteEventLoading" (click)="confirmDeleteEvent()">
+          @if (!deleteEventLoading) { מחיקה }
+          @if (deleteEventLoading) { <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> }
+        </button>
+      </div>
+    </div>
+  </div>
+}

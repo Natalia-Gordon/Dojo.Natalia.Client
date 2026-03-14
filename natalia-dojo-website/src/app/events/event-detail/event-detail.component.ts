@@ -311,7 +311,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Calculate event duration in hours
+   * Calculate event duration in hours (for internal use).
    */
   getEventDuration(): number {
     if (!this.event) return 0;
@@ -319,6 +319,22 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     const end = new Date(this.event.endDateTime);
     const diffMs = end.getTime() - start.getTime();
     return Math.round(diffMs / (1000 * 60 * 60) * 10) / 10; // Round to 1 decimal
+  }
+
+  /**
+   * Formatted duration: "X דקות" when less than 1 hour, otherwise "X שעות".
+   */
+  getEventDurationText(): string {
+    if (!this.event) return '—';
+    const start = new Date(this.event.startDateTime);
+    const end = new Date(this.event.endDateTime);
+    const diffMs = end.getTime() - start.getTime();
+    const totalMinutes = Math.round(diffMs / (1000 * 60));
+    if (totalMinutes < 60) {
+      return `${totalMinutes} דקות`;
+    }
+    const hours = Math.round((totalMinutes / 60) * 10) / 10;
+    return `${hours} שעות`;
   }
 
   /**
@@ -346,6 +362,31 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   /** Formatted price for display (avoids ICU/pipe parsing issues in template). */
   getFormattedPrice(amount: number): string {
     return amount == null ? '' : new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+  }
+
+  /** Whether locationUrl points to an online session (Zoom, Meet, etc.) rather than a map. */
+  isLocationUrlOnline(url: string | null | undefined): boolean {
+    if (!url || !url.trim()) return false;
+    const u = url.trim().toLowerCase();
+    return u.includes('zoom') || u.includes('meet.') || u.includes('teams.') || u.includes('webex') || u.includes('gotomeeting');
+  }
+
+  /** Icon for location/link: video for online session, geo for physical. */
+  getLocationIcon(): string {
+    if (this.event?.locationUrl && this.isLocationUrlOnline(this.event.locationUrl)) return 'bi bi-camera-video';
+    return 'bi bi-geo-alt';
+  }
+
+  /** Label for location field: include "אונליין" when link is to online session. */
+  getLocationLabel(): string {
+    if (this.event?.locationUrl && this.isLocationUrlOnline(this.event.locationUrl)) return 'מיקום / קישור לאירוע אונליין';
+    return 'מיקום';
+  }
+
+  /** Link text for locationUrl: "הצטרפו לאירוע" for online, "פתח במפה" for map. */
+  getLocationLinkText(): string {
+    if (this.event?.locationUrl && this.isLocationUrlOnline(this.event.locationUrl)) return 'הצטרפו לאירוע';
+    return 'פתח במפה';
   }
 
   /** Registration status label for display. */

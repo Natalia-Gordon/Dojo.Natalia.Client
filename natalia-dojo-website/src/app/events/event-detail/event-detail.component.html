@@ -100,18 +100,20 @@
                     <i class="bi bi-hourglass-split"></i>
                     <div class="detail-content">
                       <strong>משך האירוע:</strong>
-                      <div>{{ getEventDuration() }} שעות</div>
+                      <div>{{ getEventDurationText() }}</div>
                     </div>
                   </div>
-                  @if (event.location) {
+                  @if (event.location || event.locationUrl) {
                     <div class="detail-item">
-                      <i class="bi bi-geo-alt"></i>
+                      <i [class]="getLocationIcon()"></i>
                       <div class="detail-content">
-                        <strong>מיקום:</strong>
-                        <div>{{ event.location }}</div>
+                        <strong>{{ getLocationLabel() }}:</strong>
+                        @if (event.location) {
+                          <div>{{ event.location }}</div>
+                        }
                         @if (event.locationUrl) {
                           <a [href]="event.locationUrl" target="_blank" rel="noopener" class="text-primary mt-1 d-inline-block">
-                            <i class="bi bi-map"></i> פתח במפה
+                            <i class="bi bi-box-arrow-up-left"></i> {{ getLocationLinkText() }}
                           </a>
                         }
                       </div>

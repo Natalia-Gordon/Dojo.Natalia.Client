@@ -167,6 +167,19 @@
   color: #1e293b;
 }
 
+.event-card__badge--delete {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(220, 38, 38, .25);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background .2s, border-color .2s, color .2s;
+}
+
+.event-card__badge--delete:hover {
+  background: rgba(220, 38, 38, .2);
+  border-color: rgba(220, 38, 38, .4);
+}
+
 .event-card__badge i {
   font-size: 1rem;
 }
@@ -800,4 +813,87 @@ textarea.seminar-form__input {
   .seminar-form__section {
     padding: 1rem;
   }
+}
+
+/* Delete confirmation popup */
+.events-delete-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(15, 23, 42, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.events-delete-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, .2);
+  border: 1px solid rgba(148, 163, 184, .25);
+}
+
+.events-delete-title {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.events-delete-message {
+  margin: 0 0 0.5rem;
+  color: #475569;
+  font-size: 1rem;
+}
+
+.events-delete-warning {
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.events-delete-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.events-delete-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+}
+
+.events-delete-btn--cancel {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+.events-delete-btn--cancel:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.events-delete-btn--delete {
+  background: #dc2626;
+  border: 1px solid #b91c1c;
+  color: #fff;
+}
+
+.events-delete-btn--delete:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.events-delete-btn--delete:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

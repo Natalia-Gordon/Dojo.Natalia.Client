@@ -17,6 +17,8 @@ import { EventCreateHeroComponent } from './event-create-hero/event-create-hero.
 })
 export class EventCreateComponent implements OnInit, OnDestroy {
   instructors: Instructor[] = [];
+  /** When instructor is logged in, only this instructor is loaded (via GET /api/instructors/me). */
+  currentInstructor: Instructor | null = null;
   isLoadingInstructors = false;
   isLoadingEvent = false;
   errorMessage = '';
@@ -71,9 +73,17 @@ export class EventCreateComponent implements OnInit, OnDestroy {
     return this.editEventId != null;
   }
 
-  /** Instructor/teacher in edit mode cannot change מדריך; admin can. */
+  /** Instructor can only create/edit events for themselves; מדריך dropdown stays disabled. Admin can choose. */
   get instructorIdLocked(): boolean {
-    return this.isEditMode && !this.isAdmin;
+    return !this.isAdmin;
+  }
+
+  /** True when מחיר הרשמה מוקדמת has a value — show תאריך יעד להרשמה מוקדמת only then. */
+  get showEarlyBirdDeadline(): boolean {
+    const v = this.createForm.get('earlyBirdPrice')?.value;
+    if (v == null || v === '') return false;
+    const n = Number(v);
+    return !Number.isNaN(n) && n > 0;
   }
 
   ngOnInit(): void {
@@ -99,7 +109,11 @@ export class EventCreateComponent implements OnInit, OnDestroy {
       } else {
         this.editEventId = null;
         this.originalInstructorId = null;
-        this.createForm.get('instructorId')?.enable({ emitEvent: false });
+        if (this.instructorIdLocked) {
+          this.createForm.get('instructorId')?.disable({ emitEvent: false });
+        } else {
+          this.createForm.get('instructorId')?.enable({ emitEvent: false });
+        }
         this.loadInstructors();
       }
     });
@@ -153,8 +167,8 @@ export class EventCreateComponent implements OnInit, OnDestroy {
               this.isLoadingEvent = false;
               return;
             }
+            this.currentInstructor = inst;
             this.patchFormFromEvent(event);
-            this.loadInstructors();
             this.isLoadingEvent = false;
           },
           error: () => {
@@ -171,6 +185,31 @@ export class EventCreateComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Map API eventType to exact option value used by the סוג אירוע select. */
+  private normalizeEventTypeForForm(apiEventType: string | null | undefined): string {
+    const raw = (apiEventType ?? '').trim();
+    const rawLower = raw.toLowerCase().replace(/\s+/g, '_');
+    if (!rawLower) return 'Seminar';
+    const mapping: Record<string, string> = {
+      seminar: 'Seminar',
+      workshop: 'Workshop',
+      masterclass: 'Masterclass',
+      grading: 'Grading',
+      retreat: 'retreat',
+      zen_session: 'zen_session',
+      zen: 'zen_session',
+      special: 'Special',
+      special_training: 'Special',
+      social: 'Seminar',
+      online_session: 'Seminar',
+    };
+    const exact = mapping[rawLower];
+    if (exact) return exact;
+    if (['Seminar', 'Workshop', 'Masterclass', 'Grading', 'Special'].includes(raw)) return raw;
+    if (raw === 'retreat' || raw === 'zen_session') return raw;
+    return 'Seminar';
+  }
+
   private patchFormFromEvent(event: Event): void {
     const start = event.startDateTime ? this.toLocalDateTime(new Date(event.startDateTime)) : this.toLocalDateTime(new Date());
     const end = event.endDateTime ? this.toLocalDateTime(new Date(event.endDateTime)) : start;
@@ -180,9 +219,7 @@ export class EventCreateComponent implements OnInit, OnDestroy {
     const earlyBirdDeadline = event.earlyBirdDeadline
       ? this.toLocalDate(new Date(event.earlyBirdDeadline))
       : this.toLocalDate(new Date());
-    const eventType = event.eventType
-      ? String(event.eventType).charAt(0).toUpperCase() + String(event.eventType).slice(1).toLowerCase()
-      : 'Seminar';
+    const eventType = this.normalizeEventTypeForForm(event.eventType ?? null);
     this.originalInstructorId = event.instructorId ?? null;
     this.createForm.patchValue({
       title: event.title || '',
@@ -214,21 +251,50 @@ export class EventCreateComponent implements OnInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) return;
 
     this.isLoadingInstructors = true;
-    try {
-      this.instructorsService.getInstructors(false).subscribe({
-        next: (instructors) => {
-          this.instructors = instructors || [];
+    this.currentInstructor = null;
+
+    if (this.instructorIdLocked) {
+      // Instructor: load only current instructor via GET /api/instructors/me (one call); fallback to full list if /me not implemented
+      this.instructorsService.getCurrentInstructor().subscribe({
+        next: (instructor) => {
+          this.currentInstructor = instructor;
+          this.createForm.patchValue({ instructorId: String(instructor.instructorId) }, { emitEvent: false });
+          this.createForm.get('instructorId')?.disable({ emitEvent: false });
           this.isLoadingInstructors = false;
         },
         error: () => {
-          this.isLoadingInstructors = false;
-          this.instructors = [];
+          this.instructorsService.getInstructors(false).subscribe({
+            next: (instructors) => {
+              const list = instructors || [];
+              const me = this.userInfo && list.find(i => i.userId === this.userInfo!.userId);
+              if (me) {
+                this.currentInstructor = me;
+                this.createForm.patchValue({ instructorId: String(me.instructorId) }, { emitEvent: false });
+              }
+              this.createForm.get('instructorId')?.disable({ emitEvent: false });
+              this.isLoadingInstructors = false;
+            },
+            error: () => {
+              this.isLoadingInstructors = false;
+              this.currentInstructor = null;
+            }
+          });
         }
       });
-    } catch {
-      this.isLoadingInstructors = false;
-      this.instructors = [];
+      return;
     }
+
+    // Admin: load full list for dropdown
+    this.instructorsService.getInstructors(false).subscribe({
+      next: (instructors) => {
+        this.instructors = instructors || [];
+        this.isLoadingInstructors = false;
+      },
+      error: () => {
+        this.isLoadingInstructors = false;
+        this.instructors = [];
+      }
+    });
   }
 
   submitCreate(): void {
@@ -256,8 +322,8 @@ export class EventCreateComponent implements OnInit, OnDestroy {
     const raw = this.createForm.getRawValue();
     const isPublished = !!raw.isPublished;
     let instructorId: number | null = raw.instructorId ? Number(raw.instructorId) : null;
-    if (this.editEventId != null && this.instructorIdLocked) {
-      instructorId = this.originalInstructorId;
+    if (this.instructorIdLocked) {
+      instructorId = this.editEventId != null ? this.originalInstructorId : instructorId;
     }
     const request = {
       title: raw.title,
@@ -272,9 +338,9 @@ export class EventCreateComponent implements OnInit, OnDestroy {
       maxAttendees: raw.maxAttendees ? Number(raw.maxAttendees) : null,
       price: Number(raw.price),
       earlyBirdPrice: raw.earlyBirdPrice ? Number(raw.earlyBirdPrice) : null,
-      earlyBirdDeadline: raw.earlyBirdDeadline || null,
+      earlyBirdDeadline: this.showEarlyBirdDeadline ? (raw.earlyBirdDeadline || null) : null,
       registrationOpen: !!raw.registrationOpen,
-      registrationDeadline: raw.registrationDeadline || null,
+      registrationDeadline: raw.registrationDeadline ? this.toIsoDateTime(raw.registrationDeadline) : null,
       imageUrl: raw.imageUrl,
       isPublished
     };
@@ -300,16 +366,18 @@ export class EventCreateComponent implements OnInit, OnDestroy {
       next: () => {
         this.isCreating = false;
         this.successMessage = 'האירוע נוצר בהצלחה.';
+        const now = new Date();
+        const nowLocal = this.toLocalDateTime(now);
         this.createForm.reset({
           eventType: 'Seminar',
           registrationOpen: true,
           isPublished: true,
           price: 0,
           status: 'published',
-          startDateTime: this.toLocalDateTime(new Date()),
-          endDateTime: this.toLocalDateTime(new Date()),
-          earlyBirdDeadline: this.toLocalDate(new Date()),
-          registrationDeadline: this.toLocalDateTime(new Date())
+          startDateTime: nowLocal,
+          endDateTime: nowLocal,
+          earlyBirdDeadline: this.toLocalDate(now),
+          registrationDeadline: nowLocal
         });
         setTimeout(() => {
           this.successMessage = '';
@@ -322,12 +390,12 @@ export class EventCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  openGoogleMapsIfEmpty(): void {
+  /** Open the location URL in a new tab, or Google Maps if the field is empty. */
+  openLocationLink(event: MouseEvent): void {
+    event.preventDefault();
     if (!isPlatformBrowser(this.platformId)) return;
-    const url = this.createForm.get('locationUrl')?.value;
-    if (!url) {
-      window.open('https://maps.google.com', '_blank');
-    }
+    const url = (this.createForm.get('locationUrl')?.value || '').trim();
+    window.open(url || 'https://maps.google.com', '_blank');
   }
 
   private isAllowedToManageEvents(userInfo: UserInfo | null): boolean {
