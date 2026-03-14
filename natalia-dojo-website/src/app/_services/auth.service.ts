@@ -13,6 +13,11 @@ const SESSION_EXPIRY_WARN_BEFORE_MS = 60 * 1000;
 const STORAGE_KEY_ACCESS_TOKEN_EXPIRES_AT = 'auth_token_expires_at';
 const STORAGE_KEY_REFRESH_TOKEN_EXPIRES_AT = 'refresh_token_expires_at';
 
+/** Site is Hebrew; always request Hebrew API messages (backend ApiMessages). */
+function getAcceptLanguage(): string {
+  return 'he';
+}
+
 // Force explicit check - ensure we're using the correct environment
 if (!environment.apiUrl) {
   console.error('CRITICAL: environment.apiUrl is undefined!');
@@ -220,7 +225,8 @@ export class AuthService {
     // POST /api/users/login → TokenResponse (accessTokenExpiresAt, refreshTokenExpiresAt used for expiry timers)
     return this.http.post<TokenResponse>(`${this.apiUrl}/users/login`, loginRequest, {
       headers: new HttpHeaders({
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept-Language': getAcceptLanguage()
       })
     }).pipe(
       tap(response => {
@@ -782,7 +788,8 @@ export class AuthService {
     const body: RefreshTokenRequest = { refreshToken, deviceInfo: null };
     return this.http.post<TokenResponse>(`${this.apiUrl}/users/refresh-token`, body, {
       headers: new HttpHeaders({
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept-Language': getAcceptLanguage()
       })
     }).pipe(
       tap(response => {
@@ -823,9 +830,9 @@ export class AuthService {
         if (isPlatformBrowser(this.platformId) && this.router) {
           this.router.navigate(['/home']);
         }
-        // If backend returned 403 email_not_verified, open login so user sees the message and can verify
+        // If backend returned 403 email_not_verified, open login so user sees the message and can verify (message from ApiMessages.EmailNotVerifiedLogin when Accept-Language is sent)
         if (isPlatformBrowser(this.platformId) && this.loginModalService && error?.status === 403 && error?.error?.code === 'email_not_verified') {
-          const msg = error?.error?.message || 'נא לאמת את כתובת המייל לפני ההתחברות. בדקי את תיבת הדואר ולחצי על הקישור ששלחנו.';
+          const msg = error?.error?.message || 'נא לאמת את כתובת המייל לפני ההתחברות. בדוק את תיבת הדואר או השתמש באפשרות לשלוח שוב.';
           this.loginModalService.open('login', { emailNotVerifiedMessage: msg });
         }
         return throwError(() => error);
@@ -834,18 +841,21 @@ export class AuthService {
   }
 
   /**
-   * Get HTTP headers with Bearer token for authenticated requests
+   * Get HTTP headers with Bearer token for authenticated requests.
+   * Sends Accept-Language so API returns localized messages (e.g. ApiMessages.EmailNotVerifiedLogin).
    */
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     if (token) {
       return new HttpHeaders({
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept-Language': getAcceptLanguage()
       });
     }
     return new HttpHeaders({
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Accept-Language': getAcceptLanguage()
     });
   }
 }

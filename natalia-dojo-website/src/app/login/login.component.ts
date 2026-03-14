@@ -176,7 +176,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         // Handle different error scenarios
         if (error.status === 403 && error.error?.code === 'email_not_verified') {
           this.isEmailNotVerifiedError = true;
-          this.errorMessage = error.error?.message || 'נא לאמת את כתובת המייל לפני ההתחברות. בדקי את תיבת הדואר או השתמשי באפשרות לשלוח שוב.';
+          this.errorMessage = error.error?.message || 'נא לאמת את כתובת המייל לפני ההתחברות. בדוק את תיבת הדואר או השתמש באפשרות לשלוח שוב.';
         } else if (error.status === 401 || error.status === 400) {
           this.isEmailNotVerifiedError = false;
           this.errorMessage = 'שם משתמש או סיסמה שגויים';
