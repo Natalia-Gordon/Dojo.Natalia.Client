@@ -1,6 +1,6 @@
-<div class="registration-form" dir="rtl">
+<div class="registration-form" [class.registration-form--page-style]="usePageFormStyle" dir="rtl">
   <div class="registration-content">
-    <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="registration-form-fields">
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="registration-form-fields" [class.seminar-form]="usePageFormStyle">
       <!-- Minimal form for guest (login modal) — fast registration -->
       @if (isGuestRegistration) {
         <div class="form-group">
@@ -127,7 +127,15 @@
 
       <!-- Full form for admin/instructor or edit mode -->
       @if (!isGuestRegistration) {
-      <div class="register-grid">
+      <div class="registration-form__section-wrap" [class.seminar-form__section]="usePageFormStyle">
+        @if (usePageFormStyle) {
+          <h5 class="seminar-form__title">
+            <i class="bi bi-person-vcard me-2"></i>
+            פרטי משתמש
+          </h5>
+        }
+        <div class="registration-form__page-fields-wrap" [class.row]="usePageFormStyle" [class.g-4]="usePageFormStyle" [class.registration-form__page-fields]="usePageFormStyle">
+        <div class="register-grid" [class.row]="usePageFormStyle" [class.g-4]="usePageFormStyle">
         <div class="form-group">
           <label for="register-first-name" class="form-label">שם פרטי</label>
           <div class="input-wrapper">
@@ -383,18 +391,8 @@
         </div>
       </div>
 
-      @if (isAdminConnected || isInstructorConnected) {
-        <div class="form-group form-group--checkbox">
-          <label class="checkbox-label">
-            <input
-              id="register-is-active"
-              type="checkbox"
-              formControlName="isActive"
-              class="checkbox-input">
-            פעיל
-          </label>
         </div>
-      }
+      </div>
 
       }
 

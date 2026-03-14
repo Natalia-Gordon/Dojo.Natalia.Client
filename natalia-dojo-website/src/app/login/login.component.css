@@ -126,6 +126,22 @@
   animation: fadeIn 0.3s ease;
 }
 
+.login-modal-register-link {
+  margin: 1.25rem 0 0;
+  text-align: center;
+}
+
+.login-modal-register-link a {
+  color: #fbbf24;
+  text-decoration: none;
+  font-size: 0.9375rem;
+}
+
+.login-modal-register-link a:hover {
+  color: #fcd34d;
+  text-decoration: underline;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -201,19 +217,26 @@
 
 /* Login popup: match modal background so inputs don’t show a separate gray box */
 .login-form .form-input,
-.login-modal-content .form-input {
+.login-modal-content .form-input,
+.login-modal-content input.form-input,
+.login-modal-content #username,
+.login-modal-content input[type="text"],
+.login-modal-content input[type="password"] {
   width: 100%;
   padding: 0.75rem 1rem;
   background-color: rgba(30, 41, 59, 0.98) !important;
   border: 1px solid rgba(100, 116, 139, 0.4);
   border-radius: 6px;
-  color: #ffffff;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
   font-size: 0.875rem;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   -webkit-appearance: none;
   appearance: none;
 }
 
+/* Force white text after browser autocomplete/autofill */
 .login-form .form-input:-webkit-autofill,
 .login-form .form-input:-webkit-autofill:hover,
 .login-form .form-input:-webkit-autofill:focus,
@@ -221,26 +244,44 @@
 .login-modal-content .form-input:-webkit-autofill,
 .login-modal-content .form-input:-webkit-autofill:hover,
 .login-modal-content .form-input:-webkit-autofill:focus,
-.login-modal-content .form-input:-webkit-autofill:active {
+.login-modal-content .form-input:-webkit-autofill:active,
+.login-modal-content #username:-webkit-autofill,
+.login-modal-content #username:-webkit-autofill:hover,
+.login-modal-content #username:-webkit-autofill:focus,
+.login-modal-content #username:-webkit-autofill:active,
+.login-modal-content input:-webkit-autofill,
+.login-modal-content input:-webkit-autofill:hover,
+.login-modal-content input:-webkit-autofill:focus,
+.login-modal-content input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 100vmax rgba(30, 41, 59, 0.98) inset !important;
   box-shadow: 0 0 0 100vmax rgba(30, 41, 59, 0.98) inset !important;
+  color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
   caret-color: #ffffff;
   transition: background-color 5000s ease 0s;
 }
 
 .login-form .form-input:focus,
-.login-modal-content .form-input:focus {
+.login-modal-content .form-input:focus,
+.login-modal-content #username:focus,
+.login-modal-content input.form-input:focus {
   outline: none;
   border-color: #dc2626;
   background-color: rgba(30, 41, 59, 0.98) !important;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
 }
 
 .login-form .form-input:focus:-webkit-autofill,
-.login-modal-content .form-input:focus:-webkit-autofill {
+.login-modal-content .form-input:focus:-webkit-autofill,
+.login-modal-content #username:focus:-webkit-autofill,
+.login-modal-content input:focus:-webkit-autofill {
   -webkit-box-shadow: 0 0 0 100vmax rgba(30, 41, 59, 0.98) inset !important;
   box-shadow: 0 0 0 100vmax rgba(30, 41, 59, 0.98) inset !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .form-textarea {
@@ -290,6 +331,48 @@
 
 .alert-error svg {
   flex-shrink: 0;
+}
+
+.resend-verification {
+  margin-top: 0.75rem;
+}
+
+.resend-verification__btn {
+  background: transparent;
+  border: 1px solid rgba(248, 250, 252, 0.5);
+  color: #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.resend-verification__btn:hover:not(:disabled) {
+  color: #ffffff;
+  border-color: #94a3b8;
+  background: rgba(51, 65, 85, 0.5);
+}
+
+.resend-verification__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resend-message {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 6px;
+  color: #86efac;
+  font-size: 0.875rem;
+}
+
+.resend-message--error {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #f87171;
 }
 
 .submit-button {

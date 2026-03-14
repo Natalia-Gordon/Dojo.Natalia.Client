@@ -50,6 +50,7 @@ import { EventDetailComponent } from './events/event-detail/event-detail.compone
 import { EventCreateComponent } from './events/event-create/event-create.component';
 import { adminOrInstructorGuard } from './_guards/admin-or-instructor.guard';
 import { UserManagementComponent } from './core/templates/user-management/user-management.component';
+import { UserRegistrationComponent } from './user-registration/user-registration.component';
 import { EventsManagementComponent } from './core/templates/events-management/events-management.component';
 import { EventRegistrationsComponent } from './core/templates/event-registrations/event-registrations.component';
 import { RegistrationApproveComponent } from './core/templates/registration-approve/registration-approve.component';
@@ -66,6 +67,8 @@ export const routes: Routes = [
       { path: 'login', component: LoginComponent, data: { skipPrerender: true } },
       { path: 'user-details', component: UserDetailsComponent, data: { skipPrerender: true } },
       { path: 'admin/users', component: UserManagementComponent, data: { skipPrerender: true } },
+      { path: 'user-registration', component: UserRegistrationComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
+      { path: 'user-registration/edit/:userId', component: UserRegistrationComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
       { path: 'admin/events/:eventId/registrations', component: EventRegistrationsComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
       { path: 'admin/events/:id', component: EventsManagementComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },
       { path: 'admin/events', component: EventsManagementComponent, canActivate: [adminOrInstructorGuard], data: { skipPrerender: true } },

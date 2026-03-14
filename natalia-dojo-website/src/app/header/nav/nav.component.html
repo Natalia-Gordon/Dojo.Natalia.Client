@@ -123,10 +123,10 @@
         <a routerLink="/admin/events" routerLinkActive="active" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">ניהול אירועים</a>
       }
       @if (isAuthenticated && isAdminOrInstructor() && isBrowser) {
-        <a href="#" class="nav-item nav-link d-lg-none" (click)="openRegisterNewUser(); closeMobileMenu(); $event.preventDefault()">רישום משתמש חדש</a>
+        <a routerLink="/user-registration" class="nav-item nav-link d-lg-none" (click)="closeMobileMenu()">רישום משתמש חדש</a>
       }
 
-      <!-- Login Button (when not authenticated) -->
+      <!-- Login (when not authenticated) -->
       @if (!isAuthenticated || !isBrowser) {
         <div class="nav-item nav-link-auth">
           <button

@@ -80,7 +80,7 @@ export class UserMenuComponent implements OnInit, OnDestroy {
 
   onRegisterNewUserClick(): void {
     this.closeMenu();
-    this.loginModalService.open('register');
+    this.router.navigate(['/user-registration']);
   }
 
   onManageUsersClick(): void {
@@ -172,6 +172,12 @@ export class UserMenuComponent implements OnInit, OnDestroy {
   isAdminOrInstructor(): boolean {
     const role = (this.userInfo?.role || '').trim().toLowerCase();
     return role === 'admin' || role === 'instructor';
+  }
+
+  /** Instructor or teacher but not admin — for "הוסף תלמיד" menu item */
+  isInstructorOnly(): boolean {
+    const role = (this.userInfo?.role || '').trim().toLowerCase();
+    return role === 'instructor' || role === 'teacher';
   }
 
   private isMobileView(): boolean {

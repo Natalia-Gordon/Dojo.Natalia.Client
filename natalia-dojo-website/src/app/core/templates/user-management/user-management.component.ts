@@ -808,7 +808,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   openRegisterForm(): void {
-    this.loginModalService.open('register');
+    this.router.navigate(['/user-registration']);
   }
 
   /** Open login modal for re-authentication (401/403 recovery) */
@@ -875,21 +875,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   openUpdateUserForm(): void {
     const user = this.getSelectedUser();
     if (!user) return;
-    this.loginModalService.openRegisterForEditUser({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      displayName: user.displayName,
-      phone: user.phone ?? user.phoneNumber,
-      dateOfBirth: user.dateOfBirth,
-      role: user.role,
-      currentRankId: user.currentRankId,
-      profileImageUrl: user.profileImageUrl,
-      bio: user.bio,
-      isActive: user.isActive
-    });
+    this.router.navigate(['/user-registration/edit', user.id]);
   }
 
   @HostListener('document:keydown.escape')

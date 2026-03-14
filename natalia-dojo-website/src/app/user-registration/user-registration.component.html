@@ -1,0 +1,71 @@
+<!-- Hero: same style as events/create -->
+<section class="user-registration-hero">
+  <div class="user-registration-hero__overlay">
+    <div class="user-registration-hero__content" dir="rtl">
+      <div class="user-registration-hero__title-row">
+        <h1 class="user-registration-hero__title">{{ pageTitle }}</h1>
+        @if (isEditMode) {
+          <span class="user-registration-hero__badge" title="עדכון פרטי משתמש">
+            <i class="bi bi-person-gear" aria-hidden="true"></i>
+            עדכון משתמש
+          </span>
+        } @else {
+          <span class="user-registration-hero__badge" title="רישום משתמש חדש">
+            <i class="bi bi-person-plus" aria-hidden="true"></i>
+            הרשמה לדוג'ו
+          </span>
+        }
+      </div>
+      <p class="user-registration-hero__subtitle">
+        @if (isEditMode) {
+          עדכני פרטי משתמש — שם, דרגה, סוג משתמש ופרטי התחברות
+        } @else {
+          הוספת משתמש חדש למערכת — מדריך, תלמיד או אורח
+        }
+      </p>
+      <div class="user-registration-hero__breadcrumbs">
+        <a routerLink="/home">דף הבית</a>
+        <span class="divider">/</span>
+        @if (isAdmin) {
+          <a routerLink="/admin/users">ניהול משתמשים</a>
+          <span class="divider">/</span>
+        }
+        <span class="current-page">{{ pageTitle }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-fluid px-2 px-md-5 py-2 py-md-3" style="overflow-x: hidden; max-width: 100vw; width: 100%;">
+  <div class="row g-5" style="margin: 0;">
+    <div class="col-12" dir="rtl" style="padding: 0;">
+      <div class="events-content-card">
+        @if (isLoadingUser) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-danger" role="status"></div>
+            <p class="mt-2">טוען פרטי משתמש...</p>
+          </div>
+        }
+
+        @if (loadUserError) {
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ loadUserError }}
+            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" (click)="goBack()">חזרה לניהול משתמשים</button>
+          </div>
+        }
+
+        @if (!isLoadingUser && !loadUserError) {
+          <div class="admin-section">
+            <app-registration-form
+              [showLoginTab]="showLoginTab"
+              [userToEdit]="userToEdit"
+              [usePageFormStyle]="true"
+              (switchToLoginTab)="onSwitchToLoginTab($event)">
+            </app-registration-form>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

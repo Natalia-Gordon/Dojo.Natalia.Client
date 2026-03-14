@@ -39,8 +39,9 @@ export class NavComponent implements OnInit, OnDestroy {
     this.loginModalService.open();
   }
 
+  /** Navigate to user-registration page — for admin/instructor (add new user) */
   openRegisterNewUser(): void {
-    this.loginModalService.open('register');
+    this.router.navigate(['/user-registration']);
   }
 
   onLogout(): void {

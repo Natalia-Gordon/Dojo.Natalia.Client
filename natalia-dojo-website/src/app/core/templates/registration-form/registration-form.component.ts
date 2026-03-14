@@ -37,6 +37,9 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
   /** When set, form opens in edit mode for this user (e.g. from user management). */
   @Input() userToEdit: UserToEdit | null = null;
 
+  /** When true, form uses events/create page style (sections, light inputs, seminar-form look). */
+  @Input() usePageFormStyle = false;
+
   /** Emitted when registration succeeds and user is not authenticated (username to pre-fill login). */
   @Output() switchToLoginTab = new EventEmitter<string>();
 
@@ -137,7 +140,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
     this.registeredUserSnapshot = null;
     this.showPassword = false;
     this.showConfirmPassword = false;
-    this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null, isActive: true });
+    this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null, isActive: false });
     this.setRegisterModeValidators();
     this.updateRegisterControlStates();
   }
@@ -202,7 +205,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
         dateOfBirth: [''],
         profileImageUrl: [''],
         bio: [''],
-        isActive: [true]
+        isActive: [false]
       },
       { validators: [this.passwordsMatchValidator] }
     );
@@ -255,6 +258,9 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
 
     request.CreatorRole = (this.authService.getUserInfo()?.role || '').trim().toLowerCase();
 
+    // New users are inactive until email is approved
+    request.isActive = false;
+
     this.authService.register(request).subscribe({
       next: createdUser => {
         this.isRegisterLoading = false;
@@ -273,7 +279,7 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
         }
         this.registerSuccess = 'ההרשמה הושלמה. אנא התחברי כעת.';
         this.switchToLoginTab.emit(request.username || request.email || '');
-        this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null, isActive: true });
+        this.registerForm.reset({ userType: this.getDefaultRegisterUserType(), rankId: null, isActive: false });
         this.setRegisterModeValidators();
       },
       error: error => {
@@ -311,9 +317,9 @@ export class RegistrationFormComponent implements OnInit, OnDestroy {
       profileImageUrl: (formValue.profileImageUrl && String(formValue.profileImageUrl).trim()) ? formValue.profileImageUrl.trim() : null,
       bio: formValue.bio || null,
       dateOfBirth: (formValue.dateOfBirth && String(formValue.dateOfBirth).trim()) ? formValue.dateOfBirth.trim() : null,
-      isActive: formValue.isActive !== false,
       currentRankId: (formValue.rankId != null && formValue.rankId !== '') ? formValue.rankId : null
     };
+    // isActive is not editable here; user becomes פעיל after email approval
 
     // Remove null/empty values to keep request clean (same as user-details)
     Object.keys(updateRequest).forEach(key => {

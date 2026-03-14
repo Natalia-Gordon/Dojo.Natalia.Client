@@ -7,40 +7,24 @@
       <div class="modal-header login-modal-header">
         <button type="button" class="btn-close btn-close-white login-close-btn" (click)="closeModal()" aria-label="Close"></button>
         <h5 class="modal-title login-title">
-          @if (showLoginTab || isReconnectMode) {
-            התחברות לדוג'ו
-          } @else if (userToEditForForm) {
-            עידכון משתמש
-          } @else {
+          @if (activeTab === 'register') {
             הרשמה לדוג'ו
+          } @else {
+            התחברות לדוג'ו
           }
         </h5>
       </div>
       <div class="modal-body login-modal-body">
-        <!-- Tabs (hidden in reconnect mode - login only) -->
         @if (showLoginTab && !isReconnectMode) {
           <div class="login-tabs">
-            <button
-              type="button"
-              class="tab-button"
-              [class.active]="activeTab === 'login'"
-              (click)="setActiveTab('login')">
-              התחברות
-            </button>
-            <button
-              type="button"
-              class="tab-button"
-              [class.active]="activeTab === 'register'"
-              (click)="setActiveTab('register')">
-              הרשמה
-            </button>
+            <button type="button" class="tab-button" [class.active]="activeTab === 'login'" (click)="setActiveTab('login')">התחברות</button>
+            <button type="button" class="tab-button" [class.active]="activeTab === 'register'" (click)="setActiveTab('register')">הרשמה</button>
           </div>
         }
 
-        <!-- Login Form (always shown in reconnect mode) -->
-        @if (isReconnectMode || (showLoginTab && activeTab === 'login')) {
-          <div class="login-content">
-            <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+        @if (isReconnectMode || (activeTab === 'login')) {
+        <div class="login-content">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
               <!-- Username/Email Field -->
               <div class="form-group">
                 <label for="username" class="form-label">שם משתמש או אימייל</label>
@@ -94,7 +78,7 @@
                         }
                       </div>
                     }
-                  </div>
+                </div>
                   <!-- Error Message -->
                   @if (errorMessage) {
                     <div class="alert-error">
@@ -104,6 +88,27 @@
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                       </svg>
                       <span>{{ errorMessage }}</span>
+                    </div>
+                    @if (isEmailNotVerifiedError) {
+                      <div class="resend-verification">
+                        <button
+                          type="button"
+                          class="resend-verification__btn"
+                          [disabled]="isResendLoading"
+                          (click)="onResendVerificationEmail()">
+                          @if (!isResendLoading) {
+                            <span>שלחי שוב אימייל אימות</span>
+                          }
+                          @if (isResendLoading) {
+                            <span>שולח...</span>
+                          }
+                        </button>
+                      </div>
+                    }
+                  }
+                  @if (resendMessage && !errorMessage) {
+                    <div class="resend-message" [class.resend-message--error]="resendMessageIsError">
+                      <span>{{ resendMessage }}</span>
                     </div>
                   }
                   <!-- Submit Button -->
@@ -119,17 +124,21 @@
                     }
                   </button>
                 </form>
-              </div>
-            }
+          @if (showLoginTab) {
+            <p class="login-modal-register-link">
+              <a href="#" (click)="setActiveTab('register'); $event.preventDefault()">אין לך חשבון? הרשמה לדוג'ו</a>
+            </p>
+          }
+        </div>
+        }
 
-            <!-- Register Form: only when modal is open and register tab is active (avoids /api/ranks on page refresh) -->
-            @if (showModal && activeTab === 'register' && !isReconnectMode) {
-              <app-registration-form
-                [showLoginTab]="showLoginTab"
-                [userToEdit]="userToEditForForm"
-                (switchToLoginTab)="onSwitchToLoginTab($event)">
-              </app-registration-form>
-            }
+        @if (showLoginTab && !isReconnectMode && activeTab === 'register') {
+          <app-registration-form
+            [showLoginTab]="true"
+            [userToEdit]="null"
+            (switchToLoginTab)="onSwitchToLoginTab($event)">
+          </app-registration-form>
+        }
       </div>
     </div>
   </div>

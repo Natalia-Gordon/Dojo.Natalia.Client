@@ -262,3 +262,156 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* When not page style, wrappers don’t create extra layout */
+.registration-form__section-wrap:not(.seminar-form__section) {
+  display: contents;
+}
+
+.registration-form__page-fields-wrap:not(.registration-form__page-fields) {
+  display: contents;
+}
+
+/* Page style: match events/create form (light section, seminar-form look) */
+.registration-form--page-style .registration-content {
+  background: transparent;
+}
+
+.registration-form--page-style .registration-form-fields.seminar-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.registration-form--page-style .seminar-form__section {
+  background: rgba(248, 250, 252, .98);
+  border: 1px solid rgba(148, 163, 184, .3);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.registration-form--page-style .seminar-form__title {
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.registration-form--page-style .registration-form__page-fields {
+  display: grid;
+  gap: 1rem;
+}
+
+.registration-form--page-style .register-grid.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.registration-form--page-style .form-label {
+  color: #475569;
+  font-weight: 600;
+  font-size: .95rem;
+}
+
+.registration-form--page-style .form-input {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  height: 45px;
+  border-radius: 10px;
+}
+
+.registration-form--page-style .form-input:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, .1);
+  outline: none;
+}
+
+.registration-form--page-style .form-input.error {
+  border-color: #ef4444;
+}
+
+.registration-form--page-style textarea.form-input.form-textarea {
+  height: auto;
+  min-height: 96px;
+}
+
+.registration-form--page-style .form-input::placeholder {
+  color: #94a3b8;
+}
+
+.registration-form--page-style .error-message {
+  color: #ef4444;
+  font-size: .875rem;
+}
+
+.registration-form--page-style .checkbox-label {
+  color: #475569;
+  font-weight: 600;
+  font-size: .95rem;
+}
+
+.registration-form--page-style .password-toggle {
+  background: rgba(241, 245, 249, .8);
+  border: 1px solid rgba(203, 213, 225, .5);
+  color: #475569;
+}
+
+.registration-form--page-style .password-toggle:hover {
+  background: rgba(226, 232, 240, .9);
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.registration-form--page-style .password-strength__label {
+  color: #64748b;
+}
+
+.registration-form--page-style .password-generator-hint {
+  color: #64748b;
+}
+
+.registration-form--page-style .password-generator-btn {
+  color: #64748b;
+}
+
+.registration-form--page-style .password-generator-btn:hover {
+  color: #059669;
+}
+
+.registration-form--page-style .alert-error {
+  background: rgba(239, 68, 68, .08);
+  border-color: rgba(239, 68, 68, .3);
+  color: #b91c1c;
+}
+
+.registration-form--page-style .alert-success {
+  background: rgba(34, 197, 94, .1);
+  border-color: rgba(34, 197, 94, .3);
+  color: #15803d;
+}
+
+.registration-form--page-style .submit-button {
+  margin-top: 1rem;
+  border-radius: 10px;
+  padding: 0.65rem 1.35rem;
+  font-weight: 500;
+}
+
+.registration-form--page-style .submit-button--save {
+  background: #059669;
+}
+
+.registration-form--page-style .submit-button--save:hover:not(:disabled) {
+  background: #047857;
+}
+
+@media (max-width: 768px) {
+  .registration-form--page-style .register-grid.row {
+    grid-template-columns: 1fr;
+  }
+}

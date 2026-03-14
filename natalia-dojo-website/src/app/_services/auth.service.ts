@@ -37,6 +37,13 @@ export interface CreateUserRequest {
   profileImageUrl?: string | null;
   bio?: string | null;
   CurrentRankId?: number | null;
+  /** New users are created inactive; they become active after email approval. */
+  isActive?: boolean;
+}
+
+/** Request body for POST /api/users/resend-verification-email (ResendVerificationRequest). */
+export interface ResendVerificationRequest {
+  identifier?: string | null;
 }
 
 /** Matches API schema TokenResponse (accessTokenExpiresAt, refreshTokenExpiresAt are date-time ISO strings). */
@@ -251,16 +258,33 @@ export class AuthService {
   }
 
   /**
-   * Register a new user
+   * Register a new user.
+   * When called while logged in as admin, sends Authorization: Bearer <token> so the API can create instructor/teacher (or other) users.
+   * When called unauthenticated, sends only Content-Type (guest self-registration if the API allows it).
    */
   register(request: CreateUserRequest): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/users/register`, request, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      })
+      headers: this.getAuthHeaders()
     }).pipe(
       catchError(error => {
         console.error('Register error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Resend verification email for a user who has not verified yet.
+   * Pass the same identifier (email or username) used at login.
+   * POST /api/users/resend-verification-email
+   */
+  resendVerificationEmail(identifier: string): Observable<{ message?: string }> {
+    const body: ResendVerificationRequest = { identifier: (identifier || '').trim() || null };
+    return this.http.post<{ message?: string }>(`${this.apiUrl}/users/resend-verification-email`, body, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(error => {
+        console.error('Resend verification email error:', error);
         return throwError(() => error);
       })
     );
