@@ -359,13 +359,9 @@ a.event-card__badge--reg-count-link:focus-visible {
   justify-content: center;
   gap: .5rem;
   width: 100%;
-  padding: .875rem 1.75rem;
   background: linear-gradient(135deg, #dc2626, #b91c1c);
   color: #fff;
   text-decoration: none;
-  border-radius: 10px;
-  font-weight: 600;
-  transition: all .3s ease;
   position: relative;
   overflow: hidden;
   white-space: nowrap;
@@ -670,14 +666,6 @@ textarea.seminar-form__input {
   flex-wrap: wrap;
 }
 
-.seminar-form__actions .btn {
-  padding: .875rem 2rem;
-  font-weight: 600;
-  border-radius: 12px;
-  font-size: 1rem;
-  transition: all .3s ease;
-}
-
 .seminar-form__actions .btn:disabled {
   opacity: .6;
   cursor: not-allowed;
@@ -795,11 +783,6 @@ textarea.seminar-form__input {
 
   .event-card__footer {
     padding: .875rem 1rem;
-  }
-
-  .event-card__button {
-    padding: .65rem 1.25rem;
-    font-size: .95rem;
   }
 
   .empty-state {

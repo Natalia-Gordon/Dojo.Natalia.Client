@@ -84,15 +84,10 @@
 .event-registrations__hero-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.6rem 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 600;
+  gap: 0.35rem;
   color: #fff;
   background: rgba(26, 26, 26, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(8px);
 }
@@ -156,15 +151,6 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 18px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #fff;
-  background: #dc2626;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
 }
 
 .event-registrations__filter-btn:hover {
@@ -303,10 +289,6 @@
 }
 
 .event-registrations__btn {
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
   margin-left: 8px;
   border: 1px solid transparent;
 }

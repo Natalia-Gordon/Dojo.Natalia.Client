@@ -24,7 +24,7 @@
         </div>
         @if (isAdminOrInstructor && eventId != null && event) {
           <div class="event-registrations__hero-actions">
-            <button type="button" class="event-registrations__hero-btn event-registrations__hero-btn--export"
+            <button type="button" class="btn btn-outline-light event-registrations__hero-btn event-registrations__hero-btn--export"
               [disabled]="exportCsvLoading"
               (click)="exportCsv()">
               <i class="bi bi-download me-2"></i>{{ exportCsvLoading ? 'מייצא...' : 'ייצא ל-CSV' }}
@@ -122,12 +122,12 @@
                   </td>
                   <td>
                     @if (isPending(reg)) {
-                      <button type="button" class="event-registrations__btn event-registrations__btn--approve"
+                      <button type="button" class="btn event-registrations__btn event-registrations__btn--approve"
                         [disabled]="approveLoadingId === reg.registrationId || rejectLoadingId === reg.registrationId"
                         (click)="approvePayment(reg)">
                         {{ approveLoadingId === reg.registrationId ? 'מאשר...' : 'אשר תשלום' }}
                       </button>
-                      <button type="button" class="event-registrations__btn event-registrations__btn--reject"
+                      <button type="button" class="btn event-registrations__btn event-registrations__btn--reject"
                         [disabled]="rejectLoadingId === reg.registrationId || approveLoadingId === reg.registrationId"
                         (click)="rejectPayment(reg)">
                         {{ rejectLoadingId === reg.registrationId ? 'דוחה...' : 'דחה תשלום' }}

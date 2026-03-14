@@ -134,11 +134,11 @@
               <textarea id="approvalNotes" class="registration-approve__notes" [(ngModel)]="approvalNotes" rows="3" placeholder="הערות לאישור או לדחייה"></textarea>
             </div>
             <div class="registration-approve__actions">
-              <button type="button" class="registration-approve__btn registration-approve__btn--approve" [disabled]="approveLoading || rejectLoading" (click)="approve()">
+              <button type="button" class="btn registration-approve__btn registration-approve__btn--approve" [disabled]="approveLoading || rejectLoading" (click)="approve()">
                 <i class="bi bi-check-lg" aria-hidden="true"></i>
                 {{ approveLoading ? 'מאשר...' : 'אשר תשלום' }}
               </button>
-              <button type="button" class="registration-approve__btn registration-approve__btn--reject" [disabled]="rejectLoading || approveLoading" (click)="reject()">
+              <button type="button" class="btn registration-approve__btn registration-approve__btn--reject" [disabled]="rejectLoading || approveLoading" (click)="reject()">
                 <i class="bi bi-x-lg" aria-hidden="true"></i>
                 {{ rejectLoading ? 'דוחה...' : 'דחה תשלום' }}
               </button>

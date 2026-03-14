@@ -307,16 +307,10 @@ hr.border-secondary {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
+  flex-shrink: 0;
   color: #dc2626;
   background: transparent;
   border: 2px solid #dc2626;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
 }
 
 .user-details-card__btn-edit:hover {
@@ -448,9 +442,7 @@ hr.border-secondary {
   border-top: 1px solid #e2e8f0;
 }
 
-.user-details-card__btn-submit {
-  padding: 0.6rem 1.5rem;
-}
+/* .user-details-card__btn-submit uses global .btn styles */
 
 /* User details card: payment methods sibling spacing */
 .user-details-card__body > .payment-methods-card {
@@ -588,15 +580,9 @@ hr.border-secondary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 600;
   color: #dc2626;
   background: transparent;
   border: 2px solid #dc2626;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .certificates-upload__btn:hover {
@@ -694,22 +680,13 @@ hr.border-secondary {
   text-decoration: underline;
 }
 
-/* When the link is a button (authenticated download), reset button styles so it looks like a link */
-button.certificate-item__link {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-  cursor: pointer;
-  text-align: inherit;
-}
-
 .certificate-item__size {
   font-size: 0.85rem;
   color: #6b7280;
   white-space: nowrap;
 }
 
+/* Icon-only button: keep size, global .btn provides font/border-radius */
 .certificate-item__btn {
   display: inline-flex;
   align-items: center;
@@ -717,12 +694,10 @@ button.certificate-item__link {
   width: 2.25rem;
   height: 2.25rem;
   padding: 0;
+  min-height: unset;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
   background: #fff;
   color: #6b7280;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .certificate-item__btn:hover {
@@ -886,15 +861,9 @@ button.certificate-item__link {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.6rem 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 600;
   color: #dc2626;
   background: transparent;
   border: 2px solid #dc2626;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .payment-methods-card__btn-add:hover {
@@ -909,8 +878,6 @@ button.certificate-item__link {
 
 .payment-methods-card__btn-add--header {
   flex-shrink: 0;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
 }
 
 .payment-methods-list {
@@ -986,6 +953,7 @@ button.certificate-item__link {
   flex-shrink: 0;
 }
 
+/* Icon-only button: keep size, global .btn provides font/border-radius */
 .payment-method-item__btn {
   display: inline-flex;
   align-items: center;
@@ -993,12 +961,10 @@ button.certificate-item__link {
   width: 2.25rem;
   height: 2.25rem;
   padding: 0;
+  min-height: unset;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
   background: #fff;
   color: #6b7280;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .payment-method-item__btn:hover {
@@ -1223,16 +1189,7 @@ button.certificate-item__link {
   flex-direction: row-reverse;
 }
 
-.user-details__confirm-btn {
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
+/* Modal confirm buttons use global .btn; modifiers only for dialog-specific colors */
 .user-details__confirm-btn--cancel {
   background: rgba(51, 65, 85, 0.6);
   color: #ffffff;
@@ -1242,11 +1199,6 @@ button.certificate-item__link {
 .user-details__confirm-btn--cancel:hover {
   background: rgba(51, 65, 85, 0.8);
   border-color: rgba(100, 116, 139, 0.7);
-}
-
-.user-details__confirm-btn--delete {
-  background: #dc2626;
-  color: #ffffff;
 }
 
 .user-details__confirm-btn--delete:hover {

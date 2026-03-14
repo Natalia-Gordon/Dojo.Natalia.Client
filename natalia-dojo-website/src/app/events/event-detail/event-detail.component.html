@@ -60,7 +60,18 @@
                     <span class="badge bg-secondary">טיוטה</span>
                   }
                 </div>
-                <h1 class="event-detail-title">{{ event.title || 'סמינר' }}</h1>
+                <div class="event-detail-header__row">
+                  <h1 class="event-detail-title">{{ event.title || 'סמינר' }}</h1>
+                  @if (canEditEvent && event) {
+                    <a
+                      [routerLink]="['/events/edit', event.id]"
+                      class="btn btn-outline-danger event-detail-edit-btn"
+                      >
+                      <i class="bi bi-pencil-square me-2"></i>
+                      עדכני אירוע
+                    </a>
+                  }
+                </div>
               </div>
               <!-- Event Body -->
               <div class="event-detail-body">
@@ -172,17 +183,6 @@
                     </div>
                   }
                 </div>
-                @if (canEditEvent && event) {
-                  <div class="event-detail-edit-bar mb-3" dir="rtl">
-                    <a
-                      [routerLink]="['/events/edit', event.id]"
-                      class="btn btn-outline-danger event-detail-edit-btn"
-                      >
-                      <i class="bi bi-pencil-square me-2"></i>
-                      עדכני אירוע
-                    </a>
-                  </div>
-                }
                 <!-- Enroll Button -->
                 <div class="event-detail-actions">
                   <button

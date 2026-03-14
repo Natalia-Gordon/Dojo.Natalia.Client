@@ -200,7 +200,7 @@
                 </div>
                 <button
                   type="button"
-                  class="user-details-card__btn-edit"
+                  class="btn btn-outline-danger user-details-card__btn-edit"
                   (click)="toggleEditMode()">
                   <i class="bi" [class.bi-pencil]="!isEditMode" [class.bi-x]="isEditMode"></i>
                   {{ isEditMode ? 'ביטול' : 'עריכה' }}
@@ -405,7 +405,7 @@
                                                   accept=".pdf,.tiff,.tif,.jpeg,.jpg,.png,application/pdf,image/tiff,image/jpeg,image/png"
                                                   multiple
                                                   (change)="onCertificatesSelected($event)">
-                                                  <button type="button" class="certificates-upload__btn" (click)="certificatesInput.click()">
+                                                  <button type="button" class="btn btn-outline-danger certificates-upload__btn" (click)="certificatesInput.click()">
                                                     <i class="bi bi-cloud-upload"></i>
                                                     אנא בחרי קבצים להעלאה
                                                   </button>
@@ -430,7 +430,7 @@
                                                       <li class="certificate-item">
                                                         <span class="certificate-item__icon"><i class="bi bi-file-earmark-arrow-down"></i></span>
                                                         <span class="certificate-item__name" [textContent]="cert.fileName" [title]="cert.fileName"></span>
-                                                        <button type="button" class="certificate-item__link" (click)="downloadCertificate(cert)" title="הורדה">הורדה</button>
+                                                        <button type="button" class="btn btn-link certificate-item__link" (click)="downloadCertificate(cert)" title="הורדה">הורדה</button>
                                                       </li>
                                                     }
                                                   </ul>
@@ -454,7 +454,7 @@
                                                         <span class="certificate-item__size" [textContent]="formatFileSize(file.size)"></span>
                                                         <button
                                                           type="button"
-                                                          class="certificate-item__btn"
+                                                          class="btn certificate-item__btn"
                                                           (click)="removeCertificateFile($index)"
                                                           title="הסר קובץ"
                                                           aria-label="הסר קובץ">
@@ -498,7 +498,7 @@
                                               <i class="bi bi-credit-card-2-front"></i>
                                               <h5 class="payment-methods-card__title">שיטות תשלום שלי</h5>
                                             </div>
-                                            <button type="button" class="payment-methods-card__btn-add payment-methods-card__btn-add--header" (click)="openAddPaymentMethod()">
+                                            <button type="button" class="btn btn-outline-danger payment-methods-card__btn-add payment-methods-card__btn-add--header" (click)="openAddPaymentMethod()">
                                               <i class="bi bi-plus-lg"></i>
                                               הוסיפי שיטת תשלום
                                             </button>
@@ -532,10 +532,10 @@
                                                         <p class="payment-method-item__details" [textContent]="getPaymentMethodDisplayText(pm)"></p>
                                                       </div>
                                                       <div class="payment-method-item__actions">
-                                                        <button type="button" class="payment-method-item__btn payment-method-item__btn--edit" (click)="openEditPaymentMethod(pm)" title="עריכה" aria-label="עריכה">
+                                                        <button type="button" class="btn payment-method-item__btn payment-method-item__btn--edit" (click)="openEditPaymentMethod(pm)" title="עריכה" aria-label="עריכה">
                                                           <i class="bi bi-pencil"></i>
                                                         </button>
-                                                        <button type="button" class="payment-method-item__btn payment-method-item__btn--delete" (click)="openDeletePaymentMethodConfirm(pm)" title="מחיקה" aria-label="מחיקה">
+                                                        <button type="button" class="btn payment-method-item__btn payment-method-item__btn--delete" (click)="openDeletePaymentMethodConfirm(pm)" title="מחיקה" aria-label="מחיקה">
                                                           <i class="bi bi-trash"></i>
                                                         </button>
                                                       </div>
@@ -679,10 +679,10 @@
           <p class="user-details__confirm-warning">פעולה זו אינה ניתנת לשחזור.</p>
         </div>
         <div class="user-details__confirm-actions">
-          <button type="button" class="user-details__confirm-btn user-details__confirm-btn--cancel" (click)="cancelDeletePaymentMethod()">
+          <button type="button" class="btn btn-outline-secondary user-details__confirm-btn user-details__confirm-btn--cancel" (click)="cancelDeletePaymentMethod()">
             ביטול
           </button>
-          <button type="button" class="user-details__confirm-btn user-details__confirm-btn--delete" (click)="confirmDeletePaymentMethod()">
+          <button type="button" class="btn btn-danger user-details__confirm-btn user-details__confirm-btn--delete" (click)="confirmDeletePaymentMethod()">
             מחיקה
           </button>
         </div>

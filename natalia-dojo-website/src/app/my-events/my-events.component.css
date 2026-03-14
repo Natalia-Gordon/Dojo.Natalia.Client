@@ -344,15 +344,9 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  padding: 0.875rem 1.75rem;
   background: linear-gradient(135deg, #dc2626, #b91c1c);
   color: #fff;
   border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   white-space: nowrap;
@@ -416,14 +410,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.25rem;
   border: none;
   background: transparent;
   color: #64748b;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
 }
 
 .my-events-view-btn:hover {
@@ -440,15 +429,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.25rem;
   border: none;
-  border-radius: 10px;
   background: linear-gradient(135deg, #0f172a, #1e293b);
   color: #fff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .my-events-download-btn:hover:not(:disabled) {
@@ -495,12 +478,11 @@
   justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
+  padding: 0;
+  min-height: unset;
   border: 1px solid rgba(148, 163, 184, 0.3);
-  border-radius: 10px;
   background: #fff;
   color: #475569;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
 }
 
 .my-events-calendar__nav:hover {
@@ -683,10 +665,5 @@
 
   .event-card__footer {
     padding: 0.875rem 1rem;
-  }
-
-  .event-card__button {
-    padding: 0.65rem 1.25rem;
-    font-size: 0.95rem;
   }
 }

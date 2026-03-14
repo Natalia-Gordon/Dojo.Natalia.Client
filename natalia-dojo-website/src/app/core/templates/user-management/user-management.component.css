@@ -245,15 +245,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
   color: #fff;
   background: linear-gradient(135deg, #dc2626, #b91c1c);
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .user-management__btn-register:hover {
@@ -263,15 +257,9 @@
 }
 
 .user-management__btn-update {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
   color: #fff;
   background: rgba(34, 197, 94, 0.9);
   border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .user-management__btn-update:hover {
@@ -281,15 +269,9 @@
 }
 
 .user-management__btn-delete {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
   color: #fff;
   background: #dc2626;
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .user-management__btn-delete:hover {
@@ -299,14 +281,9 @@
 }
 
 .user-management__btn-bank {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
   color: #fff;
   background: rgba(100, 116, 139, 0.9);
   border: 1px solid rgba(100, 116, 139, 0.25);
-  border-radius: 10px;
-  cursor: pointer;
 }
 
 .user-management__btn-bank:hover {
@@ -374,14 +351,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
   color: #fff;
   background: linear-gradient(135deg, #dc2626, #b91c1c);
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
 }
 
 .user-management__btn-login:hover {

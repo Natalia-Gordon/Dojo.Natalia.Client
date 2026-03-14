@@ -36,10 +36,17 @@ h6,
     font-weight: 500 !important;
 }
 
+/* Global button style (all pages) – matches עדכני אירוע look */
+button,
 .btn {
-    font-family: 'Oswald', sans-serif;
-    text-transform: uppercase;
-    transition: .5s;
+    font-family: inherit;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    text-transform: none;
+    transition: 0.25s ease;
 }
 
 .btn-primary {
@@ -67,6 +74,23 @@ h6,
     padding-left: 0;
     padding-right: 0;
     text-align: center;
+}
+
+@media (max-width: 768px) {
+    button,
+    .btn {
+        padding: 0.75rem 1.25rem;
+        min-height: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    button,
+    .btn {
+        font-size: 0.95rem;
+        padding: 0.65rem 1rem;
+        min-height: 44px;
+    }
 }
 
 .back-to-top {

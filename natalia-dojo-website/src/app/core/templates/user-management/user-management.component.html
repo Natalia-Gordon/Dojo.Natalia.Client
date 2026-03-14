@@ -36,7 +36,7 @@
         </div>
         <button
           type="button"
-          class="user-management__btn-register"
+          class="btn btn-danger user-management__btn-register"
           (click)="openRegisterForm()"
         >
           רישום משתמש חדש
@@ -51,7 +51,7 @@
           </button>
           <button
             type="button"
-            class="user-management__btn-delete"
+            class="btn user-management__btn-delete"
             (click)="deleteSelectedUser()"
           >
             מחיקת משתמש
@@ -59,7 +59,7 @@
           @if (isSelectedUserInstructor) {
             <button
               type="button"
-              class="user-management__btn-bank"
+              class="btn user-management__btn-bank"
               (click)="openBankDetailsForm()"
             >
               עדכון שיטות תשלום
@@ -83,7 +83,7 @@
         {{ errorMessage }}
         @if (isUnauthorized) {
           <div class="user-management__error-actions">
-            <button type="button" class="user-management__btn-login" (click)="openLoginModal()">
+            <button type="button" class="btn btn-danger user-management__btn-login" (click)="openLoginModal()">
               <i class="bi bi-box-arrow-in-right"></i>
               התחברות
             </button>

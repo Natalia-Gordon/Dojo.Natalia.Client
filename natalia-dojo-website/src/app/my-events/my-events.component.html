@@ -57,16 +57,16 @@
           @if (!isLoading && !errorMessage && registrations.length > 0) {
             <div class="my-events-toolbar">
               <div class="my-events-view-toggle">
-                <button type="button" class="my-events-view-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'" aria-pressed="viewMode === 'list'">
+                <button type="button" class="btn my-events-view-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'" aria-pressed="viewMode === 'list'">
                   <i class="bi bi-list-ul"></i>
                   <span>רשימה</span>
                 </button>
-                <button type="button" class="my-events-view-btn" [class.active]="viewMode === 'calendar'" (click)="viewMode = 'calendar'" aria-pressed="viewMode === 'calendar'">
+                <button type="button" class="btn my-events-view-btn" [class.active]="viewMode === 'calendar'" (click)="viewMode = 'calendar'" aria-pressed="viewMode === 'calendar'">
                   <i class="bi bi-calendar3"></i>
                   <span>לוח שנה</span>
                 </button>
               </div>
-              <button type="button" class="my-events-download-btn" (click)="downloadUpcomingEvents()" [disabled]="upcomingCount === 0">
+              <button type="button" class="btn btn-outline-primary my-events-download-btn" (click)="downloadUpcomingEvents()" [disabled]="upcomingCount === 0">
                 <i class="bi bi-download"></i>
                 <span>הורידי אירועים קרובים ({{ upcomingCount }})</span>
               </button>
@@ -116,7 +116,7 @@
                     </dl>
                   </div>
                   <div class="event-card__footer">
-                    <button type="button" class="event-card__button" (click)="goToEvent(r.eventId)">
+                    <button type="button" class="btn btn-primary event-card__button" (click)="goToEvent(r.eventId)">
                       <i class="bi bi-arrow-left"></i>
                       <span>לצפייה באירוע</span>
                     </button>
@@ -129,11 +129,11 @@
             @if (viewMode === 'calendar') {
             <div class="my-events-calendar">
               <div class="my-events-calendar__header">
-                <button type="button" class="my-events-calendar__nav" (click)="calendarPrevMonth()" aria-label="חודש קודם">
+                <button type="button" class="btn my-events-calendar__nav" (click)="calendarPrevMonth()" aria-label="חודש קודם">
                   <i class="bi bi-chevron-right"></i>
                 </button>
                 <h3 class="my-events-calendar__title">{{ calendarTitle }}</h3>
-                <button type="button" class="my-events-calendar__nav" (click)="calendarNextMonth()" aria-label="חודש הבא">
+                <button type="button" class="btn my-events-calendar__nav" (click)="calendarNextMonth()" aria-label="חודש הבא">
                   <i class="bi bi-chevron-left"></i>
                 </button>
               </div>
@@ -145,7 +145,7 @@
                   <div class="my-events-calendar__day" [class.other-month]="day.isOtherMonth" [class.today]="day.isToday">
                     <span class="my-events-calendar__day-num">{{ day.date.getDate() }}</span>
                     @for (ev of day.events; track ev.registrationId) {
-                      <button type="button" class="my-events-calendar__event" (click)="goToEvent(ev.eventId)" [title]="ev.eventTitle || 'אירוע'">
+                      <button type="button" class="btn btn-sm btn-outline-secondary my-events-calendar__event" (click)="goToEvent(ev.eventId)" [title]="ev.eventTitle || 'אירוע'">
                         {{ ev.eventTitle || 'אירוע' }}
                       </button>
                     }

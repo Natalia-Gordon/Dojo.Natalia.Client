@@ -350,16 +350,10 @@
 }
 
 .registration-approve__btn {
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid transparent;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: background 0.2s, color 0.2s, transform 0.1s;
+  border: 1px solid transparent;
 }
 
 .registration-approve__btn:disabled {
