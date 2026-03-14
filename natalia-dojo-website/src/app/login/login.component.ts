@@ -201,16 +201,17 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onResendVerificationEmail(): void {
-    const identifier = this.loginForm.get('username')?.value;
-    if (!identifier || String(identifier).trim() === '') {
-      this.resendMessage = 'הזיני שם משתמש או אימייל כדי לשלוח שוב אימייל אימות.';
+    const value = this.loginForm.get('username')?.value;
+    const trimmed = value != null ? String(value).trim() : '';
+    if (!trimmed) {
+      this.resendMessage = 'הזיני שם משתמש כדי לשלוח שוב אימייל אימות.';
       this.resendMessageIsError = true;
       return;
     }
     this.isResendLoading = true;
     this.resendMessage = '';
     this.resendMessageIsError = false;
-    this.authService.resendVerificationEmail(identifier).subscribe({
+    this.authService.resendVerificationEmail(trimmed).subscribe({
       next: (res) => {
         this.isResendLoading = false;
         this.resendMessage = res?.message ?? 'נשלח אימייל אימות לכתובת שמתקשרת לחשבון. בדקי את תיבת הדואר.';

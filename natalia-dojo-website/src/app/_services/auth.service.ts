@@ -48,7 +48,7 @@ export interface CreateUserRequest {
 
 /** Request body for POST /api/users/resend-verification-email (ResendVerificationRequest). */
 export interface ResendVerificationRequest {
-  identifier?: string | null;
+  username?: string | null;
 }
 
 /** Matches API schema TokenResponse (accessTokenExpiresAt, refreshTokenExpiresAt are date-time ISO strings). */
@@ -284,8 +284,8 @@ export class AuthService {
    * Pass the same identifier (email or username) used at login.
    * POST /api/users/resend-verification-email
    */
-  resendVerificationEmail(identifier: string): Observable<{ message?: string }> {
-    const body: ResendVerificationRequest = { identifier: (identifier || '').trim() || null };
+  resendVerificationEmail(username: string): Observable<{ message?: string }> {
+    const body: ResendVerificationRequest = { username: (username || '').trim() || null };
     return this.http.post<{ message?: string }>(`${this.apiUrl}/users/resend-verification-email`, body, {
       headers: this.getAuthHeaders()
     }).pipe(
